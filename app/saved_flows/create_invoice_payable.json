@@ -1,0 +1,187 @@
+{
+    "flow_name": "create_invoice_payable",
+    "source": "playwright",
+    "steps": [
+        {
+            "action": "goto",
+            "url": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('html')"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Sign In' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Enter Passcode' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Enter Passcode' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Verify' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Navigator' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('div').filter({ hasText: /^Payables$/ })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Invoices' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Create' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('td').filter({ hasText: /^Description$/ })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('combobox', { name: 'Business Unit' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('combobox', { name: 'Business Unit' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('option', { name: 'FU01 US BU01' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('combobox', { name: 'Business Unit' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Search: Supplier' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Supplier', exact: true })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Supplier', exact: true })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('[id=\"__af_Z_window\"]').getByRole('button', { name: 'Cancel' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('combobox', { name: 'Supplier', exact: true })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('option', { name: 'TEST_S_001 10106 CORPORATION' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Number' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Number' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Amount' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Amount' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByTitle('Search: Payment Terms')"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('cell', { name: 'Immediate' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Show More' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('div').filter({ hasText: /^Accounting$/ }).nth(1)"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Expand Lines' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Amount' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Amount' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByTitle('Search: Distribution Set')"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByText('Office Supplies')"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Allocate' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Allocate' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Save', exact: true })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('menuitem', { name: 'Invoice Actions' }).locator('div')"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByText('Validate', { exact: true })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Save and Close' })"
+        }
+    ]
+}

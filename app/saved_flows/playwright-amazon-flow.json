@@ -1,0 +1,30 @@
+{
+    "flow_name": "playwright-amazon-flow",
+    "source": "playwright",
+    "steps": [
+        {
+            "action": "goto",
+            "url": "https://www.amazon.co.uk/"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Accept' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Kitchenware' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Amazon Basics Portable' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Add to Basket', exact: true })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Amazon Basics Graphite HB' })"
+        }
+    ]
+}
