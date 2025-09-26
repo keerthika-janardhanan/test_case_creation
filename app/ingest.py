@@ -108,6 +108,40 @@ def ingest_web_site(base_url: str, max_depth: int = 1, max_pages: int = 50):
 
     return docs
 
+def flatten_metadata(meta: dict) -> dict:
+    """Flatten metadata and remove None values so Chroma accepts them."""
+    flat = {}
+    for k, v in meta.items():
+        if v is None:
+            # Option 1: skip it
+            continue
+            # Option 2: convert to string
+            # flat[k] = "None"
+        elif isinstance(v, (dict, list)):
+            flat[k] = json.dumps(v, ensure_ascii=False)
+        else:
+            flat[k] = v
+    return flat
+
+
+def ingest_document(file_path: str):
+    docs = []
+    for doc_id, chunk, metadata in load_documents(file_path):
+        artifact, meta, new_doc_id = prepare_artifact_and_metadata_for_ingest(chunk, metadata)
+        final_doc_id = new_doc_id if new_doc_id else doc_id
+
+        safe_meta = flatten_metadata(meta)
+
+        db.add_document(
+            source="document",
+            doc_id=final_doc_id,
+            content=json.dumps(artifact, ensure_ascii=False),
+            metadata=safe_meta
+        )
+
+        docs.append((final_doc_id, chunk))
+    return docs
+
 def ingest_ui_crawl(path: str):
     data = load_ui_crawl(path)
     results = []

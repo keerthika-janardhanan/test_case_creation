@@ -1,0 +1,41 @@
+{
+    "flow_name": "PO purchase",
+    "source": "playwright",
+    "steps": [
+        {
+            "action": "goto",
+            "url": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })",
+            "value": "<PLACEHOLDER>"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Sign In' })"
+        }
+    ]
+}
