@@ -10,3 +10,4 @@ langchain-openai
 python-dotenv
 langchain-community
 langchain-chroma
+beautifulsoup4
