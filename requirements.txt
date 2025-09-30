@@ -11,3 +11,4 @@ python-dotenv
 langchain-community
 langchain-chroma
 beautifulsoup4
+fastapi
