@@ -4,27 +4,58 @@
     "steps": [
         {
             "action": "goto",
-            "url": "https://www.amazon.co.uk/"
+            "url": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin"
         },
         {
             "action": "click",
-            "selector": "await page.getByRole('button', { name: 'Accept' })"
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'User Name' })",
+            "value": "<PLACEHOLDER>"
         },
         {
             "action": "click",
-            "selector": "await page.getByRole('link', { name: 'Kitchenware' })"
+            "selector": "await page.getByRole('textbox', { name: 'Password' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Password' })",
+            "value": "<PLACEHOLDER>"
         },
         {
             "action": "click",
-            "selector": "await page.getByRole('link', { name: 'Amazon Basics Portable' })"
+            "selector": "await page.getByRole('button', { name: 'Sign In' })"
         },
         {
             "action": "click",
-            "selector": "await page.getByRole('button', { name: 'Add to Basket', exact: true })"
+            "selector": "await page.getByRole('textbox', { name: 'Enter Passcode' })"
+        },
+        {
+            "action": "fill",
+            "selector": "await page.getByRole('textbox', { name: 'Enter Passcode' })",
+            "value": "<PLACEHOLDER>"
         },
         {
             "action": "click",
-            "selector": "await page.getByRole('link', { name: 'Amazon Basics Graphite HB' })"
+            "selector": "await page.getByRole('button', { name: 'Verify' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Navigator' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.locator('div').filter({ hasText: /^Payables$/ })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('link', { name: 'Invoices' })"
+        },
+        {
+            "action": "click",
+            "selector": "await page.getByRole('button', { name: 'Create' })"
         }
     ]
 }

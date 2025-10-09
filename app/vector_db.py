@@ -24,9 +24,16 @@ class VectorDBClient:
         results = self.collection.query(query_texts=[query], n_results=top_k)
         if not results or "documents" not in results:
             return []
+        documents = results["documents"][0]
+        ids = results.get("ids", [[None] * len(documents)])[0]
+        metadatas = results.get("metadatas", [[{}] * len(documents)])[0]
         return [
-            {"id": results["ids"][0][i], "content": results["documents"][0][i]}
-            for i in range(len(results["documents"][0]))
+            {
+                "id": ids[i],
+                "content": documents[i],
+                "metadata": metadatas[i] if i < len(metadatas) else {},
+            }
+            for i in range(len(documents))
         ]
 
     # ---------------- Count ----------------

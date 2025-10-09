@@ -12,3 +12,5 @@ langchain-community
 langchain-chroma
 beautifulsoup4
 fastapi
+ts-morph
+langgraph
