@@ -1,4 +1,7 @@
 # orchestrator.py
+import re
+from pathlib import Path
+
 from vector_db import VectorDBClient
 from parser_utils import extract_structure, merge_recorder_flow, apply_ui_crawl_locators, insert_test_variations
 from codegen_utils import generate_final_script
@@ -15,6 +18,35 @@ def safe_content(artifact):
 class TestScriptOrchestrator:
     def __init__(self, db_path="./vector_store"):
         self.db = VectorDBClient(path=db_path)
+
+    def _load_local_recorder_flow(self, identifier: str):
+        flows_dir = Path("./app/saved_flows")
+        if not flows_dir.exists():
+            return None
+
+        key = re.sub(r"[^a-zA-Z0-9]", "", (identifier or "").lower())
+        candidates = sorted(flows_dir.glob("*.json"))
+        fallback = None
+        for path in candidates:
+            try:
+                content = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            normalized_name = re.sub(r"[^a-zA-Z0-9]", "", path.stem.lower())
+            context = {
+                "content": content,
+                "metadata": {
+                    "source": "playwright-local",
+                    "flow_name": path.stem,
+                    "type": "recorder",
+                },
+            }
+            if fallback is None:
+                fallback = context
+            if key and key not in normalized_name:
+                continue
+            return context
+        return fallback
 
     def generate_script(self, test_case_id: str):
         # 1️⃣ Fetch relevant artifacts
@@ -57,6 +89,11 @@ class TestScriptOrchestrator:
         recorder_flow   = next((a for a in artifacts if a["metadata"].get("type") == "recorder"), None)
         ui_crawl        = next((a for a in artifacts if a["metadata"].get("type") == "ui_crawl"), None)
         test_case       = next((a for a in artifacts if a["metadata"].get("type") == "test_case"), None)
+
+        if not recorder_flow:
+            local_flow = self._load_local_recorder_flow(test_case_id)
+            if local_flow:
+                recorder_flow = local_flow
 
         # 5️⃣ Process structure & steps
         structure = extract_structure(safe_content(existing_script)) if existing_script else {}

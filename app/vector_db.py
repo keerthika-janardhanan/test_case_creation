@@ -1,4 +1,7 @@
 # vector_db.py
+import argparse
+import json
+
 import chromadb
 from chromadb.utils import embedding_functions
 import os
@@ -71,3 +74,81 @@ class VectorDBClient:
         ids_to_delete = [d["id"] for d in all_docs if d["id"].startswith(f"{source}-")]
         if ids_to_delete:
             self.collection.delete(ids=ids_to_delete)
+
+
+def _cli_query(client: VectorDBClient, args: argparse.Namespace) -> int:
+    results = client.query(args.query, top_k=args.top_k)
+    print(json.dumps({"results": results}, ensure_ascii=False))
+    return 0
+
+
+def _cli_add(client: VectorDBClient, args: argparse.Namespace) -> int:
+    if not args.content:
+        raise ValueError("Content is required when adding a document to the vector DB.")
+    metadata = json.loads(args.metadata or "{}")
+    client.add_document(args.source, args.doc_id, args.content, metadata)
+    print(json.dumps({"status": "ok"}))
+    return 0
+
+
+def _cli_list(client: VectorDBClient, args: argparse.Namespace) -> int:
+    records = client.list_all(limit=args.limit)
+    print(json.dumps({"results": records}, ensure_ascii=False))
+    return 0
+
+
+def _cli_delete(client: VectorDBClient, args: argparse.Namespace) -> int:
+    if args.doc_id:
+        client.delete_document(args.doc_id)
+    elif args.source:
+        client.delete_by_source(args.source)
+    else:
+        raise ValueError("Either --doc-id or --source must be provided for delete.")
+    print(json.dumps({"status": "ok"}))
+    return 0
+
+
+def main_cli(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Vector DB command line interface.")
+    parser.add_argument("--path", default=os.getenv("VECTOR_DB_PATH", "./vector_store"), help="Path to vector DB.")
+
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    query_parser = subparsers.add_parser("query", help="Query similar documents.")
+    query_parser.add_argument("query", help="Natural language query string.")
+    query_parser.add_argument("--top-k", type=int, default=3, help="Number of results to return.")
+
+    add_parser = subparsers.add_parser("add", help="Add a new document.")
+    add_parser.add_argument("source", help="Source prefix for the document.")
+    add_parser.add_argument("doc_id", help="Document identifier.")
+    add_parser.add_argument("content", help="Document content.")
+    add_parser.add_argument("--metadata", help="JSON encoded metadata.")
+
+    list_parser = subparsers.add_parser("list", help="List documents for inspection.")
+    list_parser.add_argument("--limit", type=int, default=20, help="Limit number of documents.")
+
+    delete_parser = subparsers.add_parser("delete", help="Delete documents.")
+    delete_parser.add_argument("--doc-id", help="Specific document ID.")
+    delete_parser.add_argument("--source", help="Source prefix.")
+
+    args = parser.parse_args(argv)
+    client = VectorDBClient(path=args.path)
+
+    if args.command == "query":
+        return _cli_query(client, args)
+    if args.command == "add":
+        return _cli_add(client, args)
+    if args.command == "list":
+        return _cli_list(client, args)
+    if args.command == "delete":
+        return _cli_delete(client, args)
+    parser.error("Unknown command")
+    return 1
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main_cli())
+    except Exception as exc:
+        print(json.dumps({"error": str(exc)}))
+        raise SystemExit(1)

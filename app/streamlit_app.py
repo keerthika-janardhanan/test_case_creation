@@ -16,10 +16,13 @@ from ingest_utils import ingest_artifact
 from ingest import ingest_jira, ingest_web_site, ingest_ui_crawl, ingest_document
 from parse_playwright import parse_playwright_code
 from locator_generator import generate_xpath_candidates, to_union_xpath
+from recorder_enricher import enrich_recorder_flow, persist_enriched_artifacts
+from template_utils import load_excel_template
 import tempfile
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from datetime import datetime
 # from langchain.chat_models import ChatOpenAI
 from codegen_utils import generate_final_script
 from executor import run_trial
@@ -232,43 +235,254 @@ if st.session_state["role"] == "admin":
             st.error(f"Failed to fetch documents: {e}")
 
 # -------------------------- Playwright Recorder Panel --------------------------
-st.header("🎥 Playwright Recorder → Vector DB Ingestion")
+st.header("Playwright Recorder → Vector DB Ingestion")
 flow_name = st.text_input("Flow Name", "playwright-recorded-flow")
 record_url = st.text_input("URL to Record", "https://example.com")
 
 if "record_proc" not in st.session_state:
     st.session_state["record_proc"] = None
+if "record_session_dir" not in st.session_state:
+    st.session_state["record_session_dir"] = None
+if "record_metadata" not in st.session_state:
+    st.session_state["record_metadata"] = None
+if "record_manual_out_path" not in st.session_state:
+    st.session_state["record_manual_out_path"] = None
+if "record_manual_log" not in st.session_state:
+    st.session_state["record_manual_log"] = ""
+
+
+def _load_recorder_metadata(session_dir: str, attempts: int = 10, delay: float = 0.3) -> Optional[dict]:
+    session_path = Path(session_dir)
+    metadata_path = session_path / "metadata.json"
+    for _ in range(attempts):
+        if metadata_path.exists():
+            try:
+                return json.loads(metadata_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                time.sleep(delay)
+                continue
+        time.sleep(delay)
+    return None
+
+
+def _finalize_recorder_session() -> None:
+    session_dir = st.session_state.get("record_session_dir")
+    if not session_dir:
+        return
+    metadata = _load_recorder_metadata(session_dir)
+    if metadata:
+        st.session_state["record_metadata"] = metadata
+    else:
+        st.warning(
+            "Recorder stopped but metadata.json is not available. "
+            "If this happens repeatedly, reopen the recorder and ensure the browser closes normally."
+        )
+
+proc = st.session_state.get("record_proc")
+if proc and proc.poll() is not None:
+    st.session_state["record_proc"] = None
+    _finalize_recorder_session()
+
+if "rec_output_dir" not in st.session_state:
+    st.session_state["rec_output_dir"] = "recordings"
+if "rec_capture_dom" not in st.session_state:
+    st.session_state["rec_capture_dom"] = False
+if "rec_capture_screens" not in st.session_state:
+    st.session_state["rec_capture_screens"] = False
+if "rec_capture_trace" not in st.session_state:
+    st.session_state["rec_capture_trace"] = True
+if "rec_capture_har" not in st.session_state:
+    st.session_state["rec_capture_har"] = False
+if "rec_timeout" not in st.session_state:
+    st.session_state["rec_timeout"] = 0
+
+st.text_input("Recording Output Directory", key="rec_output_dir")
+opt_cols = st.columns(4)
+with opt_cols[0]:
+    st.checkbox("Capture DOM Snapshots", key="rec_capture_dom")
+with opt_cols[1]:
+    st.checkbox("Capture Screenshots", key="rec_capture_screens")
+with opt_cols[2]:
+    st.checkbox("Capture Playwright Trace", key="rec_capture_trace", value=True)
+with opt_cols[3]:
+    st.checkbox("Capture HAR", key="rec_capture_har")
+
+timeout_col, _ = st.columns([1, 3])
+with timeout_col:
+    st.number_input("Auto-stop after (seconds)", min_value=0, max_value=3600, step=60, key="rec_timeout")
+
+status_placeholder = st.empty()
+if st.session_state.get("record_proc"):
+    status_placeholder.info("Recorder is running. Complete your browser actions and stop when finished.")
 
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("▶ Start Recording") and not st.session_state["record_proc"]:
-        cmd = [
+    if st.button("Start Recording") and not st.session_state["record_proc"]:
+        session_name = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
+        output_root.mkdir(parents=True, exist_ok=True)
+        session_dir = output_root / session_name
+        cmd: List[str] = [
             sys.executable,
             "-m",
             "app.run_playwright_recorder",
             "--url",
             record_url,
+            "--output-dir",
+            str(output_root),
+            "--session-name",
+            session_name,
         ]
+        if not st.session_state["rec_capture_trace"]:
+            cmd.append("--no-trace")
+        if not st.session_state["rec_capture_har"]:
+            cmd.append("--no-har")
+        if st.session_state["rec_capture_dom"]:
+            cmd.append("--capture-dom")
+        if st.session_state["rec_capture_screens"]:
+            cmd.append("--capture-screenshots")
+        if st.session_state["rec_timeout"]:
+            cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
+
         creationflags = 0
         if os.name == "nt" and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
             creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
-        st.session_state["record_proc"] = subprocess.Popen(cmd, creationflags=creationflags)
-        st.success("Recorder started, perform your flow in the browser.")
+        try:
+            proc = subprocess.Popen(cmd, creationflags=creationflags)
+            st.session_state["record_proc"] = proc
+            st.session_state["record_session_dir"] = str(session_dir)
+            st.session_state["record_metadata"] = None
+            st.session_state["record_manual_out_path"] = None
+            st.session_state["record_manual_log"] = ""
+            st.success(
+                f"Recorder started. A browser window should open. Session artefacts will appear in `{session_dir}`."
+            )
+        except FileNotFoundError as exc:
+            st.error(f"Failed to launch recorder: {exc}")
+        except Exception as exc:  # noqa: BLE001
+            st.error(f"Unexpected error launching recorder: {exc}")
 
 with col2:
-    if st.button("⏹ Stop Recording") and st.session_state["record_proc"]:
+    if st.button("Stop Recording") and st.session_state["record_proc"]:
         proc = st.session_state["record_proc"]
         try:
             if os.name == "nt" and hasattr(signal, "CTRL_BREAK_EVENT"):
                 proc.send_signal(signal.CTRL_BREAK_EVENT)
             else:
                 proc.terminate()
-            proc.wait(timeout=5)
+            proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
             proc.kill()
         finally:
             st.session_state["record_proc"] = None
-        st.info("Recorder stopped. Paste the TS output below.")
+            _finalize_recorder_session()
+        st.info("Recorder stopped. Review captured metadata below.")
+
+session_dir = st.session_state.get("record_session_dir")
+metadata = st.session_state.get("record_metadata")
+if session_dir and metadata:
+    session_path = Path(session_dir)
+    actions = metadata.get("actions", [])
+    st.success(
+        f"Session `{session_path.name}` captured {len(actions)} actions "
+        f"(HAR={'yes' if metadata['options'].get('recordHar') else 'no'}, "
+        f"Trace={'yes' if metadata['options'].get('recordTrace') else 'no'})."
+    )
+
+    preview_rows = []
+    for action in actions:
+        element = action.get("element") or {}
+        preview_rows.append(
+            {
+                "Action ID": action.get("actionId"),
+                "Action": action.get("action"),
+                "Element": element.get("tagName"),
+                "Role": element.get("role"),
+                "Name / Label": element.get("ariaLabel") or element.get("name") or element.get("text"),
+                "Stable Selector": element.get("stableSelector"),
+                "Quadrant": (action.get("boundingBox") or {}).get("quadrant", ""),
+            }
+        )
+    if preview_rows:
+        st.dataframe(pd.DataFrame(preview_rows), use_container_width=True, hide_index=True)
+
+    st.markdown("##### Recorder Artefacts")
+    metadata_path = session_path / "metadata.json"
+    if metadata_path.exists():
+        with open(metadata_path, "rb") as fh:
+            st.download_button(
+                "Download metadata.json",
+                data=fh.read(),
+                file_name=f"{session_path.name}_metadata.json",
+                mime="application/json",
+                key="download_metadata_json",
+            )
+    artifacts = metadata.get("artifacts", {})
+    for label, rel_path in artifacts.items():
+        if not rel_path:
+            continue
+        file_path = session_path / rel_path
+        if file_path.exists():
+            with open(file_path, "rb") as fh:
+                st.download_button(
+                    f"Download {label}",
+                    data=fh.read(),
+                    file_name=f"{session_path.name}_{Path(rel_path).name}",
+                    key=f"download_{label}",
+                )
+
+    st.markdown("##### Generate Manual Test Cases from Recording")
+    trace_rel = artifacts.get("trace")
+    recording_source = session_path / trace_rel if trace_rel else None
+    if recording_source and recording_source.exists():
+        template_upload = st.file_uploader(
+            "Upload Excel template", type=["xlsx"], key="rec_manual_template_uploader"
+        )
+        if st.button("Generate manual_from_recording.xlsx", key="btn_manual_from_recording"):
+            if not template_upload:
+                st.warning("Please upload an Excel template before generating manual test cases.")
+            else:
+                temp_dir = Path(tempfile.mkdtemp(prefix="manual_from_recording_"))
+                template_path = temp_dir / template_upload.name
+                template_path.write_bytes(template_upload.getvalue())
+                out_path = temp_dir / f"manual_from_{session_path.name}.xlsx"
+                cmd = [
+                    sys.executable,
+                    "manual_from_recording.py",
+                    "--template",
+                    str(template_path),
+                    "--recording",
+                    str(recording_source),
+                    "--out",
+                    str(out_path),
+                ]
+                dom_dir = session_path / "dom"
+                if metadata["options"].get("captureDom") and dom_dir.exists():
+                    cmd.extend(["--dom", str(dom_dir)])
+                try:
+                    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                    st.session_state["record_manual_out_path"] = str(out_path)
+                    st.session_state["record_manual_log"] = (result.stdout or "") + (result.stderr or "")
+                    st.success("Manual workbook generated successfully.")
+                except subprocess.CalledProcessError as exc:
+                    st.session_state["record_manual_log"] = (exc.stdout or "") + (exc.stderr or "")
+                    st.error(f"manual_from_recording.py failed (exit {exc.returncode}). See logs below.")
+        if st.session_state.get("record_manual_log"):
+            st.code(st.session_state["record_manual_log"], language="bash")
+        manual_out_path = st.session_state.get("record_manual_out_path")
+        if manual_out_path and Path(manual_out_path).exists():
+            with open(manual_out_path, "rb") as fh:
+                st.download_button(
+                    "Download manual test cases workbook",
+                    data=fh.read(),
+                    file_name=Path(manual_out_path).name,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="download_manual_workbook",
+                )
+    else:
+        st.info(
+            "Trace artefact not found. Ensure trace capture is enabled or rerun the recorder with the default settings."
+        )
 
 # Paste TS code
 st.markdown("### Paste Playwright TS Codegen Output")
@@ -279,21 +493,11 @@ if st.button("📥 Convert, Ingest & Generate Locators", key="btn_convert_ingest
         # 1️⃣ Parse TS Code → Steps
         steps = parse_playwright_code(ts_code)
 
-        # 2️⃣ Save flow JSON for Vector DB
+        # 2️⃣ Save recorder flow JSON locally
         artifact = {"flow_name": flow_name, "source": "playwright", "steps": steps}
         json_path = os.path.join(JSON_FLOW_DIR, f"{flow_name}.json")
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(artifact, f, indent=4)
-
-        metadata = {
-            "artifact_type": "ui_flow",
-            "source": "playwright-recorder",
-            "flow_name": flow_name,
-            "steps_count": len(steps)
-        }
-        metadata = flatten_metadata(metadata)
-        doc_id = f"playwright_{abs(hash(flow_name))}"
-        db.add_document(source="ui_flow", doc_id=doc_id, content=json.dumps(artifact), metadata=metadata)
 
         # 3️⃣ Generate TypeScript locator file
         locator_file = os.path.join(LOCATOR_DIR, f"{flow_name}.ts")
@@ -308,9 +512,58 @@ if st.button("📥 Convert, Ingest & Generate Locators", key="btn_convert_ingest
                     f.write(f'  {locator_name}: "{xpath_value}",\n')
             f.write("};\n")
 
-        st.success(f"✅ Flow '{flow_name}' ingested & locator file generated.")
+        table_rows, sidecar = enrich_recorder_flow(flow_name, steps)
+        enriched_paths = persist_enriched_artifacts(flow_name, table_rows, sidecar)
+
+        st.success(
+            f"✅ Flow '{flow_name}' stored locally. Generated locators and enriched scenario artifacts (cache key: {enriched_paths['cache_key']})."
+        )
         st.code(open(locator_file).read(), language="typescript")
         st.json(artifact)
+
+        scenario_df = pd.DataFrame(
+            table_rows,
+            columns=["sl", "Action", "Navigation Steps", "Key Data Element Examples", "Expected Results"],
+        )
+        st.dataframe(scenario_df, hide_index=True)
+
+        with open(enriched_paths["csv_path"], "rb") as f:
+            st.download_button(
+                label="📥 Download Scenario CSV",
+                data=f.read(),
+                file_name=f"{enriched_paths['cache_key']}.csv",
+                mime="text/csv",
+                key="download_scenario_csv",
+            )
+
+        if enriched_paths.get("xlsx_path"):
+            with open(enriched_paths["xlsx_path"], "rb") as f:
+                st.download_button(
+                    label="📥 Download Scenario XLSX",
+                    data=f.read(),
+                    file_name=f"{enriched_paths['cache_key']}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="download_scenario_xlsx",
+                )
+
+        with open(enriched_paths["json_path"], "rb") as f:
+            st.download_button(
+                label="📥 Download Sidecar JSON",
+                data=f.read(),
+                file_name=f"{enriched_paths['cache_key']}.json",
+                mime="application/json",
+                key="download_scenario_json",
+            )
+
+        low_stability_targets = [
+            idx + 1
+            for idx, step_payload in enumerate(sidecar)
+            if any(target.get("stability_score", 0) < 0.6 for target in step_payload.get("targets", []))
+        ]
+        summary_message = f"Scenario contains {enriched_paths['step_count']} rows."
+        if low_stability_targets:
+            summary_message += f" Low-stability selectors flagged at steps: {', '.join(map(str, low_stability_targets))}."
+        st.info(summary_message)
 
     except Exception as e:
         st.error(f"❌ Failed to process recording: {e}")
@@ -332,7 +585,7 @@ if st.button("Generate & Download Test Cases", key="btn_generate_tc") and jira_i
         if template_file:
             ext = os.path.splitext(template_file.name)[1].lower()
             if ext in [".xlsx", ".xls"]:
-                template_df = pd.read_excel(template_file)
+                template_df = load_excel_template(template_file)
                 df = map_llm_to_template(results, template_df)
             else:
                 df = pd.DataFrame(results)
@@ -444,8 +697,8 @@ def flatten_file_keywords(uploaded_file):
         fname = uploaded_file.name
         ext = fname.split(".")[-1].lower()
         if ext in ["xlsx", "xls"]:
-            df = pd.read_excel(uploaded_file)
-            keywords = df.values.flatten().astype(str).tolist()
+            df = load_excel_template(uploaded_file, dtype=str)
+            keywords = df.fillna("").astype(str).to_numpy().flatten().tolist()
         elif ext == "json":
             data = json.load(uploaded_file)
             if isinstance(data, dict):
@@ -617,6 +870,14 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
         preview = agent.generate_preview(message, framework, context)
         state["preview"] = preview
         responses.append({"role": "assistant", "content": preview, "type": "preview"})
+        if not context.get("flow_available"):
+            responses.append(
+                {
+                    "role": "assistant",
+                    "content": "Recorder flow not found. Preview steps are derived from Jira/documentation/repository context.",
+                    "type": "text",
+                }
+            )
         responses.append(
             {
                 "role": "assistant",

@@ -39,27 +39,8 @@ def ingest_playwright_flow(code: str, flow_name: str, db_client: VectorDBClient)
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(artifact, f, indent=4)
 
-    # Build metadata for Vector DB
-    metadata = {
-        "artifact_type": "ui_flow",
-        "source": "playwright-recorder",
-        "flow_name": flow_name,
-        "steps_count": len(steps)
-    }
-
-    # Unique ID for the flow
-    doc_id = f"playwright_{abs(hash(flow_name))}"
-
-    # Ingest into Vector DB
-    db_client.add_document(
-        source="ui_flow",
-        doc_id=doc_id,
-        content=json.dumps(artifact),
-        metadata=metadata
-    )
-
-    print(f"✅ Flow '{flow_name}' ingested successfully (doc_id={doc_id})")
-    return doc_id, json_path
+    print(f"✅ Flow '{flow_name}' saved locally at {json_path}")
+    return None, json_path
 
 
 

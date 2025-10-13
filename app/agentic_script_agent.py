@@ -183,6 +183,7 @@ class AgenticScriptAgent:
                 "test_case": test_case,
                 "structure": structure,
             },
+            "flow_available": bool(recorder_flow),
         }
 
     def generate_preview(self, scenario: str, framework: FrameworkProfile, context: Dict[str, Any]) -> str:
