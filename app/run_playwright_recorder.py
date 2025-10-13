@@ -1004,7 +1004,7 @@ def main() -> None:
     else:
         print("[recorder] Press Ctrl+C in this terminal to stop recording.")
 
-    options = {
+    session_options = {
         "browser": args.browser,
         "headless": args.headless,
         "slowMo": args.slow_mo,
@@ -1040,7 +1040,7 @@ def main() -> None:
             capture_dom=args.capture_dom,
             capture_screenshots=args.capture_screenshots,
             stop_event=stop_event,
-            options=options,
+            options=session_options,
         )
 
         def _on_page(new_page: Page) -> None:
