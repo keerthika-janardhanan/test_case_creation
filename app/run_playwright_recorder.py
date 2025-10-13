@@ -10,9 +10,53 @@ import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from types import FrameType
 from typing import Any, Dict, List, Optional, Tuple
 
 from playwright.sync_api import Browser, BrowserContext, Frame, Page, Playwright, sync_playwright
+
+
+def _signal_name(signum: int) -> str:
+    try:
+        return signal.Signals(signum).name
+    except Exception:  # noqa: BLE001
+        return str(signum)
+
+
+def _install_signal_handlers(stop_event: threading.Event) -> List[Tuple[int, Any]]:
+    installed: List[Tuple[int, Any]] = []
+
+    def _make_handler(signum: int):  # noqa: ARG001
+        def _handler(received_signum: int, frame: Optional[FrameType]) -> None:  # noqa: ARG001
+            if not stop_event.is_set():
+                sys.stderr.write(
+                    f"[recorder] Signal {_signal_name(received_signum)} received. Attempting graceful shutdown...\n"
+                )
+                stop_event.set()
+            raise KeyboardInterrupt
+
+        return _handler
+
+    for signame in ("SIGINT", "SIGTERM", "SIGBREAK"):
+        signum = getattr(signal, signame, None)
+        if signum is None:
+            continue
+        try:
+            previous = signal.getsignal(signum)
+            signal.signal(signum, _make_handler(signum))
+            installed.append((signum, previous))
+        except (AttributeError, ValueError, OSError):
+            continue
+
+    return installed
+
+
+def _restore_signal_handlers(handlers: List[Tuple[int, Any]]) -> None:
+    for signum, handler in handlers:
+        try:
+            signal.signal(signum, handler)
+        except (AttributeError, ValueError, OSError):
+            continue
 
 
 PAGE_INJECT_SCRIPT = """
@@ -833,6 +877,20 @@ class RecorderSession:
         self._persist_metadata()
         return self.metadata_path
 
+    def emergency_snapshot(self, reason: str) -> Optional[Path]:
+        self._ended_at = self._ended_at or _iso_now()
+        with self._metadata_lock:
+            summary = self._build_summary()
+            session_meta = summary.setdefault("session", {})
+            session_meta.setdefault("status", "incomplete")
+            session_meta["emergencyReason"] = reason
+            try:
+                self.metadata_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+                return self.metadata_path
+            except Exception as exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to write emergency metadata snapshot: {exc}\n")
+                return None
+
 
 def _ensure_playwright() -> Playwright:
     try:
@@ -872,6 +930,23 @@ def _await_user(timeout: Optional[int], stop_event: threading.Event) -> None:
     except KeyboardInterrupt:
         print("\n[recorder] Stopping (Ctrl+C detected).")
         stop_event.set()
+
+
+def _report_session_directory(session: RecorderSession) -> None:
+    try:
+        top_level = sorted(p.name for p in session.session_dir.iterdir())
+        print(
+            "[recorder] Session directory items: "
+            + (", ".join(top_level) if top_level else "<empty>")
+        )
+        if session.capture_dom:
+            dom_files = len(list(session.dom_dir.glob("*.html")))
+            print(f"[recorder] DOM snapshots saved: {dom_files}")
+        if session.capture_screenshots:
+            screenshot_files = len(list(session.screenshot_dir.glob("*.png")))
+            print(f"[recorder] Screenshots saved: {screenshot_files}")
+    except Exception as exc:  # noqa: BLE001
+        sys.stderr.write(f"[recorder] Unable to summarize session directory: {exc}\n")
 
 
 def main() -> None:
@@ -924,6 +999,7 @@ def main() -> None:
     context = None
     browser = None
     stop_event = threading.Event()
+    signal_handlers: List[Tuple[int, Any]] = _install_signal_handlers(stop_event)
     session: Optional[RecorderSession] = None
     metadata_written = False
     try:
@@ -1013,6 +1089,10 @@ def main() -> None:
     except KeyboardInterrupt:
         stop_event.set()
         sys.stderr.write("[recorder] Interrupt received. Cleaning up...\n")
+    except Exception as exc:  # noqa: BLE001
+        stop_event.set()
+        sys.stderr.write(f"[recorder] Recorder terminated with an unexpected error: {exc}\n")
+        raise
     finally:
         # Ensure Playwright is stopped even if exceptions bubble up
         try:
@@ -1037,6 +1117,14 @@ def main() -> None:
                 print(f"[recorder] Metadata saved to {metadata_path}")
             except Exception as finalize_exc:  # noqa: BLE001
                 sys.stderr.write(f"[recorder] Failed to finalize metadata: {finalize_exc}\n")
+                emergency_path = session.emergency_snapshot("finalize_failed")
+                if emergency_path:
+                    print(f"[recorder] Emergency metadata saved to {emergency_path}")
+
+        if session:
+            _report_session_directory(session)
+
+        _restore_signal_handlers(signal_handlers)
 
 
 if __name__ == "__main__":
