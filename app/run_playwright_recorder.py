@@ -345,11 +345,13 @@ class RecorderSession:
         capture_dom: bool,
         capture_screenshots: bool,
         stop_event: threading.Event,
+        options: Dict[str, Any],
     ) -> None:
         self.session_dir = session_dir
         self.capture_dom = capture_dom
         self.capture_screenshots = capture_screenshots
         self.stop_event = stop_event
+        self.options = dict(options)
         self.actions: List[Dict[str, Any]] = []
         self.page_events: List[Dict[str, Any]] = []
         self.action_counter = 0
@@ -359,10 +361,38 @@ class RecorderSession:
         self._page_lock = threading.Lock()
         self._pages: Dict[int, Page] = {}
         self._last_page_id: Optional[int] = None
+        self._metadata_lock = threading.Lock()
+        self._ended_at: Optional[str] = None
+        self._artifacts: Dict[str, Optional[str]] = {"har": None, "trace": None}
+        self.metadata_path = self.session_dir / "metadata.json"
         if self.capture_screenshots:
             self.screenshot_dir.mkdir(parents=True, exist_ok=True)
         if self.capture_dom:
             self.dom_dir.mkdir(parents=True, exist_ok=True)
+        self._persist_metadata()
+
+    def _build_summary(self) -> Dict[str, Any]:
+        summary: Dict[str, Any] = {
+            "session": {
+                "id": self.session_dir.name,
+                "startedAt": self.started_at,
+            },
+            "options": self.options,
+            "pageContextEvents": self.page_events,
+            "actions": self.actions,
+            "artifacts": self._artifacts,
+        }
+        if self._ended_at:
+            summary["session"]["endedAt"] = self._ended_at
+        return summary
+
+    def _persist_metadata(self) -> None:
+        with self._metadata_lock:
+            summary = self._build_summary()
+            try:
+                self.metadata_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+            except Exception as exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to persist metadata snapshot: {exc}\n")
 
     @staticmethod
     def _page_key(page: Page) -> int:
@@ -408,6 +438,7 @@ class RecorderSession:
         event = dict(payload or {})
         event["receivedAt"] = _iso_now()
         self.page_events.append(event)
+        self._persist_metadata()
 
     def handle_capture(self, source: Any, payload: Dict[str, Any]) -> None:
         self.action_counter += 1
@@ -484,6 +515,7 @@ class RecorderSession:
         self.actions.append(record)
         # Helpful debug output
         sys.stderr.write(f"[recorder] captured {action_id} -> {record.get('action')}\n")
+        self._persist_metadata()
 
     def _capture_screenshot(
         self, page: Page, action_id: str, clip: Optional[Dict[str, Any]]
@@ -563,24 +595,20 @@ class RecorderSession:
             combined_error = "; ".join(errors + [str(exc)]) if errors else str(exc)
             return {"error": combined_error}
 
-    def finalize(self, options: Dict[str, Any], har_path: Optional[Path], trace_path: Optional[Path]) -> Path:
-        summary = {
-            "session": {
-                "id": self.session_dir.name,
-                "startedAt": self.started_at,
-                "endedAt": _iso_now(),
-            },
-            "options": options,
-            "pageContextEvents": self.page_events,
-            "actions": self.actions,
-            "artifacts": {
-                "har": str(har_path.relative_to(self.session_dir)) if har_path and har_path.exists() else None,
-                "trace": str(trace_path.relative_to(self.session_dir)) if trace_path and trace_path.exists() else None,
-            },
-        }
-        output_path = self.session_dir / "metadata.json"
-        output_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-        return output_path
+    def finalize(self, har_path: Optional[Path], trace_path: Optional[Path]) -> Path:
+        self._ended_at = _iso_now()
+        if har_path and har_path.exists():
+            try:
+                self._artifacts["har"] = str(har_path.relative_to(self.session_dir))
+            except Exception:
+                self._artifacts["har"] = str(har_path)
+        if trace_path and trace_path.exists():
+            try:
+                self._artifacts["trace"] = str(trace_path.relative_to(self.session_dir))
+            except Exception:
+                self._artifacts["trace"] = str(trace_path)
+        self._persist_metadata()
+        return self.metadata_path
 
 
 def _ensure_playwright() -> Playwright:
@@ -658,11 +686,23 @@ def main() -> None:
     else:
         print("[recorder] Press Ctrl+C in this terminal to stop recording.")
 
+    options = {
+        "browser": args.browser,
+        "headless": args.headless,
+        "slowMo": args.slow_mo,
+        "captureDom": args.capture_dom,
+        "captureScreenshots": args.capture_screenshots,
+        "recordHar": not args.no_har,
+        "recordTrace": not args.no_trace,
+        "url": args.url,
+    }
+
     playwright = _ensure_playwright()
     context = None
     browser = None
     stop_event = threading.Event()
     session: Optional[RecorderSession] = None
+    metadata_written = False
     try:
         if not args.no_har:
             har_path = session_dir / "network.har"
@@ -681,6 +721,7 @@ def main() -> None:
             capture_dom=args.capture_dom,
             capture_screenshots=args.capture_screenshots,
             stop_event=stop_event,
+            options=options,
         )
 
         def _on_page(new_page: Page) -> None:
@@ -733,17 +774,8 @@ def main() -> None:
         browser.close()
         playwright.stop()
 
-        options = {
-            "browser": args.browser,
-            "headless": args.headless,
-            "slowMo": args.slow_mo,
-            "captureDom": args.capture_dom,
-            "captureScreenshots": args.capture_screenshots,
-            "recordHar": not args.no_har,
-            "recordTrace": not args.no_trace,
-            "url": args.url,
-        }
-        metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+        metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+        metadata_written = True
 
         print(f"[recorder] Recorded {len(session.actions)} actions.")
         print(f"[recorder] Metadata saved to {metadata_path}")
@@ -774,6 +806,14 @@ def main() -> None:
             playwright.stop()
         except Exception:
             pass
+
+        if session and not metadata_written:
+            try:
+                metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+                metadata_written = True
+                print(f"[recorder] Metadata saved to {metadata_path}")
+            except Exception as finalize_exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to finalize metadata: {finalize_exc}\n")
 
 
 if __name__ == "__main__":
