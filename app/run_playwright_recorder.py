@@ -587,6 +587,7 @@ class RecorderSession:
             if queued_at_int:
                 event["queuedAt"] = queued_at_int
         self.page_events.append(event)
+        self._persist_metadata()
 
         page = self._resolve_page(source)
         frame = getattr(source, "frame", None)
