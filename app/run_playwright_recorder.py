@@ -70,13 +70,34 @@ PAGE_INJECT_SCRIPT = """
 
   const captureQueue = [];
   const pageContextQueue = [];
-  let bindingInterval = null;
+  let bindingsReady = false;
+  let bindingMonitor = null;
+  let bindingAttempts = 0;
 
-  const scheduleBindingCheck = delay => {
-    if (bindingInterval) {
-      clearInterval(bindingInterval);
+  const markBindingsReady = () => {
+    const captureReady = typeof window.pythonRecorderCapture === "function";
+    const contextReady = typeof window.pythonRecorderPageContext === "function";
+
+    if (captureReady || contextReady) {
+      flushQueues();
     }
-    bindingInterval = setInterval(() => ensureBindings(), delay);
+
+    const ready = captureReady && contextReady;
+    if (ready && !bindingsReady) {
+      bindingsReady = true;
+      window.__pythonRecorderBindingsReady = true;
+      if (typeof document !== "undefined" && document) {
+        try {
+          document.dispatchEvent(new CustomEvent("__pythonRecorderBindingsReady", { bubbles: false }));
+        } catch (err) {
+          if (typeof console !== "undefined" && console && console.debug) {
+            console.debug("[recorder] Failed to dispatch bindings ready event", err);
+          }
+        }
+      }
+    }
+
+    return ready;
   };
 
   const deliverCapture = payload => {
@@ -113,19 +134,49 @@ PAGE_INJECT_SCRIPT = """
   };
 
   const ensureBindings = () => {
-    const captureReady = typeof window.pythonRecorderCapture === "function";
-    const contextReady = typeof window.pythonRecorderPageContext === "function";
-    if (captureReady || contextReady) {
-      flushQueues();
+    if (markBindingsReady()) {
+      if (bindingMonitor) {
+        clearTimeout(bindingMonitor);
+        bindingMonitor = null;
+      }
+      return true;
     }
-    if (captureReady && contextReady) {
-      scheduleBindingCheck(2000);
-    } else {
-      scheduleBindingCheck(250);
-    }
+    return false;
   };
 
-  scheduleBindingCheck(250);
+  const startBindingMonitor = () => {
+    if (bindingsReady) {
+      return;
+    }
+    if (bindingMonitor) {
+      clearTimeout(bindingMonitor);
+      bindingMonitor = null;
+    }
+
+    const tick = () => {
+      if (ensureBindings()) {
+        return;
+      }
+      bindingAttempts += 1;
+      const delay = Math.min(2000, 100 + bindingAttempts * 50);
+      bindingMonitor = setTimeout(tick, delay);
+    };
+
+    bindingMonitor = setTimeout(tick, 50);
+
+    setTimeout(() => {
+      if (!bindingsReady && typeof console !== "undefined" && console && console.warn) {
+        console.warn("[recorder] Waiting for Playwright bindings to become available...");
+      }
+    }, 750);
+  };
+
+  if (typeof document !== "undefined" && document) {
+    document.addEventListener("readystatechange", startBindingMonitor, { once: false });
+    document.addEventListener("__pythonRecorderBindingsPing", startBindingMonitor);
+  }
+
+  startBindingMonitor();
   ensureBindings();
 
   const normalizeTarget = node => {
@@ -1043,8 +1094,32 @@ def main() -> None:
             options=session_options,
         )
 
+        def _ensure_page_bindings(target_page: Optional[Page]) -> None:
+            if target_page is None or target_page.is_closed():
+                return
+            try:
+                target_page.evaluate(
+                    "() => { try { document && document.dispatchEvent(new Event('__pythonRecorderBindingsPing')); } catch (err) {} }"
+                )
+            except Exception:
+                pass
+            try:
+                target_page.wait_for_function(
+                    "() => window.__pythonRecorderBindingsReady === true",
+                    timeout=5000,
+                )
+            except Exception as exc:  # noqa: BLE001
+                sys.stderr.write(
+                    f"[recorder] Recorder bindings did not become ready within the expected time: {exc}\n"
+                )
+
         def _on_page(new_page: Page) -> None:
             session.register_page(new_page)
+            try:
+                new_page.once("domcontentloaded", lambda *args: _ensure_page_bindings(new_page))
+            except Exception:
+                pass
+            _ensure_page_bindings(new_page)
             try:
                 def _handle_close() -> None:
                     session.unregister_page(new_page)
@@ -1073,6 +1148,7 @@ def main() -> None:
             tracer.start(screenshots=True, snapshots=True, sources=True)
 
         page.goto(args.url, wait_until="domcontentloaded")
+        _ensure_page_bindings(page)
 
         _await_user(args.timeout, stop_event)
 
