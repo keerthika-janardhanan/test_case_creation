@@ -17,7 +17,21 @@ from playwright.sync_api import Browser, BrowserContext, Frame, Page, Playwright
 
 PAGE_INJECT_SCRIPT = """
 (() => {
+  const ELEMENT_NODE = typeof Node !== "undefined" ? Node.ELEMENT_NODE : 1;
+  const TEXT_NODE = typeof Node !== "undefined" ? Node.TEXT_NODE : 3;
+
   const toText = node => (node && node.textContent ? node.textContent.trim().slice(0, 120) : "");
+
+  const normalizeTarget = node => {
+    if (!node) return null;
+    if (node.nodeType === ELEMENT_NODE) return node;
+    if (node.nodeType === TEXT_NODE && node.parentElement) return node.parentElement;
+    if (node === document || node === window) return document.documentElement;
+    if (node.ownerDocument && node.ownerDocument.documentElement) {
+      return node.ownerDocument.documentElement;
+    }
+    return null;
+  };
 
   const buildAncestors = element => {
     const chain = [];
@@ -146,9 +160,18 @@ PAGE_INJECT_SCRIPT = """
     return xpath;
   };
 
-  const snapshotElement = element => {
+  const snapshotElement = rawTarget => {
+    const element = normalizeTarget(rawTarget);
     if (!element) return null;
-    const rect = element.getBoundingClientRect();
+    let rect = null;
+    try {
+      rect = element.getBoundingClientRect ? element.getBoundingClientRect() : null;
+    } catch (err) {
+      rect = null;
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[recorder] Failed to read bounding box", err);
+      }
+    }
     const dataAttributes = {};
     if (element.attributes) {
       for (const attr of Array.from(element.attributes)) {
@@ -185,12 +208,14 @@ PAGE_INJECT_SCRIPT = """
       checked: !!element.checked,
       disabled: !!element.disabled,
       href: element.getAttribute ? (element.getAttribute("href") || "") : "",
-      boundingClientRect: {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height
-      },
+      boundingClientRect: rect
+        ? {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height
+          }
+        : null,
       stableSelector: buildStableSelector(element),
       xpath: buildXPath(element),
       ancestors: buildAncestors(element),
@@ -774,7 +799,7 @@ def main() -> None:
         browser.close()
         playwright.stop()
 
-        metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+        metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
         metadata_written = True
 
         print(f"[recorder] Recorded {len(session.actions)} actions.")
@@ -809,7 +834,7 @@ def main() -> None:
 
         if session and not metadata_written:
             try:
-                metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+                metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
                 metadata_written = True
                 print(f"[recorder] Metadata saved to {metadata_path}")
             except Exception as finalize_exc:  # noqa: BLE001
