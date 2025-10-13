@@ -658,11 +658,23 @@ def main() -> None:
     else:
         print("[recorder] Press Ctrl+C in this terminal to stop recording.")
 
+    options = {
+        "browser": args.browser,
+        "headless": args.headless,
+        "slowMo": args.slow_mo,
+        "captureDom": args.capture_dom,
+        "captureScreenshots": args.capture_screenshots,
+        "recordHar": not args.no_har,
+        "recordTrace": not args.no_trace,
+        "url": args.url,
+    }
+
     playwright = _ensure_playwright()
     context = None
     browser = None
     stop_event = threading.Event()
     session: Optional[RecorderSession] = None
+    metadata_written = False
     try:
         if not args.no_har:
             har_path = session_dir / "network.har"
@@ -733,17 +745,8 @@ def main() -> None:
         browser.close()
         playwright.stop()
 
-        options = {
-            "browser": args.browser,
-            "headless": args.headless,
-            "slowMo": args.slow_mo,
-            "captureDom": args.capture_dom,
-            "captureScreenshots": args.capture_screenshots,
-            "recordHar": not args.no_har,
-            "recordTrace": not args.no_trace,
-            "url": args.url,
-        }
         metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+        metadata_written = True
 
         print(f"[recorder] Recorded {len(session.actions)} actions.")
         print(f"[recorder] Metadata saved to {metadata_path}")
@@ -774,6 +777,14 @@ def main() -> None:
             playwright.stop()
         except Exception:
             pass
+
+        if session and not metadata_written:
+            try:
+                metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+                metadata_written = True
+                print(f"[recorder] Metadata saved to {metadata_path}")
+            except Exception as finalize_exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to finalize metadata: {finalize_exc}\n")
 
 
 if __name__ == "__main__":
