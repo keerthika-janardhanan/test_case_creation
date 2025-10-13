@@ -35,7 +35,7 @@ A Playwright browser window opens with the provided URL. Perform your manual act
 
 ## 4. Inspect the output
 
-Artifacts live under `<output-dir>/<session-name>/`. The `metadata.json` file contains every captured action along with contextual UI details used by downstream tooling.
+Artifacts live under `<output-dir>/<session-name>/`. The `metadata.json` file contains every captured action along with contextual UI details used by downstream tooling. Navigation events are also recorded with full-page DOM and screenshot snapshots so you can review a session even if no interactive events fire (for example on login screens that suppress standard DOM events).
 
 ## Alternative: Streamlit UI
 
