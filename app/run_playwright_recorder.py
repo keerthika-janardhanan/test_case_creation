@@ -15,6 +15,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from playwright.sync_api import Browser, BrowserContext, Frame, Page, Playwright, sync_playwright
 
+from app.browser_utils import SUPPORTED_BROWSERS, normalize_browser_name
+
 
 def _signal_name(signum: int) -> str:
     try:
@@ -906,7 +908,8 @@ def _build_context(
     slow_mo: Optional[int],
     har_path: Optional[Path],
 ) -> BrowserContext:
-    browser_factory = getattr(playwright, browser_name)
+    normalized_name = normalize_browser_name(browser_name, SUPPORTED_BROWSERS)
+    browser_factory = getattr(playwright, normalized_name)
     browser: Browser = browser_factory.launch(headless=headless, slow_mo=slow_mo)
     context_kwargs: Dict[str, Any] = {}
     if har_path:
@@ -956,7 +959,11 @@ def main() -> None:
     parser.add_argument("--url", required=True, help="Initial URL to open in the recorder session.")
     parser.add_argument("--output-dir", default="recordings", help="Base directory to store recording artifacts.")
     parser.add_argument("--session-name", default=None, help="Optional name for the recording session directory.")
-    parser.add_argument("--browser", choices=["chromium", "firefox", "webkit"], default="chromium", help="Browser engine to use.")
+    parser.add_argument(
+        "--browser",
+        default="chromium",
+        help=f"Browser engine to use ({', '.join(SUPPORTED_BROWSERS)}).",
+    )
     parser.add_argument("--headless", action="store_true", help="Run the browser in headless mode.")
     parser.add_argument("--slow-mo", type=int, default=None, help="Slow down Playwright actions by the given milliseconds.")
     parser.add_argument("--timeout", type=int, default=None, help="Automatically stop the recorder after N seconds.")
@@ -966,6 +973,13 @@ def main() -> None:
     parser.add_argument("--capture-screenshots", action="store_true", help="Capture element screenshots for each action.")
 
     args = parser.parse_args()
+
+    try:
+        normalized_browser = normalize_browser_name(args.browser, SUPPORTED_BROWSERS)
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    args.browser = normalized_browser
 
     output_root = Path(args.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
