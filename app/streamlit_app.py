@@ -9,6 +9,7 @@ import time
 import hashlib
 import pandas as pd
 import streamlit as st
+from urllib.parse import urlparse
 from hashstore import init_db
 from vector_db import VectorDBClient
 from test_case_generator import TestCaseGenerator, map_llm_to_template
@@ -297,6 +298,27 @@ def _scan_session_directory(session_dir: str) -> Dict[str, Any]:
     return summary
 
 
+def _normalize_record_url(raw_url: str) -> Tuple[Optional[str], Optional[str]]:
+    """Return a sanitized http(s) URL suitable for the recorder command."""
+
+    url = (raw_url or "").strip()
+    if not url:
+        return None, "Please enter a URL to record."
+
+    if "://" not in url:
+        url = f"https://{url}"
+
+    parsed = urlparse(url)
+    if not parsed.netloc:
+        return None, "The recording URL must include a valid host name."
+
+    if parsed.scheme.lower() not in {"http", "https"}:
+        return None, "Only http and https URLs are supported for recording."
+
+    normalized = parsed.geturl()
+    return normalized, None
+
+
 def _finalize_recorder_session() -> None:
     session_dir = st.session_state.get("record_session_dir")
     if not session_dir:
@@ -370,6 +392,35 @@ if st.session_state.get("record_proc"):
 col1, col2 = st.columns(2)
 with col1:
     if st.button("Start Recording") and not st.session_state["record_proc"]:
+        normalized_url, url_error = _normalize_record_url(record_url)
+        if url_error:
+            st.error(url_error)
+        else:
+            session_name = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
+            output_root.mkdir(parents=True, exist_ok=True)
+            session_dir = output_root / session_name
+            cmd: List[str] = [
+                sys.executable,
+                "-m",
+                "app.run_playwright_recorder",
+                "--url",
+                normalized_url,
+                "--output-dir",
+                str(output_root),
+                "--session-name",
+                session_name,
+            ]
+            if not st.session_state["rec_capture_trace"]:
+                cmd.append("--no-trace")
+            if not st.session_state["rec_capture_har"]:
+                cmd.append("--no-har")
+            if st.session_state["rec_capture_dom"]:
+                cmd.append("--capture-dom")
+            if st.session_state["rec_capture_screens"]:
+                cmd.append("--capture-screenshots")
+            if st.session_state["rec_timeout"]:
+                cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
         session_name = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
         output_root.mkdir(parents=True, exist_ok=True)
@@ -398,23 +449,23 @@ with col1:
         if st.session_state["rec_timeout"]:
             cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
 
-        creationflags = 0
-        if os.name == "nt" and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
-            creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
-        try:
-            proc = subprocess.Popen(cmd, creationflags=creationflags)
-            st.session_state["record_proc"] = proc
-            st.session_state["record_session_dir"] = str(session_dir)
-            st.session_state["record_metadata"] = None
-            st.session_state["record_manual_out_path"] = None
-            st.session_state["record_manual_log"] = ""
-            st.success(
-                f"Recorder started. A browser window should open. Session artefacts will appear in `{session_dir}`."
-            )
-        except FileNotFoundError as exc:
-            st.error(f"Failed to launch recorder: {exc}")
-        except Exception as exc:  # noqa: BLE001
-            st.error(f"Unexpected error launching recorder: {exc}")
+            creationflags = 0
+            if os.name == "nt" and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
+                creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
+            try:
+                proc = subprocess.Popen(cmd, creationflags=creationflags)
+                st.session_state["record_proc"] = proc
+                st.session_state["record_session_dir"] = str(session_dir)
+                st.session_state["record_metadata"] = None
+                st.session_state["record_manual_out_path"] = None
+                st.session_state["record_manual_log"] = ""
+                st.success(
+                    f"Recorder started. A browser window should open. Session artefacts will appear in `{session_dir}`."
+                )
+            except FileNotFoundError as exc:
+                st.error(f"Failed to launch recorder: {exc}")
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"Unexpected error launching recorder: {exc}")
 
 with col2:
     if st.button("Stop Recording") and st.session_state["record_proc"]:
