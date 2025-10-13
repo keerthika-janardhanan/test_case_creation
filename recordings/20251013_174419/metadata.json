@@ -1,0 +1,36 @@
+{
+  "session": {
+    "id": "20251013_174419",
+    "startedAt": "2025-10-13T17:44:20.231454+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": true,
+    "recordTrace": true,
+    "url": "https://ecqg-test.fa.us2.oraclecloud.com/"
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "breadcrumbs": [],
+      "timestamp": 1760377460597,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "devicePixelRatio": 1.0000000149011612
+      },
+      "trigger": "init",
+      "receivedAt": "2025-10-13T17:44:20.615768+00:00"
+    }
+  ],
+  "actions": [],
+  "artifacts": {
+    "har": null,
+    "trace": null
+  }
+}

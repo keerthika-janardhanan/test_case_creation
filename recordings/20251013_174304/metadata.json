@@ -1,0 +1,36 @@
+{
+  "session": {
+    "id": "20251013_174304",
+    "startedAt": "2025-10-13T17:43:06.396411+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": false,
+    "recordTrace": true,
+    "url": "https://example.com"
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "breadcrumbs": [],
+      "timestamp": 1760377386898,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "devicePixelRatio": 1.0000000149011612
+      },
+      "trigger": "init",
+      "receivedAt": "2025-10-13T17:43:06.918519+00:00"
+    }
+  ],
+  "actions": [],
+  "artifacts": {
+    "har": null,
+    "trace": null
+  }
+}

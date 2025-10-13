@@ -85,6 +85,13 @@ st.session_state.framework_commit_message = st.sidebar.text_input(
     value=st.session_state.framework_commit_message,
     key="framework_commit_message_input",
 )
+st.session_state.setdefault("rec_python_executable", sys.executable)
+st.session_state.rec_python_executable = st.sidebar.text_input(
+    "Recorder Python Executable",
+    value=st.session_state.rec_python_executable,
+    help="Optional path to the Python executable used to launch the recorder (defaults to Streamlit's Python).",
+    key="rec_python_executable_input",
+)
 
 st.title("Test Artifact Recorder & Ingest")
 
@@ -367,8 +374,10 @@ with col1:
         output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
         output_root.mkdir(parents=True, exist_ok=True)
         session_dir = output_root / session_name
+        python_exec = st.session_state.get("rec_python_executable") or sys.executable
+
         cmd: List[str] = [
-            sys.executable,
+            python_exec,
             "-m",
             "app.run_playwright_recorder",
             "--url",

@@ -1120,6 +1120,24 @@ def main() -> None:
             except Exception:
                 pass
             _ensure_page_bindings(new_page)
+            # Diagnostic listeners to help surface browser-side failures (console errors, page errors, failed requests)
+            try:
+                new_page.on("console", lambda msg: sys.stderr.write(f"[recorder][console] {msg.type}: {msg.text}\n"))
+            except Exception:
+                pass
+            try:
+                new_page.on("pageerror", lambda exc: sys.stderr.write(f"[recorder][pageerror] {exc}\n"))
+            except Exception:
+                pass
+            try:
+                new_page.on(
+                    "requestfailed",
+                    lambda req: sys.stderr.write(
+                        f"[recorder][requestfailed] {req.url} -> {getattr(req, 'failure', lambda: '')()}\n"
+                    ),
+                )
+            except Exception:
+                pass
             try:
                 def _handle_close() -> None:
                     session.unregister_page(new_page)
