@@ -21,7 +21,7 @@ from template_utils import load_excel_template
 import tempfile
 import shutil
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime
 # from langchain.chat_models import ChatOpenAI
 from codegen_utils import generate_final_script
@@ -249,9 +249,11 @@ if "record_manual_out_path" not in st.session_state:
     st.session_state["record_manual_out_path"] = None
 if "record_manual_log" not in st.session_state:
     st.session_state["record_manual_log"] = ""
+if "record_session_listing" not in st.session_state:
+    st.session_state["record_session_listing"] = None
 
 
-def _load_recorder_metadata(session_dir: str, attempts: int = 10, delay: float = 0.3) -> Optional[dict]:
+def _load_recorder_metadata(session_dir: str, attempts: int = 15, delay: float = 0.5) -> Optional[dict]:
     session_path = Path(session_dir)
     metadata_path = session_path / "metadata.json"
     for _ in range(attempts):
@@ -265,17 +267,60 @@ def _load_recorder_metadata(session_dir: str, attempts: int = 10, delay: float =
     return None
 
 
+def _scan_session_directory(session_dir: str) -> Dict[str, Any]:
+    session_path = Path(session_dir)
+    summary: Dict[str, Any] = {
+        "exists": session_path.exists(),
+        "top_level": [],
+        "dom_files": 0,
+        "screenshot_files": 0,
+    }
+    if not session_path.exists():
+        return summary
+    try:
+        summary["top_level"] = sorted(p.name for p in session_path.iterdir())
+    except Exception:
+        summary["top_level"] = []
+    dom_dir = session_path / "dom"
+    if dom_dir.exists():
+        summary["dom_files"] = len(list(dom_dir.glob("*.html")))
+    shots_dir = session_path / "screenshots"
+    if shots_dir.exists():
+        summary["screenshot_files"] = len(list(shots_dir.glob("*.png")))
+    return summary
+
+
 def _finalize_recorder_session() -> None:
     session_dir = st.session_state.get("record_session_dir")
     if not session_dir:
         return
+    listing = _scan_session_directory(session_dir)
+    st.session_state["record_session_listing"] = listing
     metadata = _load_recorder_metadata(session_dir)
     if metadata:
         st.session_state["record_metadata"] = metadata
+        missing_parts = []
+        options = metadata.get("options", {})
+        artifacts = metadata.get("artifacts", {})
+        if options.get("captureDom") and not listing.get("dom_files"):
+            missing_parts.append("DOM snapshots")
+        if options.get("captureScreenshots") and not listing.get("screenshot_files"):
+            missing_parts.append("screenshots")
+        if options.get("recordTrace") and not artifacts.get("trace"):
+            missing_parts.append("trace.zip")
+        if options.get("recordHar") and not artifacts.get("har"):
+            missing_parts.append("network.har")
+        if missing_parts:
+            st.warning(
+                "Recorder metadata loaded but some expected artefacts appear to be missing: "
+                + ", ".join(missing_parts)
+            )
     else:
+        existing = listing.get("top_level", []) if listing else []
         st.warning(
             "Recorder stopped but metadata.json is not available. "
-            "If this happens repeatedly, reopen the recorder and ensure the browser closes normally."
+            "Observed session directory contents: "
+            + (", ".join(existing) if existing else "<empty>")
         )
 
 proc = st.session_state.get("record_proc")
@@ -370,7 +415,7 @@ with col2:
                 proc.send_signal(signal.CTRL_BREAK_EVENT)
             else:
                 proc.send_signal(signal.SIGINT)
-            proc.wait(timeout=10)
+            proc.wait(timeout=15)
         except subprocess.TimeoutExpired:
             proc.terminate()
             try:
@@ -379,11 +424,22 @@ with col2:
                 proc.kill()
         finally:
             st.session_state["record_proc"] = None
+            time.sleep(2)
             _finalize_recorder_session()
         st.info("Recorder stopped. Review captured metadata below.")
 
 session_dir = st.session_state.get("record_session_dir")
+session_listing = st.session_state.get("record_session_listing")
 metadata = st.session_state.get("record_metadata")
+if session_dir and session_listing:
+    listing_lines = [
+        f"metadata.json: {'present' if 'metadata.json' in session_listing.get('top_level', []) else 'missing'}",
+        f"DOM snapshots: {session_listing.get('dom_files', 0)} file(s)",
+        f"Screenshots: {session_listing.get('screenshot_files', 0)} file(s)",
+    ]
+    st.markdown("###### Session Directory Snapshot")
+    st.code("\n".join(listing_lines))
+
 if session_dir and metadata:
     session_path = Path(session_dir)
     actions = metadata.get("actions", [])
