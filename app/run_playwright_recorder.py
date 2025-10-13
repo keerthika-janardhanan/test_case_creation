@@ -17,7 +17,81 @@ from playwright.sync_api import Browser, BrowserContext, Frame, Page, Playwright
 
 PAGE_INJECT_SCRIPT = """
 (() => {
+  const ELEMENT_NODE = typeof Node !== "undefined" ? Node.ELEMENT_NODE : 1;
+  const TEXT_NODE = typeof Node !== "undefined" ? Node.TEXT_NODE : 3;
+
   const toText = node => (node && node.textContent ? node.textContent.trim().slice(0, 120) : "");
+
+  const captureQueue = [];
+  const pageContextQueue = [];
+  let bindingInterval = null;
+
+  const scheduleBindingCheck = delay => {
+    if (bindingInterval) {
+      clearInterval(bindingInterval);
+    }
+    bindingInterval = setInterval(() => ensureBindings(), delay);
+  };
+
+  const deliverCapture = payload => {
+    if (typeof window.pythonRecorderCapture === "function") {
+      window.pythonRecorderCapture(payload);
+      return true;
+    }
+    captureQueue.push({ payload, queuedAt: Date.now() });
+    return false;
+  };
+
+  const deliverPageContext = payload => {
+    if (typeof window.pythonRecorderPageContext === "function") {
+      window.pythonRecorderPageContext(payload);
+      return true;
+    }
+    pageContextQueue.push({ payload, queuedAt: Date.now() });
+    return false;
+  };
+
+  const flushQueues = () => {
+    if (typeof window.pythonRecorderCapture === "function") {
+      while (captureQueue.length) {
+        const entry = captureQueue.shift();
+        window.pythonRecorderCapture({ ...entry.payload, queuedAt: entry.queuedAt });
+      }
+    }
+    if (typeof window.pythonRecorderPageContext === "function") {
+      while (pageContextQueue.length) {
+        const entry = pageContextQueue.shift();
+        window.pythonRecorderPageContext({ ...entry.payload, queuedAt: entry.queuedAt });
+      }
+    }
+  };
+
+  const ensureBindings = () => {
+    const captureReady = typeof window.pythonRecorderCapture === "function";
+    const contextReady = typeof window.pythonRecorderPageContext === "function";
+    if (captureReady || contextReady) {
+      flushQueues();
+    }
+    if (captureReady && contextReady) {
+      scheduleBindingCheck(2000);
+    } else {
+      scheduleBindingCheck(250);
+    }
+  };
+
+  scheduleBindingCheck(250);
+  ensureBindings();
+
+  const normalizeTarget = node => {
+    if (!node) return null;
+    if (node.nodeType === ELEMENT_NODE) return node;
+    if (node.nodeType === TEXT_NODE && node.parentElement) return node.parentElement;
+    if (node === document || node === window) return document.documentElement;
+    if (node.ownerDocument && node.ownerDocument.documentElement) {
+      return node.ownerDocument.documentElement;
+    }
+    return null;
+  };
 
   const buildAncestors = element => {
     const chain = [];
@@ -146,9 +220,18 @@ PAGE_INJECT_SCRIPT = """
     return xpath;
   };
 
-  const snapshotElement = element => {
+  const snapshotElement = rawTarget => {
+    const element = normalizeTarget(rawTarget);
     if (!element) return null;
-    const rect = element.getBoundingClientRect();
+    let rect = null;
+    try {
+      rect = element.getBoundingClientRect ? element.getBoundingClientRect() : null;
+    } catch (err) {
+      rect = null;
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[recorder] Failed to read bounding box", err);
+      }
+    }
     const dataAttributes = {};
     if (element.attributes) {
       for (const attr of Array.from(element.attributes)) {
@@ -185,12 +268,14 @@ PAGE_INJECT_SCRIPT = """
       checked: !!element.checked,
       disabled: !!element.disabled,
       href: element.getAttribute ? (element.getAttribute("href") || "") : "",
-      boundingClientRect: {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height
-      },
+      boundingClientRect: rect
+        ? {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height
+          }
+        : null,
       stableSelector: buildStableSelector(element),
       xpath: buildXPath(element),
       ancestors: buildAncestors(element),
@@ -207,7 +292,7 @@ PAGE_INJECT_SCRIPT = """
   };
 
   const sendAction = (action, target, extra) => {
-    if (!target || typeof window.pythonRecorderCapture !== "function") return;
+    if (!target) return;
     const element = snapshotElement(target);
     const viewport = {
       width: window.innerWidth,
@@ -215,7 +300,7 @@ PAGE_INJECT_SCRIPT = """
       devicePixelRatio: window.devicePixelRatio || 1
     };
     const box = element && element.boundingClientRect ? element.boundingClientRect : null;
-    window.pythonRecorderCapture({
+    const payload = {
       action,
       pageUrl: window.location.href,
       pageTitle: document.title,
@@ -230,11 +315,35 @@ PAGE_INJECT_SCRIPT = """
         height: box.height,
         quadrant: quadrant(box, viewport)
       } : null
-    });
+    };
+    deliverCapture(payload);
   };
 
   document.addEventListener("click", event => {
     sendAction("click", event.target, { button: event.button });
+  }, true);
+
+  document.addEventListener("dblclick", event => {
+    sendAction("dblclick", event.target, { button: event.button });
+  }, true);
+
+  document.addEventListener("contextmenu", event => {
+    sendAction("contextmenu", event.target, { button: event.button });
+  }, true);
+
+  const pointerPayload = event => ({
+    pointerType: event.pointerType,
+    button: event.button,
+    buttons: event.buttons,
+    pressure: event.pressure,
+  });
+
+  document.addEventListener("pointerdown", event => {
+    sendAction("pointerdown", event.target, pointerPayload(event));
+  }, true);
+
+  document.addEventListener("pointerup", event => {
+    sendAction("pointerup", event.target, pointerPayload(event));
   }, true);
 
   document.addEventListener("change", event => {
@@ -265,6 +374,34 @@ PAGE_INJECT_SCRIPT = """
     sendAction("focus", event.target, {});
   }, true);
 
+  document.addEventListener("blur", event => {
+    sendAction("blur", event.target, {});
+  }, true);
+
+  document.addEventListener("submit", event => {
+    const form = event.target;
+    const payload = {};
+    if (form && form.action) {
+      payload.action = form.action;
+    }
+    if (form && form.method) {
+      payload.method = form.method;
+    }
+    try {
+      const data = {};
+      new FormData(form).forEach((value, key) => {
+        if (!(key in data)) {
+          data[key] = [];
+        }
+        data[key].push(typeof value === "string" ? value : "[binary]");
+      });
+      payload.formData = data;
+    } catch (err) {
+      payload.formDataError = String(err);
+    }
+    sendAction("submit", event.target, payload);
+  }, true);
+
   document.addEventListener("keydown", event => {
     const interesting = ["Enter", "Escape", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
     if (interesting.includes(event.key)) {
@@ -279,8 +416,7 @@ PAGE_INJECT_SCRIPT = """
     }
   }, true);
 
-  const sendPageContext = () => {
-    if (typeof window.pythonRecorderPageContext !== "function") return;
+  const sendPageContext = trigger => {
     const breadcrumbSelectors = [
       "[data-breadcrumb]",
       "nav .breadcrumb li",
@@ -294,7 +430,7 @@ PAGE_INJECT_SCRIPT = """
         if (text) breadcrumbs.push(text);
       });
     });
-    window.pythonRecorderPageContext({
+    const payload = {
       pageUrl: window.location.href,
       title: document.title,
       breadcrumbs,
@@ -303,15 +439,19 @@ PAGE_INJECT_SCRIPT = """
         width: window.innerWidth,
         height: window.innerHeight,
         devicePixelRatio: window.devicePixelRatio || 1
-      }
-    });
+      },
+      trigger,
+    };
+    deliverPageContext(payload);
   };
 
-  document.addEventListener("DOMContentLoaded", () => sendPageContext());
-  window.addEventListener("hashchange", () => sendPageContext());
-  window.addEventListener("popstate", () => sendPageContext());
-  window.addEventListener("resize", () => sendPageContext());
-  sendPageContext();
+  document.addEventListener("DOMContentLoaded", () => sendPageContext("domcontentloaded"));
+  window.addEventListener("load", () => sendPageContext("load"));
+  window.addEventListener("hashchange", () => sendPageContext("hashchange"));
+  window.addEventListener("popstate", () => sendPageContext("popstate"));
+  window.addEventListener("resize", () => sendPageContext("resize"));
+  document.addEventListener("visibilitychange", () => sendPageContext("visibilitychange"));
+  sendPageContext("init");
   if (typeof console !== "undefined") {
     console.log("[recorder] instrumentation attached");
   }
@@ -345,11 +485,13 @@ class RecorderSession:
         capture_dom: bool,
         capture_screenshots: bool,
         stop_event: threading.Event,
+        options: Dict[str, Any],
     ) -> None:
         self.session_dir = session_dir
         self.capture_dom = capture_dom
         self.capture_screenshots = capture_screenshots
         self.stop_event = stop_event
+        self.options = dict(options)
         self.actions: List[Dict[str, Any]] = []
         self.page_events: List[Dict[str, Any]] = []
         self.action_counter = 0
@@ -359,10 +501,39 @@ class RecorderSession:
         self._page_lock = threading.Lock()
         self._pages: Dict[int, Page] = {}
         self._last_page_id: Optional[int] = None
+        self._metadata_lock = threading.Lock()
+        self._ended_at: Optional[str] = None
+        self._artifacts: Dict[str, Optional[str]] = {"har": None, "trace": None}
+        self.metadata_path = self.session_dir / "metadata.json"
+        self._last_navigation_url: Optional[str] = None
         if self.capture_screenshots:
             self.screenshot_dir.mkdir(parents=True, exist_ok=True)
         if self.capture_dom:
             self.dom_dir.mkdir(parents=True, exist_ok=True)
+        self._persist_metadata()
+
+    def _build_summary(self) -> Dict[str, Any]:
+        summary: Dict[str, Any] = {
+            "session": {
+                "id": self.session_dir.name,
+                "startedAt": self.started_at,
+            },
+            "options": self.options,
+            "pageContextEvents": self.page_events,
+            "actions": self.actions,
+            "artifacts": self._artifacts,
+        }
+        if self._ended_at:
+            summary["session"]["endedAt"] = self._ended_at
+        return summary
+
+    def _persist_metadata(self) -> None:
+        with self._metadata_lock:
+            summary = self._build_summary()
+            try:
+                self.metadata_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+            except Exception as exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to persist metadata snapshot: {exc}\n")
 
     @staticmethod
     def _page_key(page: Page) -> int:
@@ -404,10 +575,35 @@ class RecorderSession:
                 return self._pages.get(self._last_page_id)
         return None
 
-    def handle_page_context(self, _source: Any, payload: Dict[str, Any]) -> None:
+    def handle_page_context(self, source: Any, payload: Dict[str, Any]) -> None:
         event = dict(payload or {})
         event["receivedAt"] = _iso_now()
+        queued_at = event.get("queuedAt")
+        if queued_at:
+            try:
+                queued_at_int = int(queued_at)
+            except Exception:
+                queued_at_int = None
+            if queued_at_int:
+                event["queuedAt"] = queued_at_int
         self.page_events.append(event)
+
+        page = self._resolve_page(source)
+        frame = getattr(source, "frame", None)
+
+        url = event.get("pageUrl")
+        if url:
+            needs_record = False
+            if self._last_navigation_url is None:
+                needs_record = True
+            elif self._last_navigation_url != url:
+                needs_record = True
+            elif not self.actions:
+                needs_record = True
+            if needs_record:
+                self._record_navigation(event, page, frame)
+                self._last_navigation_url = url
+        self._persist_metadata()
 
     def handle_capture(self, source: Any, payload: Dict[str, Any]) -> None:
         self.action_counter += 1
@@ -484,6 +680,64 @@ class RecorderSession:
         self.actions.append(record)
         # Helpful debug output
         sys.stderr.write(f"[recorder] captured {action_id} -> {record.get('action')}\n")
+        self._persist_metadata()
+
+    def _record_navigation(
+        self,
+        event: Dict[str, Any],
+        page: Optional[Page],
+        frame: Optional[Frame],
+    ) -> None:
+        self.action_counter += 1
+        action_id = f"A-{self.action_counter:03}"
+        record: Dict[str, Any] = {
+            "actionId": action_id,
+            "action": "navigate",
+            "category": "navigation",
+            "pageUrl": event.get("pageUrl"),
+            "pageTitle": event.get("title"),
+            "timestamp": event.get("timestamp"),
+            "receivedAt": _iso_now(),
+            "trigger": event.get("trigger"),
+            "breadcrumbs": event.get("breadcrumbs", []),
+            "viewport": event.get("viewport"),
+        }
+        queued_at = event.get("queuedAt")
+        if queued_at:
+            record["queuedAt"] = queued_at
+
+        if frame:
+            try:
+                record.setdefault("frameUrl", frame.url)
+            except Exception:
+                pass
+
+        if page:
+            record.setdefault("pageRef", str(self._page_key(page)))
+
+        if self.capture_screenshots and page and not page.is_closed():
+            screenshot_result = self._capture_screenshot(page, action_id, None)
+            if screenshot_result:
+                screenshot_path, used_full_page = screenshot_result
+                record["screenshotPath"] = screenshot_path
+                if used_full_page:
+                    record["screenshotFullPage"] = True
+
+        if self.capture_dom and (page or frame) and not self.stop_event.is_set():
+            dom_result = self._capture_dom(page, frame, action_id)
+            if dom_result:
+                dom_path = dom_result.get("path")
+                if dom_path:
+                    record["domSnapshotPath"] = dom_path
+                scope = dom_result.get("scope")
+                if scope:
+                    record["domSnapshotScope"] = scope
+                error = dom_result.get("error")
+                if error:
+                    record.setdefault("domSnapshotError", error)
+
+        self.actions.append(record)
+        sys.stderr.write(f"[recorder] captured {action_id} -> navigate\n")
 
     def _capture_screenshot(
         self, page: Page, action_id: str, clip: Optional[Dict[str, Any]]
@@ -563,24 +817,20 @@ class RecorderSession:
             combined_error = "; ".join(errors + [str(exc)]) if errors else str(exc)
             return {"error": combined_error}
 
-    def finalize(self, options: Dict[str, Any], har_path: Optional[Path], trace_path: Optional[Path]) -> Path:
-        summary = {
-            "session": {
-                "id": self.session_dir.name,
-                "startedAt": self.started_at,
-                "endedAt": _iso_now(),
-            },
-            "options": options,
-            "pageContextEvents": self.page_events,
-            "actions": self.actions,
-            "artifacts": {
-                "har": str(har_path.relative_to(self.session_dir)) if har_path and har_path.exists() else None,
-                "trace": str(trace_path.relative_to(self.session_dir)) if trace_path and trace_path.exists() else None,
-            },
-        }
-        output_path = self.session_dir / "metadata.json"
-        output_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-        return output_path
+    def finalize(self, har_path: Optional[Path], trace_path: Optional[Path]) -> Path:
+        self._ended_at = _iso_now()
+        if har_path and har_path.exists():
+            try:
+                self._artifacts["har"] = str(har_path.relative_to(self.session_dir))
+            except Exception:
+                self._artifacts["har"] = str(har_path)
+        if trace_path and trace_path.exists():
+            try:
+                self._artifacts["trace"] = str(trace_path.relative_to(self.session_dir))
+            except Exception:
+                self._artifacts["trace"] = str(trace_path)
+        self._persist_metadata()
+        return self.metadata_path
 
 
 def _ensure_playwright() -> Playwright:
@@ -658,11 +908,23 @@ def main() -> None:
     else:
         print("[recorder] Press Ctrl+C in this terminal to stop recording.")
 
+    options = {
+        "browser": args.browser,
+        "headless": args.headless,
+        "slowMo": args.slow_mo,
+        "captureDom": args.capture_dom,
+        "captureScreenshots": args.capture_screenshots,
+        "recordHar": not args.no_har,
+        "recordTrace": not args.no_trace,
+        "url": args.url,
+    }
+
     playwright = _ensure_playwright()
     context = None
     browser = None
     stop_event = threading.Event()
     session: Optional[RecorderSession] = None
+    metadata_written = False
     try:
         if not args.no_har:
             har_path = session_dir / "network.har"
@@ -681,6 +943,7 @@ def main() -> None:
             capture_dom=args.capture_dom,
             capture_screenshots=args.capture_screenshots,
             stop_event=stop_event,
+            options=options,
         )
 
         def _on_page(new_page: Page) -> None:
@@ -733,17 +996,8 @@ def main() -> None:
         browser.close()
         playwright.stop()
 
-        options = {
-            "browser": args.browser,
-            "headless": args.headless,
-            "slowMo": args.slow_mo,
-            "captureDom": args.capture_dom,
-            "captureScreenshots": args.capture_screenshots,
-            "recordHar": not args.no_har,
-            "recordTrace": not args.no_trace,
-            "url": args.url,
-        }
-        metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
+        metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+        metadata_written = True
 
         print(f"[recorder] Recorded {len(session.actions)} actions.")
         print(f"[recorder] Metadata saved to {metadata_path}")
@@ -774,6 +1028,14 @@ def main() -> None:
             playwright.stop()
         except Exception:
             pass
+
+        if session and not metadata_written:
+            try:
+                metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+                metadata_written = True
+                print(f"[recorder] Metadata saved to {metadata_path}")
+            except Exception as finalize_exc:  # noqa: BLE001
+                sys.stderr.write(f"[recorder] Failed to finalize metadata: {finalize_exc}\n")
 
 
 if __name__ == "__main__":

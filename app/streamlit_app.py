@@ -369,10 +369,14 @@ with col2:
             if os.name == "nt" and hasattr(signal, "CTRL_BREAK_EVENT"):
                 proc.send_signal(signal.CTRL_BREAK_EVENT)
             else:
-                proc.terminate()
+                proc.send_signal(signal.SIGINT)
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
         finally:
             st.session_state["record_proc"] = None
             _finalize_recorder_session()
