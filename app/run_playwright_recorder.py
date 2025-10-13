@@ -774,7 +774,7 @@ def main() -> None:
         browser.close()
         playwright.stop()
 
-        metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+        metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
         metadata_written = True
 
         print(f"[recorder] Recorded {len(session.actions)} actions.")
@@ -809,7 +809,7 @@ def main() -> None:
 
         if session and not metadata_written:
             try:
-                metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+                metadata_path = session.finalize(options=options, har_path=har_path, trace_path=trace_path)
                 metadata_written = True
                 print(f"[recorder] Metadata saved to {metadata_path}")
             except Exception as finalize_exc:  # noqa: BLE001
