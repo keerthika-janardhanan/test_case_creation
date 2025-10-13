@@ -319,6 +319,35 @@ def _normalize_record_url(raw_url: str) -> Tuple[Optional[str], Optional[str]]:
     return normalized, None
 
 
+def _validate_recorder_runtime(python_exec: str) -> Optional[str]:
+    """Ensure the selected interpreter can launch the recorder."""
+
+    try:
+        result = subprocess.run(
+            [python_exec, "-c", "import playwright"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        return f"Recorder Python executable not found: {exc}"
+    except Exception as exc:  # noqa: BLE001
+        return f"Failed to validate recorder runtime ({python_exec}): {exc}"
+
+    if result.returncode != 0:
+        stderr = (result.stderr or "").strip()
+        stdout = (result.stdout or "").strip()
+        details = stderr or stdout or "Playwright import failed for an unknown reason."
+        instructions = (
+            "Ensure Playwright is installed for this interpreter by running:\n"
+            f"{python_exec} -m pip install playwright\n"
+            f"{python_exec} -m playwright install chromium"
+        )
+        return f"Recorder dependencies are missing: {details}\n\n{instructions}"
+
+    return None
+
+
 def _finalize_recorder_session() -> None:
     session_dir = st.session_state.get("record_session_dir")
     if not session_dir:
@@ -367,6 +396,8 @@ if "rec_capture_trace" not in st.session_state:
     st.session_state["rec_capture_trace"] = True
 if "rec_capture_har" not in st.session_state:
     st.session_state["rec_capture_har"] = False
+if "rec_ignore_https" not in st.session_state:
+    st.session_state["rec_ignore_https"] = False
 if "rec_timeout" not in st.session_state:
     st.session_state["rec_timeout"] = 0
 
@@ -380,6 +411,12 @@ with opt_cols[2]:
     st.checkbox("Capture Playwright Trace", key="rec_capture_trace", value=True)
 with opt_cols[3]:
     st.checkbox("Capture HAR", key="rec_capture_har")
+
+st.checkbox(
+    "Ignore HTTPS Errors",
+    key="rec_ignore_https",
+    help="Bypass TLS certificate validation (needed for some internal test environments).",
+)
 
 timeout_col, _ = st.columns([1, 3])
 with timeout_col:
@@ -400,72 +437,54 @@ with col1:
             output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
             output_root.mkdir(parents=True, exist_ok=True)
             session_dir = output_root / session_name
-            cmd: List[str] = [
-                sys.executable,
-                "-m",
-                "app.run_playwright_recorder",
-                "--url",
-                normalized_url,
-                "--output-dir",
-                str(output_root),
-                "--session-name",
-                session_name,
-            ]
-            if not st.session_state["rec_capture_trace"]:
-                cmd.append("--no-trace")
-            if not st.session_state["rec_capture_har"]:
-                cmd.append("--no-har")
-            if st.session_state["rec_capture_dom"]:
-                cmd.append("--capture-dom")
-            if st.session_state["rec_capture_screens"]:
-                cmd.append("--capture-screenshots")
-            if st.session_state["rec_timeout"]:
-                cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
-        session_name = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
-        output_root.mkdir(parents=True, exist_ok=True)
-        session_dir = output_root / session_name
-        python_exec = st.session_state.get("rec_python_executable") or sys.executable
+            python_exec = st.session_state.get("rec_python_executable") or sys.executable
 
-        cmd: List[str] = [
-            python_exec,
-            "-m",
-            "app.run_playwright_recorder",
-            "--url",
-            record_url,
-            "--output-dir",
-            str(output_root),
-            "--session-name",
-            session_name,
-        ]
-        if not st.session_state["rec_capture_trace"]:
-            cmd.append("--no-trace")
-        if not st.session_state["rec_capture_har"]:
-            cmd.append("--no-har")
-        if st.session_state["rec_capture_dom"]:
-            cmd.append("--capture-dom")
-        if st.session_state["rec_capture_screens"]:
-            cmd.append("--capture-screenshots")
-        if st.session_state["rec_timeout"]:
-            cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
+            runtime_error = _validate_recorder_runtime(python_exec)
+            if runtime_error:
+                st.error(runtime_error)
+                st.session_state["record_manual_log"] = runtime_error
+            else:
+                cmd: List[str] = [
+                    python_exec,
+                    "-m",
+                    "app.run_playwright_recorder",
+                    "--url",
+                    normalized_url,
+                    "--output-dir",
+                    str(output_root),
+                    "--session-name",
+                    session_name,
+                ]
+                if not st.session_state["rec_capture_trace"]:
+                    cmd.append("--no-trace")
+                if not st.session_state["rec_capture_har"]:
+                    cmd.append("--no-har")
+                if st.session_state["rec_capture_dom"]:
+                    cmd.append("--capture-dom")
+                if st.session_state["rec_capture_screens"]:
+                    cmd.append("--capture-screenshots")
+                if st.session_state["rec_ignore_https"]:
+                    cmd.append("--ignore-https-errors")
+                if st.session_state["rec_timeout"]:
+                    cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
 
-            creationflags = 0
-            if os.name == "nt" and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
-                creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
-            try:
-                proc = subprocess.Popen(cmd, creationflags=creationflags)
-                st.session_state["record_proc"] = proc
-                st.session_state["record_session_dir"] = str(session_dir)
-                st.session_state["record_metadata"] = None
-                st.session_state["record_manual_out_path"] = None
-                st.session_state["record_manual_log"] = ""
-                st.success(
-                    f"Recorder started. A browser window should open. Session artefacts will appear in `{session_dir}`."
-                )
-            except FileNotFoundError as exc:
-                st.error(f"Failed to launch recorder: {exc}")
-            except Exception as exc:  # noqa: BLE001
-                st.error(f"Unexpected error launching recorder: {exc}")
+                creationflags = 0
+                if os.name == "nt" and hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
+                    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
+                try:
+                    proc = subprocess.Popen(cmd, creationflags=creationflags)
+                    st.session_state["record_proc"] = proc
+                    st.session_state["record_session_dir"] = str(session_dir)
+                    st.session_state["record_metadata"] = None
+                    st.session_state["record_manual_out_path"] = None
+                    st.session_state["record_manual_log"] = ""
+                    st.success(
+                        f"Recorder started. A browser window should open. Session artefacts will appear in `{session_dir}`."
+                    )
+                except FileNotFoundError as exc:
+                    st.error(f"Failed to launch recorder: {exc}")
+                except Exception as exc:  # noqa: BLE001
+                    st.error(f"Unexpected error launching recorder: {exc}")
 
 with col2:
     if st.button("Stop Recording") and st.session_state["record_proc"]:

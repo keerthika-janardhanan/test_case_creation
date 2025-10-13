@@ -13,9 +13,24 @@ from pathlib import Path
 from types import FrameType
 from typing import Any, Dict, List, Optional, Tuple
 
-from playwright.sync_api import Browser, BrowserContext, Frame, Page, Playwright, sync_playwright
+from playwright.sync_api import (
+    Browser,
+    BrowserContext,
+    ConsoleMessage,
+    Frame,
+    Page,
+    Playwright,
+    Request,
+    Response,
+    sync_playwright,
+)
 
 from app.browser_utils import SUPPORTED_BROWSERS, normalize_browser_name
+
+DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+)
 
 
 def _signal_name(signum: int) -> str:
@@ -958,6 +973,7 @@ def _build_context(
     headless: bool,
     slow_mo: Optional[int],
     har_path: Optional[Path],
+    ignore_https_errors: bool,
 ) -> BrowserContext:
     normalized_name = normalize_browser_name(browser_name, SUPPORTED_BROWSERS)
     browser_factory = getattr(playwright, normalized_name)
@@ -968,7 +984,7 @@ def _build_context(
             record_har_path=str(har_path),
             record_har_mode="minimal",
         )
-    context = browser.new_context(**context_kwargs)
+    context = browser.new_context(ignore_https_errors=ignore_https_errors, **context_kwargs)
     return context
 
 
@@ -1022,6 +1038,11 @@ def main() -> None:
     parser.add_argument("--no-har", action="store_true", help="Disable HAR/network capture.")
     parser.add_argument("--capture-dom", action="store_true", help="Persist DOM snapshot HTML for each captured action.")
     parser.add_argument("--capture-screenshots", action="store_true", help="Capture element screenshots for each action.")
+    parser.add_argument(
+        "--ignore-https-errors",
+        action="store_true",
+        help="Skip TLS/SSL certificate validation (useful for internal/self-signed environments).",
+    )
 
     args = parser.parse_args()
 
@@ -1064,6 +1085,7 @@ def main() -> None:
         "recordHar": not args.no_har,
         "recordTrace": not args.no_trace,
         "url": args.url,
+        "ignoreHttpsErrors": args.ignore_https_errors,
     }
 
     playwright = _ensure_playwright()
@@ -1083,6 +1105,7 @@ def main() -> None:
             headless=args.headless,
             slow_mo=args.slow_mo,
             har_path=har_path if not args.no_har else None,
+            ignore_https_errors=args.ignore_https_errors,
         )
         browser = context.browser
 
