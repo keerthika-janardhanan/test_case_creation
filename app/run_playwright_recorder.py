@@ -974,10 +974,16 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    original_browser = args.browser
     try:
-        normalized_browser = normalize_browser_name(args.browser, SUPPORTED_BROWSERS)
+        normalized_browser = normalize_browser_name(original_browser, SUPPORTED_BROWSERS)
     except ValueError as exc:
         parser.error(str(exc))
+
+    if normalized_browser.lower() != original_browser.strip().lower():
+        print(
+            f"[recorder] Normalizing browser '{original_browser}' to '{normalized_browser}'."
+        )
 
     args.browser = normalized_browser
 

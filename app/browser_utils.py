@@ -9,7 +9,7 @@ SUPPORTED_BROWSERS: Tuple[str, ...] = ("chromium", "firefox", "webkit")
 
 
 def normalize_browser_name(browser_name: str, supported: Sequence[str] | None = None) -> str:
-    """Return a canonical browser name or raise a helpful error.
+    """Return a canonical browser name, fixing close typos when possible.
 
     Parameters
     ----------
@@ -23,14 +23,14 @@ def normalize_browser_name(browser_name: str, supported: Sequence[str] | None = 
     Returns
     -------
     str
-        The canonical browser identifier from ``supported``.
+        The canonical browser identifier from ``supported``. When the input is
+        a close typo of a supported option the closest match is returned.
 
     Raises
     ------
     ValueError
         If ``browser_name`` is empty or does not correspond to a supported
-        browser. When the input is close to a supported value, the exception
-        message includes a suggestion to aid the caller.
+        browser and no close match can be determined.
     """
 
     if supported is None:
@@ -49,8 +49,7 @@ def normalize_browser_name(browser_name: str, supported: Sequence[str] | None = 
 
     matches = get_close_matches(normalized, list(canonical_map.keys()), n=1, cutoff=0.6)
     if matches:
-        suggestion = canonical_map[matches[0]]
-        raise ValueError(f"Unsupported browser '{browser_name}'. Did you mean '{suggestion}'?")
+        return canonical_map[matches[0]]
 
     options = ", ".join(canonical_map.values())
     raise ValueError(f"Unsupported browser '{browser_name}'. Choose from {options}.")

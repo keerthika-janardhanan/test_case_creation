@@ -14,10 +14,8 @@ def test_normalize_browser_accepts_supported_variants():
     assert normalize_browser_name(" firefox  ") == "firefox"
 
 
-def test_normalize_browser_suggests_close_match():
-    with pytest.raises(ValueError) as excinfo:
-        normalize_browser_name("chorium")
-    assert "Did you mean 'chromium'" in str(excinfo.value)
+def test_normalize_browser_corrects_close_match():
+    assert normalize_browser_name("chorium") == "chromium"
 
 
 def test_normalize_browser_lists_supported_options_when_unknown():
