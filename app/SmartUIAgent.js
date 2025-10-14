@@ -747,6 +747,7 @@ class StorageManager {
     this.maxBuffer = maxBuffer;
     this.records = [];
     this.insights = [];
+    this.environment = null;
   }
 
   addRecord(record) {
@@ -760,10 +761,15 @@ class StorageManager {
     this.insights.push({ ...insight, timestamp: new Date().toISOString() });
   }
 
+  setEnvironment(env) {
+    this.environment = { ...env };
+  }
+
   toJSON() {
     return {
       version: '1.0.0',
       generatedAt: new Date().toISOString(),
+      environment: this.environment,
       records: this.records,
       insights: this.insights
     };
@@ -864,6 +870,11 @@ export class SmartUIAgent {
       this.context.start();
     }
     this.state = SESSION_STATE.OBSERVING;
+    // Capture environment snapshot at start
+    try {
+      const env = this.getEnvironmentSnapshot();
+      this.storage.setEnvironment(env);
+    } catch (_) { /* noop */ }
     this.attachListeners();
     this.ui.mount();
     this.ui.updateStatus(this.state);
@@ -1132,7 +1143,108 @@ export class SmartUIAgent {
     this.stop();
     this.ui.teardown();
   }
+
+  // ---------------------- Environment & Test Cases ----------------------
+  getEnvironmentSnapshot() {
+    const navEntry = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || null;
+    const viewport = { width: window.innerWidth, height: window.innerHeight, dpr: window.devicePixelRatio || 1 };
+    const timing = navEntry ? {
+      type: navEntry.type,
+      startTime: navEntry.startTime,
+      domContentLoaded: navEntry.domContentLoadedEventEnd,
+      loadEventEnd: navEntry.loadEventEnd,
+      responseEnd: navEntry.responseEnd
+    } : null;
+    return {
+      url: location.href,
+      title: document.title,
+      referrer: document.referrer || null,
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+      viewport,
+      timing,
+      capturedAt: new Date().toISOString()
+    };
+  }
+
+  generateTestCases() {
+    // Map recorded events to structured manual test steps
+    const steps = [];
+    let stepIndex = 1;
+    const toLabel = (rec) => (rec.textContent && rec.textContent.trim()) || rec.metadata.labels?.[0] || rec.metadata.placeholder || rec.metadata.nameAttr || rec.metadata.id || rec.metadata.tag;
+    const toAction = (type, meta) => {
+      switch (type) {
+        case 'submit': return 'Submit Form';
+        case 'change': return 'Update Field';
+        case 'input': return 'Enter Data';
+        case 'click': return meta.semanticRole === 'link' ? 'Follow Link' : 'Click';
+        case 'hover': return 'Hover';
+        case 'focus': return 'Focus Field';
+        case 'blur': return 'Leave Field';
+        default: return type.charAt(0).toUpperCase() + type.slice(1);
+      }
+    };
+    const toExpected = (type, txt) => {
+      if (type === 'submit') return 'Form submitted and response displayed.';
+      if (type === 'change' || type === 'input') return 'Value accepted and rendered.';
+      if (/save|apply|confirm|checkout/i.test(txt || '')) return 'Action acknowledged by the UI.';
+      if (type === 'click') return 'Control responds and state updates.';
+      return '';
+    };
+    this.storage.records.forEach((rec) => {
+      const label = toLabel(rec);
+      const action = toAction(rec.eventType, rec.metadata);
+      const navText = `${action} ${label ? `'${label}'` : rec.targetSummary}`.trim();
+      steps.push({
+        step: stepIndex++,
+        action,
+        navigation: navText,
+        data: rec.eventType === 'input' || rec.eventType === 'change' ? (rec.textContent || '') : '',
+        expected: toExpected(rec.eventType, rec.textContent)
+      });
+    });
+    return {
+      id: `TC-${Date.now()}`,
+      title: document.title || 'Recorded Scenario',
+      type: 'positive',
+      preconditions: [
+        `Navigate to ${location.href}`,
+        'User has required access and test data available.'
+      ],
+      step_details: steps,
+      steps: steps.map((s) => `${s.action} - ${s.navigation}${s.data ? ` | Data: ${s.data}` : ''}${s.expected ? ` | Expected: ${s.expected}` : ''}`),
+      data: {},
+      expected: steps.length ? steps[steps.length - 1].expected : '',
+      tags: ['recorded', 'smart-ui-agent'],
+      assumptions: []
+    };
+  }
+
+  exportTestCases(format = 'json') {
+    const tc = this.generateTestCases();
+    if (format === 'json') {
+      downloadFile(`smart-ui-tests-${Date.now()}.json`, JSON.stringify([tc], null, 2));
+      return;
+    }
+    if (format === 'csv') {
+      const headers = ['SL','Action','Navigation Steps','Key Data Element Examples','Expected Results'];
+      const rows = tc.step_details.map((d, idx) => [idx + 1, d.action, escapeCsv(d.navigation), escapeCsv(d.data), escapeCsv(d.expected)]);
+      const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      downloadFile(`smart-ui-tests-${Date.now()}.csv`, csv, 'text/csv');
+    }
+  }
 }
 
 export default SmartUIAgent;
+
+// ---------------------- Helpers ----------------------
+function escapeCsv(text) {
+  const s = (text == null ? '' : String(text));
+  if (/[",\n]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
 

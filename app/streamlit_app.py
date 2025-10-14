@@ -447,7 +447,7 @@ with col1:
                 cmd: List[str] = [
                     python_exec,
                     "-m",
-                    "app.run_playwright_recorder",
+                    "app.run_playwright_recorder_v2",
                     "--url",
                     normalized_url,
                     "--output-dir",
@@ -543,7 +543,7 @@ if session_dir and metadata:
             }
         )
     if preview_rows:
-        st.dataframe(pd.DataFrame(preview_rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(preview_rows), width="stretch", hide_index=True)
 
     st.markdown("##### Recorder Artefacts")
     metadata_path = session_path / "metadata.json"

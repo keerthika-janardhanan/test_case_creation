@@ -1,4 +1,16 @@
-"""Instrumented Playwright recorder that captures rich UI metadata for each action."""
+"""Instrumented Playwright recorder: robust navigation + rich diagnostics.
+
+Artifacts per session:
+  recordings/<session>/
+    - metadata.json
+    - dom/*.html              (with --capture-dom)
+    - screenshots/*.png       (with --capture-screenshots)
+    - network.har             (unless --no-har)
+    - trace.zip               (unless --no-trace)
+
+Usage (PowerShell):
+  python -m app.run_playwright_recorder --url "https://example.com" --capture-dom --timeout 20
+"""
 
 from __future__ import annotations
 
@@ -14,563 +26,468 @@ from types import FrameType
 from typing import Any, Dict, List, Optional, Tuple
 
 from playwright.sync_api import (
-    Browser,
-    BrowserContext,
-    ConsoleMessage,
-    Frame,
-    Page,
-    Playwright,
-    Request,
-    Response,
-    sync_playwright,
+  Browser,
+  BrowserContext,
+  ConsoleMessage,
+  Frame,
+  Page,
+  Playwright,
+  Request,
+  Response,
+  sync_playwright,
 )
 
 from app.browser_utils import SUPPORTED_BROWSERS, normalize_browser_name
 
+
+# ----------------------------- Defaults -----------------------------
 DEFAULT_USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+  "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 )
 
 
+# ----------------------------- Helpers ------------------------------
+def _iso_now() -> str:
+  return datetime.now(timezone.utc).isoformat()
+
+
+def _mask(value: Optional[str]) -> Optional[str]:
+  if value is None:
+    return None
+  s = str(value)
+  low = s.lower()
+  if any(tok in low for tok in ("password", "secret", "token", "otp")):
+    return "********"
+  if "@" in s and " " not in s:
+    return "<email>"
+  return s if len(s) <= 64 else f"{s[:8]}...{s[-4:]}"
+
+
 def _signal_name(signum: int) -> str:
-    try:
-        return signal.Signals(signum).name
-    except Exception:  # noqa: BLE001
-        return str(signum)
+  try:
+    return signal.Signals(signum).name
+  except Exception:  # noqa: BLE001
+    return str(signum)
 
 
 def _install_signal_handlers(stop_event: threading.Event) -> List[Tuple[int, Any]]:
-    installed: List[Tuple[int, Any]] = []
+  installed: List[Tuple[int, Any]] = []
 
-    def _make_handler(signum: int):  # noqa: ARG001
-        def _handler(received_signum: int, frame: Optional[FrameType]) -> None:  # noqa: ARG001
-            if not stop_event.is_set():
-                sys.stderr.write(
-                    f"[recorder] Signal {_signal_name(received_signum)} received. Attempting graceful shutdown...\n"
-                )
-                stop_event.set()
-            raise KeyboardInterrupt
+  def _handler(received_signum: int, frame: Optional[FrameType]) -> None:  # noqa: ARG001
+    if not stop_event.is_set():
+      sys.stderr.write(
+        f"[recorder] Signal {_signal_name(received_signum)} received. Stopping...\n"
+      )
+      stop_event.set()
 
-        return _handler
-
-    for signame in ("SIGINT", "SIGTERM", "SIGBREAK"):
-        signum = getattr(signal, signame, None)
-        if signum is None:
-            continue
-        try:
-            previous = signal.getsignal(signum)
-            signal.signal(signum, _make_handler(signum))
-            installed.append((signum, previous))
-        except (AttributeError, ValueError, OSError):
-            continue
-
-    return installed
+  for signame in ("SIGINT", "SIGTERM", "SIGBREAK"):
+    signum = getattr(signal, signame, None)
+    if signum is None:
+      continue
+    try:
+      prev = signal.getsignal(signum)
+      signal.signal(signum, _handler)
+      installed.append((signum, prev))
+    except (AttributeError, ValueError, OSError):
+      continue
+  return installed
 
 
 def _restore_signal_handlers(handlers: List[Tuple[int, Any]]) -> None:
-    for signum, handler in handlers:
-        try:
-            signal.signal(signum, handler)
-        except (AttributeError, ValueError, OSError):
-            continue
+  for signum, handler in handlers:
+    try:
+      signal.signal(signum, handler)
+    except (AttributeError, ValueError, OSError):
+      pass
 
 
+# ----------------------- Page-side instrumentation ------------------
 PAGE_INJECT_SCRIPT = """
 (() => {
-  const ELEMENT_NODE = typeof Node !== "undefined" ? Node.ELEMENT_NODE : 1;
-  const TEXT_NODE = typeof Node !== "undefined" ? Node.TEXT_NODE : 3;
-
-  const toText = node => (node && node.textContent ? node.textContent.trim().slice(0, 120) : "");
-
   const captureQueue = [];
-  const pageContextQueue = [];
-  let bindingsReady = false;
-  let bindingMonitor = null;
-  let bindingAttempts = 0;
+  const pageEventsQueue = [];
 
-  const markBindingsReady = () => {
-    const captureReady = typeof window.pythonRecorderCapture === "function";
-    const contextReady = typeof window.pythonRecorderPageContext === "function";
-
-    if (captureReady || contextReady) {
-      flushQueues();
-    }
-
-    const ready = captureReady && contextReady;
-    if (ready && !bindingsReady) {
-      bindingsReady = true;
-      window.__pythonRecorderBindingsReady = true;
-      if (typeof document !== "undefined" && document) {
-        try {
-          document.dispatchEvent(new CustomEvent("__pythonRecorderBindingsReady", { bubbles: false }));
-        } catch (err) {
-          if (typeof console !== "undefined" && console && console.debug) {
-            console.debug("[recorder] Failed to dispatch bindings ready event", err);
-          }
-        }
-      }
-    }
-
-    return ready;
-  };
-
-  const deliverCapture = payload => {
-    if (typeof window.pythonRecorderCapture === "function") {
-      window.pythonRecorderCapture(payload);
-      return true;
-    }
-    captureQueue.push({ payload, queuedAt: Date.now() });
-    return false;
-  };
-
-  const deliverPageContext = payload => {
-    if (typeof window.pythonRecorderPageContext === "function") {
-      window.pythonRecorderPageContext(payload);
-      return true;
-    }
-    pageContextQueue.push({ payload, queuedAt: Date.now() });
-    return false;
-  };
-
-  const flushQueues = () => {
-    if (typeof window.pythonRecorderCapture === "function") {
-      while (captureQueue.length) {
-        const entry = captureQueue.shift();
-        window.pythonRecorderCapture({ ...entry.payload, queuedAt: entry.queuedAt });
-      }
-    }
-    if (typeof window.pythonRecorderPageContext === "function") {
-      while (pageContextQueue.length) {
-        const entry = pageContextQueue.shift();
-        window.pythonRecorderPageContext({ ...entry.payload, queuedAt: entry.queuedAt });
-      }
-    }
-  };
-
-  const ensureBindings = () => {
-    if (markBindingsReady()) {
-      if (bindingMonitor) {
-        clearTimeout(bindingMonitor);
-        bindingMonitor = null;
-      }
-      return true;
-    }
-    return false;
-  };
-
-  const startBindingMonitor = () => {
-    if (bindingsReady) {
-      return;
-    }
-    if (bindingMonitor) {
-      clearTimeout(bindingMonitor);
-      bindingMonitor = null;
-    }
-
-    const tick = () => {
-      if (ensureBindings()) {
-        return;
-      }
-      bindingAttempts += 1;
-      const delay = Math.min(2000, 100 + bindingAttempts * 50);
-      bindingMonitor = setTimeout(tick, delay);
-    };
-
-    bindingMonitor = setTimeout(tick, 50);
-
-    setTimeout(() => {
-      if (!bindingsReady && typeof console !== "undefined" && console && console.warn) {
-        console.warn("[recorder] Waiting for Playwright bindings to become available...");
-      }
-    }, 750);
-  };
-
-  if (typeof document !== "undefined" && document) {
-    document.addEventListener("readystatechange", startBindingMonitor, { once: false });
-    document.addEventListener("__pythonRecorderBindingsPing", startBindingMonitor);
+  const deliver = (name, payload) => {
+  const fn = (window && window[name]);
+  if (typeof fn === 'function') {
+    fn(payload);
+    return true;
   }
+  return false;
+  PAGE_INJECT_SCRIPT = """
+  (() => {
+    const toText = n => (n && n.textContent ? n.textContent.trim().slice(0, 120) : '');
+    const deliver = (name, payload) => { const fn = window && window[name]; if (typeof fn === 'function') { fn(payload); return true; } return false; };
+    const captureQ = []; const ctxQ = [];
+    const sendCap = p => { if (!deliver('pythonRecorderCapture', p)) captureQ.push(p); };
+    const _sendCtx = p => { if (!deliver('pythonRecorderPageContext', p)) ctxQ.push(p); };
+    setInterval(() => { while (captureQ.length && deliver('pythonRecorderCapture', captureQ[0])) captureQ.shift(); while (ctxQ.length && deliver('pythonRecorderPageContext', ctxQ[0])) ctxQ.shift(); }, 200);
+    const norm = n => (n && n.nodeType === Node.TEXT_NODE ? n.parentElement : (n && n.nodeType === Node.ELEMENT_NODE ? n : null));
+    const xp = el => { if (!el || el.nodeType !== 1) return ''; const s=[]; let n=el; while(n&&n.nodeType===1){let i=1;let b=n.previousSibling;while(b){if(b.nodeType===1&&b.nodeName===n.nodeName)i++; b=b.previousSibling;} s.unshift(`${n.nodeName.toLowerCase()}[${i}]`); n=n.parentNode&&n.parentNode.nodeType===1?n.parentNode:null;} return '/' + s.join('/'); };
+    const css = el => { const parts=[]; let n=el; while(n&&n.nodeType===1){ let sel=n.nodeName.toLowerCase(); if(n.id){parts.unshift(`${sel}#${n.id}`);break;} const p=n.parentNode; if(!p) break; const i=Array.from(p.children).indexOf(n)+1; parts.unshift(`${sel}:nth-child(${i})`); n=p;} return parts.join(' > '); };
+    const snap = raw => { const el = norm(raw); if (!el) return null; let r=null; try{ r=el.getBoundingClientRect(); }catch(e){} return { tag: (el.tagName||'').toLowerCase(), id: el.id||'', className: el.className||'', text: toText(el), xpath: xp(el), cssPath: css(el), rect: r?{x:r.x,y:r.y,width:r.width,height:r.height}:null }; };
+    const send = (action, target, extra) => { const element = snap(target); const payload = { action, pageUrl: location.href, pageTitle: document.title, timestamp: Date.now(), element, extra: extra||{} }; sendCap(payload); };
+    document.addEventListener('click', e => send('click', e.target, {button:e.button}), true);
+    document.addEventListener('change', e => { const t=e.target; send('change', t, {value: t && t.value}); }, true);
+    document.addEventListener('input', e => { const t=e.target; send('input', t, {value: t && t.value}); }, true);
+    document.addEventListener('keydown', e => { const keys=['Enter','Escape','Tab']; if (keys.includes(e.key)) send('press', e.target, {key:e.key}); }, true);
+    const sendCtx = (trigger) => { const payload = { pageUrl: location.href, title: document.title, timestamp: Date.now(), trigger }; _sendCtx(payload); };
+    document.addEventListener('DOMContentLoaded', () => sendCtx('domcontentloaded'));
+    window.addEventListener('load', () => sendCtx('load'));
+    sendCtx('init');
+  })();
+  """
 
-  startBindingMonitor();
-  ensureBindings();
+    self.actions: List[Dict[str, Any]] = []
+    self.page_events: List[Dict[str, Any]] = []
+    self.action_counter = 0
+    self.started_at = _iso_now()
+    self.ended_at: Optional[str] = None
+    self.artifacts: Dict[str, Optional[str]] = {"har": None, "trace": None}
+    self.metadata_path = self.session_dir / "metadata.json"
+    self._lock = threading.Lock()
 
-  const normalizeTarget = node => {
-    if (!node) return null;
-    if (node.nodeType === ELEMENT_NODE) return node;
-    if (node.nodeType === TEXT_NODE && node.parentElement) return node.parentElement;
-    if (node === document || node === window) return document.documentElement;
-    if (node.ownerDocument && node.ownerDocument.documentElement) {
-      return node.ownerDocument.documentElement;
-    }
-    return null;
-  };
+    self._persist()
 
-  const buildAncestors = element => {
-    const chain = [];
-    let current = element.parentElement;
-    let depth = 0;
-    while (current && depth < 8) {
-      chain.push({
-        tagName: current.tagName ? current.tagName.toLowerCase() : "",
-        id: current.id || "",
-        className: current.className || "",
-        role: current.getAttribute ? (current.getAttribute("role") || "") : ""
-      });
-      current = current.parentElement;
-      depth += 1;
+  def _persist(self) -> None:
+    payload = {
+      "session": {"id": self.session_dir.name, "startedAt": self.started_at, **({"endedAt": self.ended_at} if self.ended_at else {})},
+      "options": self.options,
+      "pageContextEvents": self.page_events,
+      "actions": self.actions,
+      "artifacts": self.artifacts,
     }
-    return chain;
-  };
+    try:
+      self.metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    except Exception as exc:  # noqa: BLE001
+      sys.stderr.write(f"[recorder] Failed to write metadata: {exc}\n")
 
-  const siblingSummary = element => {
-    if (!element || !element.parentElement) {
-      return { previous: null, next: null, position: -1, total: 0 };
-    }
-    const siblings = Array.from(element.parentElement.children);
-    const index = siblings.indexOf(element);
-    const describe = node => {
-      if (!node) return null;
-      return {
-        tagName: node.tagName ? node.tagName.toLowerCase() : "",
-        text: toText(node),
-        role: node.getAttribute ? (node.getAttribute("role") || "") : "",
-        id: node.id || ""
-      };
-    };
-    return {
-      previous: describe(siblings[index - 1]),
-      next: describe(siblings[index + 1]),
-      position: index,
-      total: siblings.length
-    };
-  };
+  def add_page_event(self, data: Dict[str, Any]) -> None:
+    data = dict(data or {})
+    data["receivedAt"] = _iso_now()
+    self.page_events.append(data)
+    self._persist()
 
-  const findHeadingBackwards = node => {
-    let current = node;
-    while (current) {
-      if (current.tagName && /^H[1-6]$/i.test(current.tagName)) {
-        const text = toText(current);
-        if (text) return text;
-      }
-      if (current.getAttribute && current.getAttribute("role") === "heading") {
-        const text = toText(current);
-        if (text) return text;
-      }
-      current = current.previousElementSibling;
-    }
-    return null;
-  };
+  def add_action(self, raw: Dict[str, Any]) -> None:
+    with self._lock:
+      self.action_counter += 1
+      action_id = f"A-{self.action_counter:03}"
+    record = dict(raw or {})
+    record["actionId"] = action_id
+    record["receivedAt"] = _iso_now()
 
-  const nearestHeading = element => {
-    let cursor = element;
-    while (cursor) {
-      const heading = findHeadingBackwards(cursor.previousElementSibling);
-      if (heading) return heading;
-      cursor = cursor.parentElement;
-    }
-    const docHeading = document.querySelector("h1, h2, h3, [role='heading']");
-    return docHeading ? toText(docHeading) : "";
-  };
+    # Mask values
+    element = record.get("element") or {}
+    extra = record.get("extra") or {}
+    if "text" in element:
+      element["text"] = _mask(element["text"])  # shallow mask for sensitive-like text
+    for key in ("value", "text", "inputValue"):
+      if key in extra:
+        extra[f"{key}Masked"] = _mask(extra[key])
+    record["element"] = element
+    record["extra"] = extra
 
-  const frameChain = () => {
-    let frame = window.frameElement;
-    const chain = [];
-    while (frame) {
-      chain.push({
-        tagName: frame.tagName ? frame.tagName.toLowerCase() : "",
-        name: frame.getAttribute ? (frame.getAttribute("name") || "") : "",
-        id: frame.id || "",
-        src: frame.getAttribute ? (frame.getAttribute("src") || "") : ""
-      });
-      const owner = frame.ownerDocument && frame.ownerDocument.defaultView;
-      frame = owner ? owner.frameElement : null;
-    }
-    return chain;
-  };
+    self.actions.append(record)
+    sys.stderr.write(f"[recorder] captured {action_id} -> {record.get('type')}\n")
+    self._persist()
 
-  const quadrant = (box, viewport) => {
-    if (!box || !viewport) return "";
-    const cx = box.x + box.width / 2;
-    const cy = box.y + box.height / 2;
-    const horizontal = cx < viewport.width / 2 ? "left" : "right";
-    const vertical = cy < viewport.height / 2 ? "top" : "bottom";
-    return `${vertical}-${horizontal}`;
-  };
+  def finalize(self, har_path: Optional[Path], trace_path: Optional[Path]) -> Path:
+    self.ended_at = _iso_now()
+    if har_path and har_path.exists():
+      try:
+        self.artifacts["har"] = str(har_path.relative_to(self.session_dir))
+      except Exception:
+        self.artifacts["har"] = str(har_path)
+    if trace_path and trace_path.exists():
+      try:
+        self.artifacts["trace"] = str(trace_path.relative_to(self.session_dir))
+      except Exception:
+        self.artifacts["trace"] = str(trace_path)
+    self._persist()
+    return self.metadata_path
 
-  const buildStableSelector = element => {
-    if (!element) return "";
-    if (element.hasAttribute && element.hasAttribute("data-testid")) {
-      return `${element.tagName.toLowerCase()}[data-testid="${element.getAttribute("data-testid")}"]`;
-    }
-    if (element.id) {
-      return `${element.tagName.toLowerCase()}#${element.id}`;
-    }
-    if (element.getAttribute && element.getAttribute("name")) {
-      return `${element.tagName.toLowerCase()}[name="${element.getAttribute("name")}"]`;
-    }
-    if (element.classList && element.classList.length) {
-      return `${element.tagName.toLowerCase()}.${Array.from(element.classList).slice(0, 3).join(".")}`;
-    }
-    return "";
-  };
 
-  const buildXPath = element => {
-    if (!element || element.nodeType !== 1) return "";
-    let xpath = "";
-    let node = element;
-    while (node && node.nodeType === 1) {
-      let index = 1;
-      let sibling = node.previousSibling;
-      while (sibling) {
-        if (sibling.nodeType === 1 && sibling.nodeName === node.nodeName) index += 1;
-        sibling = sibling.previousSibling;
-      }
-      const tag = node.nodeName.toLowerCase();
-      xpath = `/${tag}[${index}]` + xpath;
-      node = node.parentNode && node.parentNode.nodeType === 1 ? node.parentNode : null;
-    }
-    return xpath;
-  };
+# ------------------------------ Core flow ---------------------------
+def _ensure_playwright() -> Playwright:
+  try:
+    return sync_playwright().start()
+  except Exception as exc:  # noqa: BLE001
+    raise RuntimeError("Failed to start Playwright. Ensure browsers are installed: `python -m playwright install chromium`." ) from exc
 
-  const snapshotElement = rawTarget => {
-    const element = normalizeTarget(rawTarget);
-    if (!element) return null;
-    let rect = null;
-    try {
-      rect = element.getBoundingClientRect ? element.getBoundingClientRect() : null;
-    } catch (err) {
-      rect = null;
-      if (typeof console !== "undefined" && console.warn) {
-        console.warn("[recorder] Failed to read bounding box", err);
-      }
-    }
-    const dataAttributes = {};
-    if (element.attributes) {
-      for (const attr of Array.from(element.attributes)) {
-        if (attr.name.startsWith("data-")) {
-          dataAttributes[attr.name] = attr.value;
-        }
-      }
-    }
-    const root = element.getRootNode ? element.getRootNode() : null;
-    const shadowHost = root && root.host ? root.host : null;
-    const selectedOptions = [];
-    if (element.tagName === "SELECT") {
-      Array.from(element.selectedOptions || []).forEach(option => {
-        selectedOptions.push({
-          value: option.value,
-          label: toText(option)
-        });
-      });
-    }
-    return {
-      tagName: element.tagName ? element.tagName.toLowerCase() : "",
-      role: element.getAttribute ? (element.getAttribute("role") || "") : "",
-      ariaLabel: element.getAttribute ? (element.getAttribute("aria-label") || "") : "",
-      ariaLabelledBy: element.getAttribute ? (element.getAttribute("aria-labelledby") || "") : "",
-      placeholder: element.getAttribute ? (element.getAttribute("placeholder") || "") : "",
-      title: element.getAttribute ? (element.getAttribute("title") || "") : "",
-      text: toText(element),
-      value: element.value !== undefined ? element.value : null,
-      type: element.type || "",
-      name: element.name || "",
-      id: element.id || "",
-      className: element.className || "",
-      dataAttributes,
-      checked: !!element.checked,
-      disabled: !!element.disabled,
-      href: element.getAttribute ? (element.getAttribute("href") || "") : "",
-      boundingClientRect: rect
-        ? {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height
+
+def _build_context(
+  playwright: Playwright,
+  browser_name: str,
+  headless: bool,
+  slow_mo: Optional[int],
+  har_path: Optional[Path],
+  ignore_https_errors: bool,
+  user_agent: Optional[str],
+) -> BrowserContext:
+  normalized = normalize_browser_name(browser_name, SUPPORTED_BROWSERS)
+  browser_factory = getattr(playwright, normalized)
+  browser: Browser = browser_factory.launch(headless=headless, slow_mo=slow_mo)
+  ctx_kwargs: Dict[str, Any] = {"ignore_https_errors": ignore_https_errors}
+  if har_path:
+    ctx_kwargs.update(record_har_path=str(har_path), record_har_mode="minimal")
+  if user_agent:
+    ctx_kwargs["user_agent"] = user_agent
+  return browser.new_context(**ctx_kwargs)
+
+
+def _await_user(timeout: Optional[int], stop_event: threading.Event) -> None:
+  start = time.time()
+  try:
+    while not stop_event.is_set():
+      time.sleep(0.2)
+      if timeout and time.time() - start >= timeout:
+        print(f"[recorder] Auto-stopping after {timeout} seconds.")
+        stop_event.set()
+        break
+  except KeyboardInterrupt:
+    print("\n[recorder] Stopping (Ctrl+C detected).")
+    stop_event.set()
+
+
+def main() -> None:
+  parser = argparse.ArgumentParser(description="Open a browser and record rich UI metadata.")
+  parser.add_argument("--url", required=True, help="Initial URL to open.")
+  parser.add_argument("--output-dir", default="recordings", help="Base directory for artifacts.")
+  parser.add_argument("--session-name", default=None, help="Session folder name (default: timestamp).")
+  parser.add_argument("--browser", default="chromium", help=f"Browser engine ({', '.join(SUPPORTED_BROWSERS)}).")
+  parser.add_argument("--headless", action="store_true", help="Run browser in headless mode.")
+  parser.add_argument("--slow-mo", type=int, default=None, help="Slow down actions by N ms.")
+  parser.add_argument("--timeout", type=int, default=None, help="Auto-stop after N seconds.")
+  parser.add_argument("--no-trace", action="store_true", help="Disable Playwright trace capture.")
+  parser.add_argument("--no-har", action="store_true", help="Disable HAR/network capture.")
+  parser.add_argument("--capture-dom", action="store_true", help="Persist DOM snapshot for each action.")
+  parser.add_argument("--capture-screenshots", action="store_true", help="Capture screenshots for actions.")
+  parser.add_argument("--ignore-https-errors", action="store_true", help="Skip TLS certificate validation.")
+  parser.add_argument("--user-agent", default=DEFAULT_USER_AGENT, help="Override browser User-Agent.")
+
+  args = parser.parse_args()
+
+  # Normalize browser name
+  try:
+    args.browser = normalize_browser_name(args.browser, SUPPORTED_BROWSERS)
+  except ValueError as exc:
+    parser.error(str(exc))
+
+  # Session dirs
+  output_root = Path(args.output_dir).resolve()
+  output_root.mkdir(parents=True, exist_ok=True)
+  session_name = args.session_name or datetime.now().strftime("%Y%m%d_%H%M%S")
+  session_dir = output_root / session_name
+  session_dir.mkdir(parents=True, exist_ok=True)
+
+  stop_event = threading.Event()
+  handlers = _install_signal_handlers(stop_event)
+
+  har_path = None if args.no_har else session_dir / "network.har"
+  trace_path = None if args.no_trace else session_dir / "trace.zip"
+
+  print(f"[recorder] Session directory: {session_dir}")
+  print(f"[recorder] Launching browser ({args.browser}) at {args.url}")
+  if args.timeout:
+    print(f"[recorder] Will auto-stop after {args.timeout} seconds or Ctrl+C.")
+  else:
+    print("[recorder] Press Ctrl+C to stop recording.")
+
+  playwright = _ensure_playwright()
+  context: Optional[BrowserContext] = None
+  browser: Optional[Browser] = None
+  trace_started = False
+
+  # Prepare session
+  session = RecorderSession(
+    session_dir=session_dir,
+    capture_dom=args.capture_dom,
+    capture_screenshots=args.capture_screenshots,
+    options={
+      "browser": args.browser,
+      "headless": args.headless,
+      "slowMo": args.slow_mo,
+      "captureDom": args.capture_dom,
+      "captureScreenshots": args.capture_screenshots,
+      "recordHar": not args.no_har,
+      "recordTrace": not args.no_trace,
+      "url": args.url,
+      "ignoreHttpsErrors": args.ignore_https_errors,
+      "userAgent": args.user_agent,
+    },
+  )
+
+  try:
+    context = _build_context(
+      playwright=playwright,
+      browser_name=args.browser,
+      headless=args.headless,
+      slow_mo=args.slow_mo,
+      har_path=har_path,
+      ignore_https_errors=args.ignore_https_errors,
+      user_agent=args.user_agent,
+    )
+    browser = context.browser
+
+    # Bindings BEFORE any navigation
+    context.expose_binding("pythonRecorderCapture", lambda source, payload: _on_capture(session, source, payload, args))
+    context.expose_binding("pythonRecorderPageContext", lambda source, payload: _on_page_context(session, source, payload))
+    context.add_init_script(PAGE_INJECT_SCRIPT)
+
+    # Diagnostics
+    context.on("requestfailed", lambda req: sys.stderr.write(f"[recorder][requestfailed] {req.url} -> {getattr(req, 'failure', lambda: '')()}\n"))
+
+    page = context.new_page()
+    page.on("console", _on_console)
+    page.on("pageerror", _on_page_error)
+
+    # Trace
+    if trace_path is not None:
+      try:
+        context.tracing.start(screenshots=True, snapshots=True, sources=True)
+        trace_started = True
+      except Exception as exc:  # noqa: BLE001
+        sys.stderr.write(f"[recorder] Failed to start tracing: {exc}\n")
+
+    # Navigate
+    page.goto(args.url, wait_until="domcontentloaded")
+
+    _await_user(args.timeout, stop_event)
+
+    # Stop trace if active
+    if trace_started and trace_path is not None:
+      try:
+        context.tracing.stop(path=str(trace_path))
+      except Exception as exc:  # noqa: BLE001
+        sys.stderr.write(f"[recorder] Failed to stop tracing: {exc}\n")
+
+    context.close()
+    browser.close()
+    playwright.stop()
+
+    meta_path = session.finalize(har_path=har_path, trace_path=trace_path)
+    print(f"[recorder] Recorded {len(session.actions)} actions.")
+    print(f"[recorder] Metadata saved to {meta_path}")
+    if har_path and har_path.exists():
+      print(f"[recorder] HAR saved to {har_path}")
+    if trace_path and trace_path.exists():
+      print(f"[recorder] Trace saved to {trace_path}")
+    if args.capture_dom:
+      print(f"[recorder] DOM snapshots: {len(list((session.dom_dir).glob('*.html')))} file(s)")
+    if args.capture_screenshots:
+      print(f"[recorder] Screenshots: {len(list((session.screenshot_dir).glob('*.png')))} file(s)")
+
+  except KeyboardInterrupt:
+    stop_event.set()
+    sys.stderr.write("[recorder] Interrupt received. Cleaning up...\n")
+  except Exception as exc:  # noqa: BLE001
+    stop_event.set()
+    sys.stderr.write(f"[recorder] Unexpected error: {exc}\n")
+    raise
+  finally:
+    try:
+      if context and not context.is_closed():
+        context.close()
+    except Exception:
+      pass
+    try:
+      if browser and browser.is_connected():
+        browser.close()
+    except Exception:
+      pass
+    try:
+      playwright.stop()
+    except Exception:
+      pass
+    _restore_signal_handlers(handlers)
+
+
+# ------------------------------- Callbacks --------------------------
+def _on_console(msg: ConsoleMessage) -> None:
+  try:
+    sys.stderr.write(f"[recorder][console] {msg.type}: {msg.text}\n")
+  except Exception:
+    pass
+
+
+def _on_page_error(exc: Exception) -> None:
+  try:
+    sys.stderr.write(f"[recorder][pageerror] {exc}\n")
+  except Exception:
+    pass
+
+
+def _on_page_context(session: RecorderSession, source: Any, payload: Dict[str, Any]) -> None:
+  session.add_page_event(payload)
+
+
+def _on_capture(session: RecorderSession, source: Any, payload: Dict[str, Any], args: argparse.Namespace) -> None:
+  """Process an element capture event from the page (called via expose_binding)."""
+  record = dict(payload or {})
+
+  # Optional DOM snapshot
+  if args.capture_dom:
+    try:
+      frame = getattr(source, "frame", None)
+      html = None
+      scope = "page"
+      if frame is not None:
+        try:
+          html = frame.content()
+          scope = "frame"
+        except Exception:
+          html = None
+      if html is None:
+        page = getattr(source, "page", None)
+        if page is not None:
+          try:
+            html = page.content()
+            scope = "page"
+          except Exception:
+            html = None
+      if html:
+        idx = len(session.actions) + 1
+        dom_path = session.dom_dir / f"A-{idx:03}.html"
+        dom_path.write_text(html, encoding="utf-8")
+        record["domSnapshotPath"] = str(dom_path.relative_to(session.session_dir))
+        record["domSnapshotScope"] = scope
+    except Exception as exc:  # noqa: BLE001
+      record["domSnapshotError"] = str(exc)
+
+  # Optional screenshot
+  if args.capture_screenshots:
+    try:
+      page = getattr(source, "page", None)
+      if page and not page.is_closed():
+        idx = len(session.actions) + 1
+        shot_path = session.screenshot_dir / f"A-{idx:03}.png"
+        clip = None
+        element_rect = ((record.get("element") or {}).get("rect") or None)
+        if element_rect and all(k in element_rect for k in ("x", "y", "width", "height")):
+          clip = {
+            "x": max(0, float(element_rect.get("x", 0))),
+            "y": max(0, float(element_rect.get("y", 0))),
+            "width": max(1, float(element_rect.get("width", 1))),
+            "height": max(1, float(element_rect.get("height", 1))),
           }
-        : null,
-      stableSelector: buildStableSelector(element),
-      xpath: buildXPath(element),
-      ancestors: buildAncestors(element),
-      siblings: siblingSummary(element),
-      nearestHeading: nearestHeading(element),
-      frameChain: frameChain(),
-      shadowHost: shadowHost ? {
-        tagName: shadowHost.tagName ? shadowHost.tagName.toLowerCase() : "",
-        id: shadowHost.id || "",
-        className: shadowHost.className || ""
-      } : null,
-      selectedOptions
-    };
-  };
+        try:
+          if clip:
+            page.screenshot(path=str(shot_path), clip=clip)
+          else:
+            page.screenshot(path=str(shot_path), full_page=True)
+          record["screenshotPath"] = str(shot_path.relative_to(session.session_dir))
+        except Exception:
+          # Fallback to full-page on any clip error
+          page.screenshot(path=str(shot_path), full_page=True)
+          record["screenshotPath"] = str(shot_path.relative_to(session.session_dir))
+    except Exception as exc:  # noqa: BLE001
+      record["screenshotError"] = str(exc)
 
-  const sendAction = (action, target, extra) => {
-    if (!target) return;
-    const element = snapshotElement(target);
-    const viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-      devicePixelRatio: window.devicePixelRatio || 1
-    };
-    const box = element && element.boundingClientRect ? element.boundingClientRect : null;
-    const payload = {
-      action,
-      pageUrl: window.location.href,
-      pageTitle: document.title,
-      timestamp: Date.now(),
-      viewport,
-      element,
-      extra: extra || {},
-      boundingBox: box ? {
-        x: box.x,
-        y: box.y,
-        width: box.width,
-        height: box.height,
-        quadrant: quadrant(box, viewport)
-      } : null
-    };
-    deliverCapture(payload);
-  };
-
-  document.addEventListener("click", event => {
-    sendAction("click", event.target, { button: event.button });
-  }, true);
-
-  document.addEventListener("dblclick", event => {
-    sendAction("dblclick", event.target, { button: event.button });
-  }, true);
-
-  document.addEventListener("contextmenu", event => {
-    sendAction("contextmenu", event.target, { button: event.button });
-  }, true);
-
-  const pointerPayload = event => ({
-    pointerType: event.pointerType,
-    button: event.button,
-    buttons: event.buttons,
-    pressure: event.pressure,
-  });
-
-  document.addEventListener("pointerdown", event => {
-    sendAction("pointerdown", event.target, pointerPayload(event));
-  }, true);
-
-  document.addEventListener("pointerup", event => {
-    sendAction("pointerup", event.target, pointerPayload(event));
-  }, true);
-
-  document.addEventListener("change", event => {
-    const target = event.target;
-    const payload = {};
-    if (target && target.value !== undefined) {
-      payload.value = target.value;
-    }
-    if (target && target.tagName === "SELECT") {
-      payload.selectedOptions = Array.from(target.selectedOptions || []).map(opt => ({
-        value: opt.value,
-        label: toText(opt)
-      }));
-    }
-    sendAction("change", event.target, payload);
-  }, true);
-
-  document.addEventListener("input", event => {
-    const target = event.target;
-    const payload = {};
-    if (target && target.value !== undefined) {
-      payload.value = target.value;
-    }
-    sendAction("input", event.target, payload);
-  }, true);
-
-  document.addEventListener("focus", event => {
-    sendAction("focus", event.target, {});
-  }, true);
-
-  document.addEventListener("blur", event => {
-    sendAction("blur", event.target, {});
-  }, true);
-
-  document.addEventListener("submit", event => {
-    const form = event.target;
-    const payload = {};
-    if (form && form.action) {
-      payload.action = form.action;
-    }
-    if (form && form.method) {
-      payload.method = form.method;
-    }
-    try {
-      const data = {};
-      new FormData(form).forEach((value, key) => {
-        if (!(key in data)) {
-          data[key] = [];
-        }
-        data[key].push(typeof value === "string" ? value : "[binary]");
-      });
-      payload.formData = data;
-    } catch (err) {
-      payload.formDataError = String(err);
-    }
-    sendAction("submit", event.target, payload);
-  }, true);
-
-  document.addEventListener("keydown", event => {
-    const interesting = ["Enter", "Escape", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
-    if (interesting.includes(event.key)) {
-      sendAction("press", event.target, {
-        key: event.key,
-        code: event.code,
-        metaKey: event.metaKey,
-        ctrlKey: event.ctrlKey,
-        altKey: event.altKey,
-        shiftKey: event.shiftKey
-      });
-    }
-  }, true);
-
-  const sendPageContext = trigger => {
-    const breadcrumbSelectors = [
-      "[data-breadcrumb]",
-      "nav .breadcrumb li",
-      ".breadcrumb li",
-      "nav[aria-label='Breadcrumb'] *"
-    ];
-    const breadcrumbs = [];
-    breadcrumbSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(node => {
-        const text = toText(node);
-        if (text) breadcrumbs.push(text);
-      });
-    });
-    const payload = {
-      pageUrl: window.location.href,
-      title: document.title,
-      breadcrumbs,
-      timestamp: Date.now(),
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        devicePixelRatio: window.devicePixelRatio || 1
-      },
-      trigger,
-    };
-    deliverPageContext(payload);
-  };
-
-  document.addEventListener("DOMContentLoaded", () => sendPageContext("domcontentloaded"));
-  window.addEventListener("load", () => sendPageContext("load"));
-  window.addEventListener("hashchange", () => sendPageContext("hashchange"));
-  window.addEventListener("popstate", () => sendPageContext("popstate"));
-  window.addEventListener("resize", () => sendPageContext("resize"));
-  document.addEventListener("visibilitychange", () => sendPageContext("visibilitychange"));
-  sendPageContext("init");
-  if (typeof console !== "undefined") {
-    console.log("[recorder] instrumentation attached");
-  }
-})();
-"""
+  session.add_action(record)
 
 
+ 
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -974,16 +891,27 @@ def _build_context(
     slow_mo: Optional[int],
     har_path: Optional[Path],
     ignore_https_errors: bool,
+    user_agent: Optional[str] = None,
+    proxy_server: Optional[str] = None,
+    launch_args: Optional[List[str]] = None,
 ) -> BrowserContext:
     normalized_name = normalize_browser_name(browser_name, SUPPORTED_BROWSERS)
     browser_factory = getattr(playwright, normalized_name)
-    browser: Browser = browser_factory.launch(headless=headless, slow_mo=slow_mo)
+    launch_kwargs: Dict[str, Any] = {"headless": headless, "slow_mo": slow_mo}
+    if proxy_server:
+        # Playwright expects a dict with server key
+        launch_kwargs["proxy"] = {"server": proxy_server}
+    if launch_args:
+        launch_kwargs["args"] = list(launch_args)
+    browser: Browser = browser_factory.launch(**launch_kwargs)
     context_kwargs: Dict[str, Any] = {}
     if har_path:
         context_kwargs.update(
             record_har_path=str(har_path),
             record_har_mode="minimal",
         )
+    if user_agent:
+        context_kwargs["user_agent"] = user_agent
     context = browser.new_context(ignore_https_errors=ignore_https_errors, **context_kwargs)
     return context
 
@@ -1043,6 +971,20 @@ def main() -> None:
         action="store_true",
         help="Skip TLS/SSL certificate validation (useful for internal/self-signed environments).",
     )
+    parser.add_argument(
+        "--user-agent",
+        default=DEFAULT_USER_AGENT,
+        help="Override User-Agent string for the browser context.",
+    )
+    parser.add_argument(
+        "--proxy",
+        help="Proxy server URL, e.g. http://proxy.mycorp:3128",
+    )
+    parser.add_argument(
+        "--disable-gpu",
+        action="store_true",
+        help="Pass GPU-disabling flags to Chromium to avoid blank rendering on some drivers.",
+    )
 
     args = parser.parse_args()
 
@@ -1086,6 +1028,9 @@ def main() -> None:
         "recordTrace": not args.no_trace,
         "url": args.url,
         "ignoreHttpsErrors": args.ignore_https_errors,
+    "userAgent": args.user_agent,
+    "proxy": args.proxy,
+    "disableGpu": args.disable_gpu,
     }
 
     playwright = _ensure_playwright()
@@ -1095,6 +1040,32 @@ def main() -> None:
     signal_handlers: List[Tuple[int, Any]] = _install_signal_handlers(stop_event)
     session: Optional[RecorderSession] = None
     metadata_written = False
+  # Helpers available to inner scopes
+  def _log_to_file(message: str) -> None:
+    try:
+      with open(session_dir / "recorder.log", "a", encoding="utf-8") as lf:
+        lf.write(message + "\n")
+    except Exception:
+      pass
+
+  def _ensure_page_bindings(target_page: Optional[Page]) -> None:
+    if target_page is None or target_page.is_closed():
+      return
+    try:
+      target_page.evaluate(
+        "() => { try { document && document.dispatchEvent(new Event('__pythonRecorderBindingsPing')); } catch (err) {} }"
+      )
+    except Exception:
+      pass
+    try:
+      target_page.wait_for_function(
+        "() => window.__pythonRecorderBindingsReady === true",
+        timeout=5000,
+      )
+    except Exception as exc:  # noqa: BLE001
+      sys.stderr.write(
+        f"[recorder] Recorder bindings did not become ready within the expected time: {exc}\n"
+      )
     try:
         if not args.no_har:
             har_path = session_dir / "network.har"
@@ -1106,6 +1077,9 @@ def main() -> None:
             slow_mo=args.slow_mo,
             har_path=har_path if not args.no_har else None,
             ignore_https_errors=args.ignore_https_errors,
+            user_agent=args.user_agent,
+            proxy_server=args.proxy,
+            launch_args=["--disable-gpu", "--disable-software-rasterizer"] if args.disable_gpu and args.browser == "chromium" else None,
         )
         browser = context.browser
 
@@ -1117,112 +1091,155 @@ def main() -> None:
             options=session_options,
         )
 
-        def _ensure_page_bindings(target_page: Optional[Page]) -> None:
-            if target_page is None or target_page.is_closed():
-                return
-            try:
-                target_page.evaluate(
-                    "() => { try { document && document.dispatchEvent(new Event('__pythonRecorderBindingsPing')); } catch (err) {} }"
-                )
-            except Exception:
-                pass
-            try:
-                target_page.wait_for_function(
-                    "() => window.__pythonRecorderBindingsReady === true",
-                    timeout=5000,
-                )
-            except Exception as exc:  # noqa: BLE001
-                sys.stderr.write(
-                    f"[recorder] Recorder bindings did not become ready within the expected time: {exc}\n"
-                )
+        
 
-        def _on_page(new_page: Page) -> None:
-            session.register_page(new_page)
-            try:
-                new_page.once("domcontentloaded", lambda *args: _ensure_page_bindings(new_page))
-            except Exception:
-                pass
-            _ensure_page_bindings(new_page)
-            # Diagnostic listeners to help surface browser-side failures (console errors, page errors, failed requests)
-            try:
-                new_page.on("console", lambda msg: sys.stderr.write(f"[recorder][console] {msg.type}: {msg.text}\n"))
-            except Exception:
-                pass
-            try:
-                new_page.on("pageerror", lambda exc: sys.stderr.write(f"[recorder][pageerror] {exc}\n"))
-            except Exception:
-                pass
-            try:
-                new_page.on(
-                    "requestfailed",
-                    lambda req: sys.stderr.write(
-                        f"[recorder][requestfailed] {req.url} -> {getattr(req, 'failure', lambda: '')()}\n"
-                    ),
-                )
-            except Exception:
-                pass
-            try:
-                def _handle_close() -> None:
-                    session.unregister_page(new_page)
-                    stop_event.set()
-
-                new_page.once("close", _handle_close)
-            except Exception:
-                pass
-
-        context.on("page", _on_page)
-        try:
-            context.once("close", lambda: stop_event.set())
-        except Exception:
+    def _on_page(new_page: Page) -> None:
+      session.register_page(new_page)
+      try:
+        new_page.once("domcontentloaded", lambda *args: _ensure_page_bindings(new_page))
+      except Exception:
+        pass
+      _ensure_page_bindings(new_page)
+      # Diagnostic listeners to help surface browser-side failures (console errors, page errors, failed requests)
+      try:
+        def _on_console(msg):
+          line = f"[recorder][console] {msg.type}: {msg.text}"
+          sys.stderr.write(line + "\n")
+          _log_to_file(line)
+        new_page.on("console", _on_console)
+      except Exception:
+        pass
+      try:
+        def _on_pageerror(exc):
+          line = f"[recorder][pageerror] {exc}"
+          sys.stderr.write(line + "\n")
+          _log_to_file(line)
+        new_page.on("pageerror", _on_pageerror)
+      except Exception:
+        pass
+      try:
+        def _on_requestfailed(req):
+          reason = ""
+          try:
+            failure = req.failure()
+            reason = failure.get("errorText") if isinstance(failure, dict) else str(failure)
+          except Exception:
+            reason = ""
+          line = f"[recorder][requestfailed] {req.url} -> {reason}"
+          sys.stderr.write(line + "\n")
+          _log_to_file(line)
+        new_page.on("requestfailed", _on_requestfailed)
+      except Exception:
+        pass
+      try:
+        def _on_popup(popup: Page):
+          info = f"[recorder][popup] opened. url={getattr(popup, 'url', lambda: '')()}"
+          sys.stderr.write(info + "\n")
+          _log_to_file(info)
+          session.register_page(popup)
+          _ensure_page_bindings(popup)
+        new_page.on("popup", _on_popup)
+      except Exception:
+        pass
+      try:
+        def _on_framenav(frame: Frame):
+          furl = ""
+          try:
+            furl = frame.url
+          except Exception:
             pass
+          line = f"[recorder][framenavigated] {furl}"
+          sys.stderr.write(line + "\n")
+          _log_to_file(line)
+        new_page.on("framenavigated", _on_framenav)
+      except Exception:
+        pass
+      try:
+        def _handle_close() -> None:
+          session.unregister_page(new_page)
+          stop_event.set()
+        new_page.once("close", _handle_close)
+      except Exception:
+        pass
 
-        context.expose_binding("pythonRecorderCapture", session.handle_capture)
-        context.expose_binding("pythonRecorderPageContext", session.handle_page_context)
-        context.add_init_script(PAGE_INJECT_SCRIPT)
+    context.on("page", _on_page)
+    try:
+      context.once("close", lambda: stop_event.set())
+    except Exception:
+      pass
 
-        page = context.new_page()
-        _on_page(page)
+    context.expose_binding("pythonRecorderCapture", session.handle_capture)
+    context.expose_binding("pythonRecorderPageContext", session.handle_page_context)
+    context.add_init_script(PAGE_INJECT_SCRIPT)
 
-        tracer = context.tracing
-        if not args.no_trace:
-            trace_path = session_dir / "trace.zip"
-            tracer.start(screenshots=True, snapshots=True, sources=True)
+    page = context.new_page()
+    _on_page(page)
 
-        page.goto(args.url, wait_until="domcontentloaded")
-        _ensure_page_bindings(page)
+    tracer = context.tracing
+    if not args.no_trace:
+      trace_path = session_dir / "trace.zip"
+      tracer.start(screenshots=True, snapshots=True, sources=True)
 
-        _await_user(args.timeout, stop_event)
+    # Navigate with fallback and logging
+    nav_ok = False
+    try:
+      page.goto(args.url, wait_until="domcontentloaded")
+      nav_ok = True
+      _log_to_file(f"[recorder] page.goto succeeded -> {args.url}")
+    except Exception as nav_exc:  # noqa: BLE001
+      msg = f"[recorder] page.goto failed: {nav_exc}"
+      sys.stderr.write(msg + "\n")
+      _log_to_file(msg)
+      try:
+        page.evaluate("url => window.location.assign(url)", args.url)
+        page.wait_for_load_state("domcontentloaded", timeout=15000)
+        nav_ok = True
+        _log_to_file("[recorder] Fallback window.location.assign succeeded")
+      except Exception as eval_exc:  # noqa: BLE001
+        msg2 = f"[recorder] Fallback navigation failed: {eval_exc}"
+        sys.stderr.write(msg2 + "\n")
+        _log_to_file(msg2)
 
-        if not args.no_trace and trace_path:
-            try:
-                tracer.stop(path=str(trace_path))
-            except KeyboardInterrupt:
-                stop_event.set()
-                sys.stderr.write("[recorder] Trace stop interrupted.\n")
-            except Exception as exc:  # noqa: BLE001
-                message = str(exc)
-                if "Target page" in message or "Browser has been closed" in message:
-                    sys.stderr.write("[recorder] Trace already closed when stopping (browser closed first).\n")
-                else:
-                    sys.stderr.write(f"[recorder] Failed to stop tracing: {exc}\n")
+    if nav_ok:
+      try:
+        page.wait_for_load_state("load", timeout=20000)
+      except Exception:
+        pass
 
-        context.close()
-        browser.close()
-        playwright.stop()
+    _ensure_page_bindings(page)
 
-        metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
-        metadata_written = True
+    _await_user(args.timeout, stop_event)
 
-        print(f"[recorder] Recorded {len(session.actions)} actions.")
-        print(f"[recorder] Metadata saved to {metadata_path}")
-        if har_path and har_path.exists():
-            print(f"[recorder] HAR saved to {har_path}")
-        if trace_path and trace_path.exists():
-            print(f"[recorder] Trace saved to {trace_path}")
-        if session.capture_dom:
-            print(f"[recorder] DOM snapshots stored in {session.dom_dir}")
-        if session.capture_screenshots:
-            print(f"[recorder] Screenshots stored in {session.screenshot_dir}")
+    if not args.no_trace and trace_path:
+      try:
+        tracer.stop(path=str(trace_path))
+      except KeyboardInterrupt:
+        stop_event.set()
+        sys.stderr.write("[recorder] Trace stop interrupted.\n")
+      except Exception as exc:  # noqa: BLE001
+        message = str(exc)
+        if "Target page" in message or "Browser has been closed" in message:
+          sys.stderr.write("[recorder] Trace already closed when stopping (browser closed first).\n")
+        else:
+          sys.stderr.write(f"[recorder] Failed to stop tracing: {exc}\n")
+
+    context.close()
+    browser.close()
+    playwright.stop()
+
+    metadata_path = session.finalize(har_path=har_path, trace_path=trace_path)
+    metadata_written = True
+
+    print(f"[recorder] Recorded {len(session.actions)} actions.")
+    print(f"[recorder] Metadata saved to {metadata_path}")
+    if har_path and har_path.exists():
+      print(f"[recorder] HAR saved to {har_path}")
+    if trace_path and trace_path.exists():
+      print(f"[recorder] Trace saved to {trace_path}")
+    if session.capture_dom:
+      print(f"[recorder] DOM snapshots stored in {session.dom_dir}")
+    if session.capture_screenshots:
+      print(f"[recorder] Screenshots stored in {session.screenshot_dir}")
     except KeyboardInterrupt:
         stop_event.set()
         sys.stderr.write("[recorder] Interrupt received. Cleaning up...\n")

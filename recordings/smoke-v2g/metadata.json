@@ -1,0 +1,358 @@
+{
+  "session": {
+    "id": "smoke-v2g",
+    "startedAt": "2025-10-13T23:46:43.062669+00:00",
+    "endedAt": "2025-10-13T23:47:32.162460+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": false,
+    "recordTrace": false,
+    "url": "https://ecqg-test.fa.us2.oraclecloud.com",
+    "ignoreHttpsErrors": false,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "proxy": null,
+    "disableGpu": false
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "timestamp": 1760399203234,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:45.995209+00:00"
+    },
+    {
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "title": "",
+      "timestamp": 1760399204679,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:45.995209+00:00"
+    },
+    {
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "title": "",
+      "timestamp": 1760399204679,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:45.996212+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205965,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:45.997218+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205965,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:45.999218+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205967,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-006.html",
+      "screenshotPath": "screenshots\\P-006.png",
+      "receivedAt": "2025-10-13T23:46:47.082212+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205967,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-007.html",
+      "screenshotPath": "screenshots\\P-007.png",
+      "receivedAt": "2025-10-13T23:46:47.337578+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205969,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-008.html",
+      "screenshotPath": "screenshots\\P-008.png",
+      "receivedAt": "2025-10-13T23:46:47.603124+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=SdKddgMQ4U3zZ8akyrxplmPh-TDvi08xsV7mCvrApLg&nonce=qx2g7RC3Dpbv1lKQVC3HrgpW5iZb_bNiAi9t3ridbWY&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45818648845897099%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253Dte5rpp7p8_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=ZxN6vTJjOfz5AwAAvwMAABAgvwMAAKUDAAAQAIh97jL9Mf309tTEvAwy72UNRmLn4aq4JwfdCguecdE7Teu9kH1CS5A6Hbl1TnmGlM0LlMBMXGrvZaQRVVqp7SDNkFEOQbXLLuq0kJMEq5rLakXRVs1VjFlcR6_GTcvAv-5E7RsTvO5_d3WYWifWwJjGbZcaJk1s18xeWxYNVuKgsuqEF2xXV0JhtcS3q67xoYCJkOKHyx0Yv60nt4IE2RFadT5CkWYP4jD-ITRy_aNkqMTplrxfxYDT4C28B7kw6E3bPc1KE0BD7sga0f1BWwsGYHpueV6R5HSHNpvORKwIw_99BtzGTxV3-rMHxG8s2wdJTAgfe9y0mV12MzdHYQbI5-6Ht91rRESEC2Ty0_mE9RaQgmxwv5i3xpg2itC2KL_En_YAoYJujX_lKHUTvQ5NaRhJUgc-IumghA8G2Ii1xH7uQmYRfQQLhMwAzcIrQx0GCP0ZADhSavG98uRwwjlh2nHRske-eW8Zq6HQNPs0xcuZJmixlJbJ3m0JOwFa6FAZQfxctrjVtex1SIILQO4XGma7JbEYeG4LOVXCEcnQZFZeaOZOLmZEvPfTaTCf7BGYMLYl8tOtTjj6GiXJlXpKVIwbkZow5eNW_Zof6FF3nE7cPnHr5vkQyhup0_i8gJtsYIiSv0mAXkDDxolRxC0-KO8MOH0xiwP_MAWKt1v3F7NWWkD6ebjgW1rFtOQmYgPJUHSUlDxRqj92SmCET4HGXqq2PMoGAJs1w5i-svai5IszNp9xaNGavpaqXqG3r7RdrWqsdUWimCSMRW9wl4eoRECq7HC8eXw5skDVU-xkeSksRPaXfl4eR_qMehvxeeAmQsCYok6bsk0tqdKWIyKw7Q_Rx8-YWTYq5bOiEQHUwHzVRnitcoh9Lvhk3HZOfteujxKUXytv4t43KoK4TgW4KBL4lME_xsGLTu8BRkpm_v06YifcAlNa7ba3-Ol4h-YqOmRjzMnaIN6l8or68JEh6CmyJKonJGPY6mBd0wC3ViZ41hXv-PaffZgjNmlDExocK7KF8fLnyVSnSc3Z3Xd6SAuZm0uEYzX_XsI4ctO37iLoxmv7ATGXDrMBHF6A2PSamRtR4cQcOPtJKQN5Rz1Qzu8EJUmvtffTpOvKZwWfuIf15Fkme94dqDTTRjSoPN6vusRVFAoCdHEpkUdB7gj890oOsUnPeGTTN0NhiQmFgNIh_tV9RV8FgbDU1oFtTdpaCDlsfVmbbQRw4vh0Pjcy6nNo0EGMh-Q3SPnwrP2xveYrWHpMBYSWrqHHcmiaYi4Om-kSA6zSrEwHjmwv1A8C1hH6CW-lw_y7aQKoDCMFBThXceg",
+      "title": "",
+      "timestamp": 1760399205970,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-009.html",
+      "screenshotPath": "screenshots\\P-009.png",
+      "receivedAt": "2025-10-13T23:46:47.918513+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399206159,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:47.919518+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399206159,
+      "trigger": "init",
+      "receivedAt": "2025-10-13T23:46:47.919518+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399207833,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-012.html",
+      "screenshotPath": "screenshots\\P-012.png",
+      "receivedAt": "2025-10-13T23:46:48.183041+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399207833,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-013.html",
+      "screenshotPath": "screenshots\\P-013.png",
+      "receivedAt": "2025-10-13T23:46:48.595540+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399207836,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-014.html",
+      "screenshotPath": "screenshots\\P-014.png",
+      "receivedAt": "2025-10-13T23:46:48.873624+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760399207836,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-015.html",
+      "screenshotPath": "screenshots\\P-015.png",
+      "receivedAt": "2025-10-13T23:46:49.798915+00:00"
+    }
+  ],
+  "actions": [
+    {
+      "action": "focus",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399208910,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 332.76251220703125,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {},
+      "domSnapshotPath": "dom\\A-001.html",
+      "screenshotPath": "screenshots\\A-001.png",
+      "receivedAt": "2025-10-13T23:46:49.889778+00:00"
+    },
+    {
+      "action": "focus",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399208911,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 332.76251220703125,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {},
+      "domSnapshotPath": "dom\\A-002.html",
+      "screenshotPath": "screenshots\\A-002.png",
+      "receivedAt": "2025-10-13T23:46:49.971469+00:00"
+    },
+    {
+      "action": "pointerdown",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209792,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0,
+        "pointerType": "mouse"
+      },
+      "domSnapshotPath": "dom\\A-003.html",
+      "screenshotPath": "screenshots\\A-003.png",
+      "receivedAt": "2025-10-13T23:46:50.043811+00:00"
+    },
+    {
+      "action": "pointerdown",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209793,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0,
+        "pointerType": "mouse"
+      },
+      "domSnapshotPath": "dom\\A-004.html",
+      "screenshotPath": "screenshots\\A-004.png",
+      "receivedAt": "2025-10-13T23:46:50.126565+00:00"
+    },
+    {
+      "action": "pointerup",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209956,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0,
+        "pointerType": "mouse"
+      },
+      "domSnapshotPath": "dom\\A-005.html",
+      "screenshotPath": "screenshots\\A-005.png",
+      "receivedAt": "2025-10-13T23:46:50.222375+00:00"
+    },
+    {
+      "action": "pointerup",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209956,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0,
+        "pointerType": "mouse"
+      },
+      "domSnapshotPath": "dom\\A-006.html",
+      "screenshotPath": "screenshots\\A-006.png",
+      "receivedAt": "2025-10-13T23:46:50.290169+00:00"
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209957,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0
+      },
+      "domSnapshotPath": "dom\\A-007.html",
+      "screenshotPath": "screenshots\\A-007.png",
+      "receivedAt": "2025-10-13T23:46:50.376237+00:00"
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": 1760399209957,
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "text": "",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "rect": {
+          "x": 398.8000183105469,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        }
+      },
+      "extra": {
+        "button": 0
+      },
+      "domSnapshotPath": "dom\\A-008.html",
+      "screenshotPath": "screenshots\\A-008.png",
+      "receivedAt": "2025-10-13T23:46:50.465345+00:00"
+    }
+  ],
+  "artifacts": {
+    "har": null,
+    "trace": null
+  }
+}

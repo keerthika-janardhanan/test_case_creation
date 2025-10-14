@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import ast
 from pathlib import Path
 from typing import List, Tuple, Optional
 
@@ -180,18 +181,99 @@ class TestCaseGenerator:
                 f"Regex failure while normalising LLM JSON (pattern={pattern!r}): {exc}"
             ) from exc
 
+        # Primary parse
         try:
             test_cases = json.loads(normalized_output)
-        except json.JSONDecodeError as e:
-            preview = normalized_output[:800] + ("..." if len(normalized_output) > 800 else "")
-            print(f"❌ JSON parse error while generating test cases: {e}\nOutput snippet:\n{preview}")
-            raise ValueError("Generated test cases were not valid JSON. Please retry or adjust keywords.") from e
+        except json.JSONDecodeError:
+            # Attempt to repair and extract a JSON array from the LLM output
+            repaired = self._repair_llm_output_to_json_array(normalized_output)
+            if repaired is None:
+                preview = normalized_output[:800] + ("..." if len(normalized_output) > 800 else "")
+                raise ValueError(
+                    "Generated test cases were not valid JSON after repair. Please retry or adjust keywords.\n"
+                    f"Preview: {preview}"
+                )
+            test_cases = repaired
 
         cleaned_cases = self._enforce_schema(test_cases)
         cleaned_cases = self._inject_flow_details(cleaned_cases, flow_steps, context_sources)
         if not cleaned_cases:
             raise ValueError("No valid test cases could be generated from the provided context.")
         return cleaned_cases
+
+    # ----------------- JSON repair helpers -----------------
+    def _repair_llm_output_to_json_array(self, text: str):
+        """Best-effort extraction and repair of a JSON array from free-form LLM output.
+        Returns a Python list on success, or None if irreparable.
+        """
+        if not text:
+            return None
+
+        s = text.strip()
+        # Normalize smart quotes and BOM
+        s = s.replace("\ufeff", "").replace("“", '"').replace("”", '"').replace("’", "'").replace("‘", "'")
+        # Drop leading/trailing prose outside the first top-level JSON array using bracket scanning
+        extracted = self._extract_first_json_array(s)
+        candidate = (extracted or s).strip()
+        # Remove trailing commas like {"a":1,}
+        candidate = re.sub(r",\s*([}\]])", r"\1", candidate)
+        # If it looks like Python literals (single quotes), try ast.literal_eval
+        def _try_parsers(payload: str):
+            try:
+                return json.loads(payload)
+            except Exception:
+                pass
+            try:
+                lit = ast.literal_eval(payload)
+                if isinstance(lit, dict):
+                    return [lit]
+                if isinstance(lit, list):
+                    return lit
+            except Exception:
+                pass
+            return None
+
+        parsed = _try_parsers(candidate)
+        if isinstance(parsed, list):
+            return parsed
+        # Last resort: if the whole string is not parseable, try to find any bracketed list inside
+        if extracted and extracted != candidate:
+            parsed = _try_parsers(extracted)
+            if isinstance(parsed, list):
+                return parsed
+        return None
+
+    def _extract_first_json_array(self, s: str) -> str | None:
+        """Extract the first top-level JSON array substring using bracket depth accounting.
+        Handles strings to avoid counting brackets inside quoted content.
+        """
+        start = s.find("[")
+        if start == -1:
+            return None
+        i = start
+        depth = 0
+        in_str = False
+        esc = False
+        while i < len(s):
+            ch = s[i]
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == "[":
+                    depth += 1
+                elif ch == "]":
+                    depth -= 1
+                    if depth == 0:
+                        return s[start : i + 1]
+            i += 1
+        return None
 
     def _collect_context(self, story: str, top_k: int = 8) -> Tuple[List[str], List[dict], List[str]]:
         chunks: List[str] = []
@@ -879,6 +961,13 @@ def map_llm_to_template(llm_output, template_df):
                     combined = f"{combined} | Expected: {detail['expected']}" if combined else f"Expected: {detail['expected']}"
                 if combined:
                     strings.append(combined)
+            # Insert Title at the top, keep End of Task at the end
+            title = str(case.get("title") or "").strip()
+            ctype = str(case.get("type") or "").strip().capitalize()
+            if title:
+                title_line = f"Title: {title} ({ctype})" if ctype else f"Title: {title}"
+                strings.insert(0, title_line)
+            strings.append("End of Task")
             return strings
         return case.get("steps", [])
 
@@ -1027,6 +1116,20 @@ def _map_to_detailed_flow_template(llm_output, template_df, columns, normalized_
         case_expected = normalise_expected(case.get("expected", ""))
         last_action_written = None
 
+        # Prepend Title row
+        title = str(case.get("title") or "").strip()
+        ctype = str(case.get("type") or "").strip().capitalize()
+        label = f"Title: {title} ({ctype})" if title and ctype else (f"Title: {title}" if title else "")
+        if label:
+            rows.append({
+                sl_col: sl_counter,
+                action_col: label,
+                nav_col: "",
+                data_col: "",
+                expected_col: "",
+            })
+            sl_counter += 1
+
         for detail in details_iterable:
             action_value = derive_action(detail, default_action, previous_action)
             navigation_value = str(detail.get("navigation", "")).strip()
@@ -1066,6 +1169,16 @@ def _map_to_detailed_flow_template(llm_output, template_df, columns, normalized_
                 expected_col: case_expected,
             })
             sl_counter += 1
+
+        # Append only 'End of Task' as the final line (no trailing Title)
+        rows.append({
+            sl_col: sl_counter,
+            action_col: "End of Task",
+            nav_col: "",
+            data_col: "",
+            expected_col: "",
+        })
+        sl_counter += 1
 
     if not rows:
         return template_df.copy()

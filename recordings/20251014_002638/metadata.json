@@ -1,0 +1,73 @@
+{
+  "session": {
+    "id": "20251014_002638",
+    "startedAt": "2025-10-14T00:26:39.388394+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": true,
+    "recordTrace": true,
+    "url": "https://ecqg-test.fa.us2.oraclecloud.com/",
+    "ignoreHttpsErrors": false,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "proxy": null,
+    "disableGpu": false
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "timestamp": 1760401599642,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:26:42.819381+00:00"
+    },
+    {
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "title": "",
+      "timestamp": 1760401601162,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:26:42.820388+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=WkKldqvEwXvlxa_zODRgq8qsZh155ybuSGwIbADbDNA&nonce=xiS9edf7JqSrU98TN3yFmWiEW0lDPXTGWjzMX2I-A2k&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45821045275405419%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D13ly2psfhz_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=_Hd1uJE9K-76AwAAwAMAABAgwAMAAKYDAAAQACGYhoN3m5GlS8mOYtLqmGOR9ibru9SUIonkgxewMn5xctNBWwLM0423zXb_-0HaHsdWcUp9ZW6Oq-x63XTpKpJ0SOd9iftKBRgbPQ7YxWVlEYrU-RDz9sGfBPSU6TL-e_AUhVW1DOWdwuB97bB3wO47HUlk7iW0gxAC-peXq8hwacjUnT2ehTm1jmgtB8fd1GaNqUfK3_asg7rHqysiwYc-2oB0ZHfG5vpXLz66fpzEGLTA3EmgEI3IMLU8AwiDSZVK2Tt-0Us0sEg65qqdRIEdAJcjyY3rouXIbyvVmqJ09P0C1_jKk6E0ub-PbAkYgC_9QrCxooAo6B6MbrT1fTMwaj39X2s7QQM6tRdXROZyYCgkzNOnxmXK15IZjPm7u0ExjNANfbvS7rInMNcSRrnFqIIVXEAduY6yBKw_Mv88xBmRdbZ3yRmIrOn1W61am9c4wP9GOUwLDS01GYCpc1hxbLTOd-JoCF0fp11E3P4pwCloqaQUCvW5KIJDUbyKLhbpTcbqNAIzfRZxHE_hg3qP7Q9EL6strIvt1QIjOi87UVoT-d9bU7Wf6toWmGn4uVYUdYFk53VmSRQUHsMoGJ_0-_T6Rt7RHIlyaJVywB33GPLKyhbtRhJ0yP5kbtJG7j97a3yhtWtBAhCFe4xv3Y3YA901mDTHJG_ktZF0vG7SZII5vWPm3RU4havxYFI540IFfZOellu2dGvEXQzT_kF2cdByVMh3dGjgP9iOtz2_mahU58Ewc0Ee0InNEvctwxHRB0I58JlCym3NMhPjq_XRAnb_Ae3odIE5sL1bfqPi2pcIN6Hwie1VX6hd285j3jbvk4eu2zqKuIRfmRYTv8k-IZW6Jz1I4w2Bpgrhs1O39jk7DAKfFkco8MrvWAeH_eLGPeYPmEYhvtATpTy82Inx1w4uttd0ryJ7hgufAoowMESQeuEIMUnSr64us5-QeynC3Nsklh01PsQOcZYwXvL0PJi4kMNWxA5eXeCHcnN2udd9XPhiHsc5IiJKo1jQq-V6y8UuEDlynx9uNJ8_y4KbDqYpr71SZdv44WBrOEmryGcjFh3m07MTP3Mps9nVwyOJ9F73HAgWfbL_mslB3meftxx56k6XClD5-oSuRXR3DU-KdmqcSJs_lmQOv5NoXwQEIqlJ15reYnajy1-R8l9YM4O31atIw6KyCg3q2Ig4AUXR5QgSPb99TVJLRmVsMqwF_8r7v4soIRQE86pM4EOWUIHn2eT3-9TA_7gqKp1kr1gQNDyykfpwf0bYYm0eAdukaNDyt8IF5GNCyZH0_rGv4UZNHhZ2ccse5UZwfE77D4QtGbMo",
+      "title": "",
+      "timestamp": 1760401602797,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:26:42.820388+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=WkKldqvEwXvlxa_zODRgq8qsZh155ybuSGwIbADbDNA&nonce=xiS9edf7JqSrU98TN3yFmWiEW0lDPXTGWjzMX2I-A2k&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45821045275405419%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D13ly2psfhz_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=_Hd1uJE9K-76AwAAwAMAABAgwAMAAKYDAAAQACGYhoN3m5GlS8mOYtLqmGOR9ibru9SUIonkgxewMn5xctNBWwLM0423zXb_-0HaHsdWcUp9ZW6Oq-x63XTpKpJ0SOd9iftKBRgbPQ7YxWVlEYrU-RDz9sGfBPSU6TL-e_AUhVW1DOWdwuB97bB3wO47HUlk7iW0gxAC-peXq8hwacjUnT2ehTm1jmgtB8fd1GaNqUfK3_asg7rHqysiwYc-2oB0ZHfG5vpXLz66fpzEGLTA3EmgEI3IMLU8AwiDSZVK2Tt-0Us0sEg65qqdRIEdAJcjyY3rouXIbyvVmqJ09P0C1_jKk6E0ub-PbAkYgC_9QrCxooAo6B6MbrT1fTMwaj39X2s7QQM6tRdXROZyYCgkzNOnxmXK15IZjPm7u0ExjNANfbvS7rInMNcSRrnFqIIVXEAduY6yBKw_Mv88xBmRdbZ3yRmIrOn1W61am9c4wP9GOUwLDS01GYCpc1hxbLTOd-JoCF0fp11E3P4pwCloqaQUCvW5KIJDUbyKLhbpTcbqNAIzfRZxHE_hg3qP7Q9EL6strIvt1QIjOi87UVoT-d9bU7Wf6toWmGn4uVYUdYFk53VmSRQUHsMoGJ_0-_T6Rt7RHIlyaJVywB33GPLKyhbtRhJ0yP5kbtJG7j97a3yhtWtBAhCFe4xv3Y3YA901mDTHJG_ktZF0vG7SZII5vWPm3RU4havxYFI540IFfZOellu2dGvEXQzT_kF2cdByVMh3dGjgP9iOtz2_mahU58Ewc0Ee0InNEvctwxHRB0I58JlCym3NMhPjq_XRAnb_Ae3odIE5sL1bfqPi2pcIN6Hwie1VX6hd285j3jbvk4eu2zqKuIRfmRYTv8k-IZW6Jz1I4w2Bpgrhs1O39jk7DAKfFkco8MrvWAeH_eLGPeYPmEYhvtATpTy82Inx1w4uttd0ryJ7hgufAoowMESQeuEIMUnSr64us5-QeynC3Nsklh01PsQOcZYwXvL0PJi4kMNWxA5eXeCHcnN2udd9XPhiHsc5IiJKo1jQq-V6y8UuEDlynx9uNJ8_y4KbDqYpr71SZdv44WBrOEmryGcjFh3m07MTP3Mps9nVwyOJ9F73HAgWfbL_mslB3meftxx56k6XClD5-oSuRXR3DU-KdmqcSJs_lmQOv5NoXwQEIqlJ15reYnajy1-R8l9YM4O31atIw6KyCg3q2Ig4AUXR5QgSPb99TVJLRmVsMqwF_8r7v4soIRQE86pM4EOWUIHn2eT3-9TA_7gqKp1kr1gQNDyykfpwf0bYYm0eAdukaNDyt8IF5GNCyZH0_rGv4UZNHhZ2ccse5UZwfE77D4QtGbMo",
+      "title": "",
+      "timestamp": 1760401602801,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-004.html",
+      "screenshotPath": "screenshots\\P-004.png",
+      "receivedAt": "2025-10-14T00:26:44.277255+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=WkKldqvEwXvlxa_zODRgq8qsZh155ybuSGwIbADbDNA&nonce=xiS9edf7JqSrU98TN3yFmWiEW0lDPXTGWjzMX2I-A2k&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D45821045275405419%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D13ly2psfhz_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=_Hd1uJE9K-76AwAAwAMAABAgwAMAAKYDAAAQACGYhoN3m5GlS8mOYtLqmGOR9ibru9SUIonkgxewMn5xctNBWwLM0423zXb_-0HaHsdWcUp9ZW6Oq-x63XTpKpJ0SOd9iftKBRgbPQ7YxWVlEYrU-RDz9sGfBPSU6TL-e_AUhVW1DOWdwuB97bB3wO47HUlk7iW0gxAC-peXq8hwacjUnT2ehTm1jmgtB8fd1GaNqUfK3_asg7rHqysiwYc-2oB0ZHfG5vpXLz66fpzEGLTA3EmgEI3IMLU8AwiDSZVK2Tt-0Us0sEg65qqdRIEdAJcjyY3rouXIbyvVmqJ09P0C1_jKk6E0ub-PbAkYgC_9QrCxooAo6B6MbrT1fTMwaj39X2s7QQM6tRdXROZyYCgkzNOnxmXK15IZjPm7u0ExjNANfbvS7rInMNcSRrnFqIIVXEAduY6yBKw_Mv88xBmRdbZ3yRmIrOn1W61am9c4wP9GOUwLDS01GYCpc1hxbLTOd-JoCF0fp11E3P4pwCloqaQUCvW5KIJDUbyKLhbpTcbqNAIzfRZxHE_hg3qP7Q9EL6strIvt1QIjOi87UVoT-d9bU7Wf6toWmGn4uVYUdYFk53VmSRQUHsMoGJ_0-_T6Rt7RHIlyaJVywB33GPLKyhbtRhJ0yP5kbtJG7j97a3yhtWtBAhCFe4xv3Y3YA901mDTHJG_ktZF0vG7SZII5vWPm3RU4havxYFI540IFfZOellu2dGvEXQzT_kF2cdByVMh3dGjgP9iOtz2_mahU58Ewc0Ee0InNEvctwxHRB0I58JlCym3NMhPjq_XRAnb_Ae3odIE5sL1bfqPi2pcIN6Hwie1VX6hd285j3jbvk4eu2zqKuIRfmRYTv8k-IZW6Jz1I4w2Bpgrhs1O39jk7DAKfFkco8MrvWAeH_eLGPeYPmEYhvtATpTy82Inx1w4uttd0ryJ7hgufAoowMESQeuEIMUnSr64us5-QeynC3Nsklh01PsQOcZYwXvL0PJi4kMNWxA5eXeCHcnN2udd9XPhiHsc5IiJKo1jQq-V6y8UuEDlynx9uNJ8_y4KbDqYpr71SZdv44WBrOEmryGcjFh3m07MTP3Mps9nVwyOJ9F73HAgWfbL_mslB3meftxx56k6XClD5-oSuRXR3DU-KdmqcSJs_lmQOv5NoXwQEIqlJ15reYnajy1-R8l9YM4O31atIw6KyCg3q2Ig4AUXR5QgSPb99TVJLRmVsMqwF_8r7v4soIRQE86pM4EOWUIHn2eT3-9TA_7gqKp1kr1gQNDyykfpwf0bYYm0eAdukaNDyt8IF5GNCyZH0_rGv4UZNHhZ2ccse5UZwfE77D4QtGbMo",
+      "title": "",
+      "timestamp": 1760401602801,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-005.html",
+      "screenshotPath": "screenshots\\P-005.png",
+      "receivedAt": "2025-10-14T00:26:44.590958+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1760401603103,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:26:44.590958+00:00"
+    }
+  ],
+  "actions": [],
+  "artifacts": {
+    "har": null,
+    "trace": null
+  }
+}

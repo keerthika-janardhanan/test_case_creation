@@ -12,10 +12,10 @@ pip install -r requirements.txt
 
 ## 2. Run the recorder
 
-Invoke the recorder module directly with the URL you want to explore:
+Invoke the v2 recorder module directly with the URL you want to explore:
 
 ```bash
-python -m app.run_playwright_recorder --url https://example.com
+python -m app.run_playwright_recorder_v2 --url https://example.com
 ```
 
 Key optional flags:
@@ -37,11 +37,11 @@ A Playwright browser window opens with the provided URL. Perform your manual act
 
 ## 4. Inspect the output
 
-Artifacts live under `<output-dir>/<session-name>/`. The `metadata.json` file contains every captured action along with contextual UI details used by downstream tooling. Navigation events are also recorded with full-page DOM and screenshot snapshots so you can review a session even if no interactive events fire (for example on login screens that suppress standard DOM events).
+Artifacts live under `<output-dir>/<session-name>/`. The `metadata.json` file contains every captured action along with contextual UI details used by downstream tooling. Navigation events are also recorded with full-page DOM and screenshot snapshots (P-### files) so you can review a session even if no interactive events fire. Per-action artifacts (A-### files) appear when you actually interact (click, type, submit, etc.).
 
 ## Alternative: Streamlit UI
 
-You can also manage recordings via the Streamlit dashboard:
+You can also manage recordings via the Streamlit dashboard (uses the same v2 recorder under the hood):
 
 ```bash
 streamlit run app/streamlit_app.py

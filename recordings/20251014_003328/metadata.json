@@ -1,0 +1,94 @@
+{
+  "session": {
+    "id": "20251014_003328",
+    "startedAt": "2025-10-14T00:33:30.169648+00:00",
+    "endedAt": "2025-10-14T00:34:30.069780+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": true,
+    "recordTrace": true,
+    "url": "https://example.com",
+    "ignoreHttpsErrors": false,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "proxy": null,
+    "disableGpu": false
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "timestamp": 1760402010414,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:33:31.307880+00:00"
+    },
+    {
+      "pageUrl": "https://example.com/",
+      "title": "",
+      "timestamp": 1760402011268,
+      "trigger": "init",
+      "receivedAt": "2025-10-14T00:33:31.308911+00:00"
+    },
+    {
+      "pageUrl": "https://example.com/",
+      "title": "Example Domain",
+      "timestamp": 1760402011291,
+      "trigger": "domcontentloaded",
+      "domSnapshotPath": "dom\\P-003.html",
+      "screenshotPath": "screenshots\\P-003.png",
+      "receivedAt": "2025-10-14T00:33:31.685241+00:00"
+    },
+    {
+      "pageUrl": "https://example.com/",
+      "title": "Example Domain",
+      "timestamp": 1760402011292,
+      "trigger": "load",
+      "domSnapshotPath": "dom\\P-004.html",
+      "screenshotPath": "screenshots\\P-004.png",
+      "receivedAt": "2025-10-14T00:33:31.995940+00:00"
+    }
+  ],
+  "actions": [
+    {
+      "action": "pointerdown",
+      "pageUrl": "https://example.com/",
+      "element": {
+        "tag": "a"
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-10-14T00:34:30.050686+00:00"
+    },
+    {
+      "action": "focus",
+      "pageUrl": "https://example.com/",
+      "element": {
+        "tag": "a"
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-10-14T00:34:30.056685+00:00"
+    },
+    {
+      "action": "pointerup",
+      "pageUrl": "https://example.com/",
+      "element": {
+        "tag": "a"
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-10-14T00:34:30.062700+00:00"
+    }
+  ],
+  "artifacts": {
+    "har": null,
+    "trace": null
+  }
+}

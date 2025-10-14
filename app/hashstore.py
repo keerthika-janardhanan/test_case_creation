@@ -1,7 +1,8 @@
 import sqlite3
 import os
 import hashlib
-from typing import Optional
+import json
+from typing import Optional, Any, Dict
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "hashstore.db")
 
@@ -55,3 +56,59 @@ def is_changed(key: str, content: str, meta: str = None) -> bool:
         set_hash(key, new_hash, meta)
         return True
     return False
+
+
+# -------------------------------
+# JSON file-based HashStore (for tests)
+# -------------------------------
+class HashStore:
+    """
+    Lightweight JSON file-based hash store used by tests.
+
+    - add(payload): store the hash of payload
+    - is_new(payload): return True if hash not seen
+    The file stores a dict { "hashes": [sha256, ...] } for simplicity.
+    """
+
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+        # ensure directory exists
+        folder = os.path.dirname(os.path.abspath(file_path))
+        if folder and not os.path.exists(folder):
+            os.makedirs(folder, exist_ok=True)
+
+    def _load(self) -> Dict[str, Any]:
+        if not os.path.exists(self.file_path):
+            return {"hashes": []}
+        try:
+            with open(self.file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict) and "hashes" in data and isinstance(data["hashes"], list):
+                    return data
+                return {"hashes": []}
+        except Exception:
+            return {"hashes": []}
+
+    def _save(self, data: Dict[str, Any]) -> None:
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+
+    def _hash_payload(self, payload: Any) -> str:
+        try:
+            text = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+        except Exception:
+            text = str(payload)
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    def is_new(self, payload: Any) -> bool:
+        data = self._load()
+        digest = self._hash_payload(payload)
+        return digest not in data.get("hashes", [])
+
+    def add(self, payload: Any) -> None:
+        data = self._load()
+        digest = self._hash_payload(payload)
+        if digest not in data.get("hashes", []):
+            data.setdefault("hashes", []).append(digest)
+            self._save(data)
+
