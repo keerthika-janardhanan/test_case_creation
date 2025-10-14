@@ -26,6 +26,8 @@ Key optional flags:
 - `--capture-screenshots`: capture per-action element screenshots.
 - `--no-trace` / `--no-har`: disable Playwright trace or HAR capture if not needed.
 - `--timeout`: auto-stop the session after the given number of seconds.
+- `--ignore-https-errors`: skip TLS/SSL certificate errors (handy for internal/self-signed environments).
+- `--user-agent`: spoof the reported browser user agent (defaults to a realistic desktop Chrome string).
 
 Refer to `python -m app.run_playwright_recorder --help` for the full list of options.
 
