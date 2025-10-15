@@ -89,7 +89,7 @@ class TemplateLoader:
 
 
 class TestCaseGenerator:
-    def __init__(self, db: VectorDBClient, template=None):
+    def __init__(self, db: VectorDBClient, template=None, llm: Optional[object] = None):
         self.db = db
         self.template = template or {}
         self.relevant_types = {
@@ -126,8 +126,8 @@ class TestCaseGenerator:
         ]
         self.cached_flow_steps: List[dict] = []
 
-        # ✅ Use AzureChatOpenAI instead of ChatOpenAI
-        self.llm = AzureChatOpenAI(
+        # ✅ Use AzureChatOpenAI instead of ChatOpenAI (allow injection for testing)
+        self.llm = llm or AzureChatOpenAI(
             openai_api_version=os.getenv("OPENAI_API_VERSION"),
             azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "GPT-4o"),
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -135,7 +135,7 @@ class TestCaseGenerator:
             temperature=0.2,
         )
 
-    def generate_test_cases(self, story: str):
+    def generate_test_cases(self, story: str, per_step_negatives: int = 1, per_step_edges: int = 1, max_steps_for_variants: int = 8):
         try:
             context_chunks, flow_steps, context_sources = self._collect_context(story)
         except re.error as exc:
@@ -146,60 +146,186 @@ class TestCaseGenerator:
         self.cached_flow_steps = flow_steps
         context_text = "\n\n---\n".join(context_chunks) if context_chunks else "(No direct context retrieved. Provide best-effort scenarios and state assumptions.)"
 
-        prompt_text = self._build_generation_prompt(
-            story,
-            context_text,
-            json.dumps(flow_steps, ensure_ascii=False) if flow_steps else "[]",
+        # Agentic path: attempt LLM with retries; if recorder flow missing and LLM fails, synthesize from vector context
+        cases = self._agentic_generate(story, context_text, flow_steps, context_sources)
+        # Ensure granular coverage: add per-step negative/edge variants when missing
+        cases = self._ensure_per_step_variants(
+            cases,
+            flow_steps,
+            per_step_negatives=per_step_negatives,
+            per_step_edges=per_step_edges,
+            max_steps=max_steps_for_variants,
+            story=story,
         )
+        return cases
 
-        try:
-            resp = self.llm.invoke(prompt_text)
-        except re.error as exc:
-            pattern = getattr(exc, "pattern", None)
-            raise ValueError(
-                f"Regex failure while invoking LLM (pattern={pattern!r}): {exc}"
-            ) from exc
-
-        output = resp.content if hasattr(resp, "content") else str(resp)
-
-        # Remove code fences if any
-        try:
-            output = re.sub(r"^```(?:json)?\s*", "", output, flags=re.DOTALL)
-            output = re.sub(r"\s*```$", "", output, flags=re.DOTALL).strip()
-        except re.error as exc:
-            pattern = getattr(exc, "pattern", None)
-            raise ValueError(
-                f"Regex failure while sanitising LLM output (pattern={pattern!r}): {exc}"
-            ) from exc
-        output = output.strip()
-
-        try:
-            normalized_output = self._normalize_llm_json(output)
-        except re.error as exc:
-            pattern = getattr(exc, "pattern", None)
-            raise ValueError(
-                f"Regex failure while normalising LLM JSON (pattern={pattern!r}): {exc}"
-            ) from exc
-
-        # Primary parse
-        try:
-            test_cases = json.loads(normalized_output)
-        except json.JSONDecodeError:
-            # Attempt to repair and extract a JSON array from the LLM output
-            repaired = self._repair_llm_output_to_json_array(normalized_output)
-            if repaired is None:
-                preview = normalized_output[:800] + ("..." if len(normalized_output) > 800 else "")
-                raise ValueError(
-                    "Generated test cases were not valid JSON after repair. Please retry or adjust keywords.\n"
-                    f"Preview: {preview}"
+    def _agentic_generate(self, story: str, context_text: str, flow_steps: List[dict], context_sources: List[str], max_attempts: int = 2) -> List[dict]:
+        last_error = ""
+        for attempt in range(1, max_attempts + 1):
+            prompt = self._build_generation_prompt(
+                story,
+                context_text,
+                json.dumps(flow_steps, ensure_ascii=False) if flow_steps else "[]",
+            )
+            if attempt > 1:
+                strict_suffix = (
+                    "\n\nIMPORTANT: Your previous output failed validation. Return ONLY a valid JSON array with objects containing keys "
+                    f"{', '.join(self.default_fields)} and 'step_details'. No prose, no code fences, no trailing commas, no comments."
                 )
-            test_cases = repaired
+                prompt = prompt + strict_suffix
 
-        cleaned_cases = self._enforce_schema(test_cases)
-        cleaned_cases = self._inject_flow_details(cleaned_cases, flow_steps, context_sources)
-        if not cleaned_cases:
-            raise ValueError("No valid test cases could be generated from the provided context.")
-        return cleaned_cases
+            try:
+                resp = self.llm.invoke(prompt)
+            except re.error as exc:
+                pattern = getattr(exc, "pattern", None)
+                raise ValueError(
+                    f"Regex failure while invoking LLM (pattern={pattern!r}): {exc}"
+                ) from exc
+
+            output = resp.content if hasattr(resp, "content") else str(resp)
+            # Strip fences
+            try:
+                output = re.sub(r"^```(?:json)?\s*", "", output, flags=re.DOTALL)
+                output = re.sub(r"\s*```$", "", output, flags=re.DOTALL).strip()
+            except re.error as exc:
+                pattern = getattr(exc, "pattern", None)
+                raise ValueError(
+                    f"Regex failure while sanitising LLM output (pattern={pattern!r}): {exc}"
+                ) from exc
+            output = output.strip()
+
+            try:
+                normalized_output = self._normalize_llm_json(output)
+            except re.error as exc:
+                pattern = getattr(exc, "pattern", None)
+                raise ValueError(
+                    f"Regex failure while normalising LLM JSON (pattern={pattern!r}): {exc}"
+                ) from exc
+
+            parsed_cases = None
+            try:
+                parsed_cases = json.loads(normalized_output)
+            except json.JSONDecodeError as je:
+                last_error = f"json decode: {je}"
+                repaired = self._repair_llm_output_to_json_array(normalized_output)
+                if isinstance(repaired, list):
+                    parsed_cases = repaired
+
+            if isinstance(parsed_cases, list):
+                cleaned = self._enforce_schema(parsed_cases)
+                cleaned = self._inject_flow_details(cleaned, flow_steps, context_sources)
+                if cleaned:
+                    return cleaned
+                last_error = "parsed but no valid cases after schema enforcement"
+
+        # All attempts failed; choose fallback strategy
+        if flow_steps:
+            return self._fallback_from_flow(story, flow_steps)
+        # Synthesize from vector context
+        return self._synthesize_from_context(story, context_text, context_sources)
+
+    def _fallback_from_flow(self, story: str, flow_steps: List[dict]) -> List[dict]:
+        step_details = [
+            {
+                "action": item.get("action", ""),
+                "navigation": item.get("navigation", ""),
+                "data": item.get("data", ""),
+                "expected": item.get("expected", ""),
+            }
+            for item in flow_steps
+        ]
+        step_strings = []
+        for detail in step_details:
+            parts = [p for p in [detail.get("action", ""), detail.get("navigation", "")] if p]
+            if detail.get("data"):
+                parts.append(f"Data: {detail['data']}")
+            if detail.get("expected"):
+                parts.append(f"Expected: {detail['expected']}")
+            step_strings.append(" - ".join(parts).strip(" -"))
+
+        return [{
+            "id": "TC001",
+            "title": f"{story} - Positive Scenario".strip(" -"),
+            "type": "positive",
+            "preconditions": [],
+            "step_details": step_details,
+            "steps": step_strings,
+            "data": {},
+            "expected": step_details[-1].get("expected", ""),
+            "priority": "medium",
+            "tags": ["recorder", "auto-fallback"],
+            "assumptions": [
+                "Auto-generated directly from recorder flow steps due to empty LLM output. Please review wording."
+            ],
+        }]
+
+    def _synthesize_from_context(self, story: str, context_text: str, context_sources: List[str]) -> List[dict]:
+        # Heuristically extract procedural lines
+        lines = [ln.strip() for ln in context_text.splitlines() if ln.strip()]
+        keywords = ("click", "navigate", "select", "enter", "fill", "choose", "submit", "save", "open")
+        step_lines: List[str] = []
+        for ln in lines:
+            low = ln.lower()
+            if any(kw in low for kw in keywords):
+                # Avoid the 'Source:' headers
+                if not low.startswith("source:"):
+                    step_lines.append(ln)
+            if len(step_lines) >= 8:
+                break
+
+        step_details: List[dict] = []
+        if step_lines:
+            for idx, ln in enumerate(step_lines, start=1):
+                step_details.append({
+                    "action": "",
+                    "navigation": ln,
+                    "data": "",
+                    "expected": "Action completes successfully.",
+                })
+        else:
+            # Generic outline if no procedural text found
+            step_details = [
+                {"action": "Log into Oracle", "navigation": "Log into Oracle Fusion.", "data": "", "expected": "Home page is displayed."},
+                {"action": "Navigate", "navigation": f"Navigate to the area relevant to '{story}'.", "data": "", "expected": "Target work area opens."},
+                {"action": "Perform action", "navigation": f"Execute the core action for '{story}'.", "data": "", "expected": "System accepts inputs without errors."},
+                {"action": "Verify", "navigation": "Confirm the business result is reflected (list/update/confirmation).", "data": "", "expected": "Outcome is visible and persisted."},
+            ]
+
+        steps = []
+        for d in step_details:
+            parts = [p for p in [d.get("action", ""), d.get("navigation", "")] if p]
+            if d.get("data"):
+                parts.append(f"Data: {d['data']}")
+            if d.get("expected"):
+                parts.append(f"Expected: {d['expected']}")
+            steps.append(" - ".join(parts).strip(" -"))
+
+        assumptions = []
+        if context_sources:
+            formatted = []
+            for item in context_sources[:3]:
+                if ":" in item:
+                    src, desc = item.split(":", 1)
+                    formatted.append(f"{src.strip()} -> {desc.strip()}")
+                else:
+                    formatted.append(item)
+            assumptions.append("Derived from vector DB context: " + ", ".join(formatted))
+        else:
+            assumptions.append("Limited context available; outline inferred from story keywords.")
+
+        return [{
+            "id": "TC001",
+            "title": f"{story} - Positive Scenario".strip(" -"),
+            "type": "positive",
+            "preconditions": [],
+            "step_details": step_details,
+            "steps": steps,
+            "data": {},
+            "expected": step_details[-1].get("expected", ""),
+            "priority": "medium",
+            "tags": ["vector-db", "agentic-fallback"],
+            "assumptions": assumptions,
+        }]
 
     # ----------------- JSON repair helpers -----------------
     def _repair_llm_output_to_json_array(self, text: str):
@@ -236,11 +362,29 @@ class TestCaseGenerator:
         parsed = _try_parsers(candidate)
         if isinstance(parsed, list):
             return parsed
-        # Last resort: if the whole string is not parseable, try to find any bracketed list inside
+        # Last resort 1: if the whole string is not parseable, try to find any bracketed list inside
         if extracted and extracted != candidate:
             parsed = _try_parsers(extracted)
             if isinstance(parsed, list):
                 return parsed
+
+        # Last resort 1b: attempt to auto-close unbalanced JSON and parse
+        autoclose = self._auto_close_json(candidate)
+        if autoclose:
+            parsed = _try_parsers(autoclose)
+            if isinstance(parsed, list):
+                return parsed
+
+        # Last resort 2: extract balanced JSON objects and return those that parse
+        objects = self._extract_balanced_json_objects(s)
+        parsed_objects = []
+        for obj_str in objects:
+            val = _try_parsers(obj_str)
+            if isinstance(val, dict):
+                parsed_objects.append(val)
+        if parsed_objects:
+            return parsed_objects
+
         return None
 
     def _extract_first_json_array(self, s: str) -> str | None:
@@ -274,6 +418,102 @@ class TestCaseGenerator:
                         return s[start : i + 1]
             i += 1
         return None
+
+    def _extract_balanced_json_objects(self, s: str) -> List[str]:
+        """Extract all balanced top-level JSON object substrings from text.
+        This helps salvage partially valid content when the surrounding array is malformed or truncated.
+        """
+        results: List[str] = []
+        depth = 0
+        in_str = False
+        esc = False
+        start_idx: Optional[int] = None
+        i = 0
+        while i < len(s):
+            ch = s[i]
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == '{':
+                    if depth == 0:
+                        start_idx = i
+                    depth += 1
+                elif ch == '}':
+                    if depth > 0:
+                        depth -= 1
+                        if depth == 0 and start_idx is not None:
+                            results.append(s[start_idx:i+1])
+                            start_idx = None
+            i += 1
+        return results
+
+    def _auto_close_json(self, s: str) -> Optional[str]:
+        """Attempt to auto-close unbalanced JSON strings and brackets.
+        - Closes an open string if needed.
+        - Appends missing closing braces/brackets.
+        - Wraps top-level object in an array when appropriate.
+        Returns a repaired string or None if no structure hints found.
+        """
+        if not s:
+            return None
+        text = s.strip()
+        # Heuristic: if clearly not JSON-like, bail
+        if not any(ch in text for ch in ['[', '{']):
+            return None
+
+        # If starts with object, consider wrapping later
+        starts_with_object = text.lstrip().startswith('{') and not text.lstrip().startswith('[')
+
+        stack: List[str] = []
+        out_chars: List[str] = []
+        in_str = False
+        esc = False
+        for ch in text:
+            out_chars.append(ch)
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == '\\':
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+                continue
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == '{':
+                    stack.append('}')
+                elif ch == '[':
+                    stack.append(']')
+                elif ch == '}' or ch == ']':
+                    if stack and stack[-1] == ch:
+                        stack.pop()
+                    else:
+                        # unmatched closer; ignore
+                        pass
+
+        # Close open string
+        if in_str:
+            out_chars.append('"')
+
+        # Append remaining closers in reverse order
+        while stack:
+            out_chars.append(stack.pop())
+
+        repaired = ''.join(out_chars)
+
+        # If started with an object and not already wrapped in an array, wrap
+        if starts_with_object and not repaired.lstrip().startswith('['):
+            repaired = f"[{repaired}]"
+
+        return repaired
 
     def _collect_context(self, story: str, top_k: int = 8) -> Tuple[List[str], List[dict], List[str]]:
         chunks: List[str] = []
@@ -337,21 +577,21 @@ class TestCaseGenerator:
         if not flows_dir.exists():
             return [], []
 
-        key = re.sub(r"[^a-zA-Z0-9]", "", story.lower())
-        snippets = []
-        structured_steps: List[dict] = []
+        key = re.sub(r"[^a-zA-Z0-9]", "", (story or "").lower())
 
-        def process_flow(path: Path) -> Optional[List[dict]]:
-            try:
-                data = json.loads(path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, UnicodeDecodeError):
-                return None
-            steps = data.get("steps") or []
+        def normalize(text: str) -> str:
+            return re.sub(r"[^a-zA-Z0-9]", "", (text or "").lower())
+
+        snippets: List[str] = []
+        structured_steps: List[dict] = []
+        matched_any = False
+
+        def build_humanized(path: Path, flow_title: str, steps: List[dict]) -> Optional[List[dict]]:
             enriched = self._load_enriched_steps(path.stem)
-            humanized = enriched if enriched else self._humanize_flow_steps(steps, path.stem)
+            humanized = enriched if enriched else self._humanize_flow_steps(steps, flow_title or path.stem)
             if not humanized:
                 return None
-            step_lines = []
+            step_lines: List[str] = []
             for step in humanized[:12]:
                 nav_text = step.get("navigation", "")
                 data_text = step.get("data", "")
@@ -367,19 +607,41 @@ class TestCaseGenerator:
             snippets.append(f"Saved flow: {path.name}\n{snippet}")
             return humanized
 
-        for path in flows_dir.glob("*.json"):
-            stem = path.stem.lower()
-            if key and key not in re.sub(r"[^a-zA-Z0-9]", "", stem):
+        # Prefer most recent flows by modification time
+        flow_files = sorted(list(flows_dir.glob("*.json")), key=lambda p: p.stat().st_mtime, reverse=True)
+
+        # First pass: match by filename or internal flow_name
+        for path in flow_files:
+            try:
+                raw = path.read_text(encoding="utf-8")
+                data = json.loads(raw)
+            except Exception:
                 continue
-            humanized = process_flow(path)
+            flow_title = str(data.get("flow_name") or "")
+            steps = data.get("steps") or []
+            if key:
+                stem_norm = normalize(path.stem)
+                title_norm = normalize(flow_title)
+                if key not in stem_norm and key not in title_norm:
+                    continue
+            humanized = build_humanized(path, flow_title, steps)
             if humanized and not structured_steps:
                 structured_steps = humanized
+            matched_any = True
             if len(snippets) >= limit:
                 break
 
-        if not snippets:
-            for path in list(flows_dir.glob("*.json"))[:limit]:
-                humanized = process_flow(path)
+        # Fallback: if nothing matched, take first few most recent flows
+        if not matched_any:
+            for path in flow_files[:limit]:
+                try:
+                    raw = path.read_text(encoding="utf-8")
+                    data = json.loads(raw)
+                except Exception:
+                    continue
+                flow_title = str(data.get("flow_name") or "")
+                steps = data.get("steps") or []
+                humanized = build_humanized(path, flow_title, steps)
                 if humanized and not structured_steps:
                     structured_steps = humanized
                 if len(snippets) >= limit:
@@ -712,7 +974,8 @@ class TestCaseGenerator:
             "You are also provided the recorder flow steps (each item has step index, action, navigation description, data hints, expected hints). "
             "For the primary positive scenario, you MUST mirror these steps exactly, expanding them into detailed test actions with explicit navigation, data entry, and observable expected outcomes.\n"
             f"Recorder flow steps JSON:\n{flow_steps_json}\n\n"
-            "Output strictly as a JSON array. Each element must contain the fields: "
+            "Additionally, for EACH core step in the positive flow (up to 6-8 main steps), generate at least one negative and one edge case focusing on that step's validation (e.g., required field empty, invalid format, unauthorized action, boundary values). Keep these as separate cases with precise 'type' values and step-by-step actions.\n\n"
+            "Output strictly as a JSON array. Respond with ONLY the JSON array — no prose, no explanations, no code fences. Each element must contain the fields: "
             f"{fields}, plus an additional field 'step_details'.\n"
             "'step_details' must be an ordered list of objects with keys:\n"
             "- action: High-level activity label (e.g., 'Log into Oracle', 'Navigate to Payables', 'Create Supplier').\n"
@@ -721,7 +984,7 @@ class TestCaseGenerator:
             "- expected: Immediate system response/validation (string; empty string if none).\n\n"
             "Rules:\n"
             "- Treat each test case as a manual QA script suitable for handover to a test team.\n"
-            "- Produce at least one positive, one negative, and one edge case.\n"
+            "- Produce at least one positive overall, and per-step variants: for each core step of the positive flow, add one negative and one edge case focused on that step.\n"
             "- 'type' must be one of ['positive', 'negative', 'edge'].\n"
             "- 'steps' should mirror 'step_details' but as plain text summaries (list of strings) written as executable manual instructions.\n"
             "- Include concrete preconditions, required data/test accounts (use the 'data' field), and expected results with clear pass/fail criteria.\n"
@@ -735,6 +998,143 @@ class TestCaseGenerator:
             "- All values must be valid JSON strings (no expressions like \"a\".repeat(3)).\n"
             "- If context is limited, propose the most probable flow and document assumptions explicitly.\n"
         )
+
+    # ----------------- Variant expansion helpers -----------------
+    def _ensure_per_step_variants(
+        self,
+        cases: List[dict],
+        flow_steps: List[dict],
+        per_step_negatives: int,
+        per_step_edges: int,
+        max_steps: int,
+        story: str,
+    ) -> List[dict]:
+        if not cases:
+            return cases
+        # Find a base positive case to expand
+        base = None
+        for c in cases:
+            if str(c.get("type", "")).lower() == "positive" and c.get("step_details"):
+                base = c
+                break
+        if not base:
+            # Try to synthesize from flow steps if available
+            if flow_steps:
+                synthesized = self._fallback_from_flow(story, flow_steps)[0]
+                base = synthesized
+                cases.insert(0, synthesized)
+            else:
+                return cases
+
+        existing_counts = {}
+        for c in cases:
+            t = str(c.get("type", "")).lower()
+            existing_counts[t] = existing_counts.get(t, 0) + 1
+
+        step_details = base.get("step_details", [])
+        if not isinstance(step_details, list) or not step_details:
+            return cases
+
+        # Cap to first N steps to avoid explosion
+        limit = min(max_steps, len(step_details))
+
+        next_id_num = len(cases) + 1
+        def _next_id(prefix: str) -> str:
+            nonlocal next_id_num
+            val = f"{prefix}{next_id_num:03}"
+            next_id_num += 1
+            return val
+
+        new_cases: List[dict] = []
+        for idx in range(limit):
+            base_step = step_details[idx]
+            # Generate negative variants
+            for _ in range(max(0, per_step_negatives)):
+                neg_case = self._make_negative_variant(base, idx)
+                neg_case["id"] = _next_id("TCN")
+                neg_case["tags"] = list(set((neg_case.get("tags") or []) + [f"per-step-variant:{idx+1}"]))
+                new_cases.append(neg_case)
+            # Generate edge variants
+            for _ in range(max(0, per_step_edges)):
+                edge_case = self._make_edge_variant(base, idx)
+                edge_case["id"] = _next_id("TCE")
+                edge_case["tags"] = list(set((edge_case.get("tags") or []) + [f"per-step-variant:{idx+1}"]))
+                new_cases.append(edge_case)
+
+        # Append new variants
+        cases.extend(new_cases)
+        return cases
+
+    def _clone_case(self, case: dict) -> dict:
+        import copy
+        return copy.deepcopy(case)
+
+    def _make_negative_variant(self, base_case: dict, step_index: int) -> dict:
+        case = self._clone_case(base_case)
+        case["type"] = "negative"
+        base_title = str(base_case.get("title") or "Scenario")
+        case["title"] = f"{base_title} - Negative at Step {step_index+1}"
+        details = case.get("step_details", [])
+        # Adjust the focus step with invalid/missing data
+        if 0 <= step_index < len(details):
+            target = details[step_index]
+            nav = target.get("navigation", "")
+            # Heuristic: if it's a data entry step, blank the data; else insert an invalid value
+            data_val = target.get("data", "")
+            if data_val:
+                target["data"] = self._mutate_data_invalid(data_val)
+            else:
+                target["data"] = "<required>: (empty)"
+            target["expected"] = target.get("expected") or "Validation error is displayed; system prevents save."
+        # Trim steps after failure point to keep scenario focused
+        case["step_details"] = details[: step_index + 1]
+        case["steps"] = [
+            f"{d.get('action','')} - {d.get('navigation','')}".strip(" -") + (f" | Data: {d['data']}" if d.get('data') else '') + (f" | Expected: {d['expected']}" if d.get('expected') else '')
+            for d in case["step_details"]
+        ]
+        case["expected"] = case["step_details"][-1].get("expected", "")
+        return case
+
+    def _make_edge_variant(self, base_case: dict, step_index: int) -> dict:
+        case = self._clone_case(base_case)
+        case["type"] = "edge"
+        base_title = str(base_case.get("title") or "Scenario")
+        case["title"] = f"{base_title} - Edge at Step {step_index+1}"
+        details = case.get("step_details", [])
+        if 0 <= step_index < len(details):
+            target = details[step_index]
+            data_val = target.get("data", "")
+            target["data"] = self._mutate_data_edge(data_val)
+            target["expected"] = target.get("expected") or "System handles boundary value gracefully."
+        case["step_details"] = details[: step_index + 1] + details[step_index + 1:]
+        case["steps"] = [
+            f"{d.get('action','')} - {d.get('navigation','')}".strip(" -") + (f" | Data: {d['data']}" if d.get('data') else '') + (f" | Expected: {d['expected']}" if d.get('expected') else '')
+            for d in case["step_details"]
+        ]
+        case["expected"] = details[step_index].get("expected", case.get("expected", ""))
+        return case
+
+    def _mutate_data_invalid(self, data_str: str) -> str:
+        # Simple heuristic mutations: empty required; invalid email; invalid number
+        lower = data_str.lower()
+        if "email" in lower:
+            return data_str + " | email: not-an-email"
+        if any(k in lower for k in ["amount", "qty", "quantity", "number", "rate"]):
+            return data_str + " | amount: -1"
+        if any(k in lower for k in ["date", "dob", "effective"]):
+            return data_str + " | date: 31-02-2025"
+        # Default: required missing
+        return data_str + " | <required>: (empty)"
+
+    def _mutate_data_edge(self, data_str: str) -> str:
+        lower = data_str.lower()
+        if any(k in lower for k in ["name", "supplier", "description"]):
+            return data_str + " | name: 'A' * 255"
+        if any(k in lower for k in ["amount", "qty", "quantity", "number", "rate"]):
+            return data_str + " | amount: 999999999"
+        if any(k in lower for k in ["date", "dob", "effective"]):
+            return data_str + " | date: 29-02-2024"
+        return data_str + " | note: boundary conditions applied"
 
     def _normalize_llm_json(self, text: str) -> str:
         def replace_repeat(match: re.Match) -> str:

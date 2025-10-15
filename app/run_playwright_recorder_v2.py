@@ -165,6 +165,53 @@ def _ensure_playwright() -> Playwright:
     return sync_playwright().start()
 
 
+def _wait_bindings_ready(p: Optional[Page], timeout_ms: int = 5000) -> None:
+    """Best-effort wait that our injected recorder bindings are ready on the page.
+
+    This reduces missed early actions caused by race conditions where the page is interactive
+    before the init script runs. Safe to call even if the page is closing.
+    """
+    if not p or p.is_closed():
+        return
+    try:
+        # Nudge the page to ensure scripts run, then wait for our flag.
+        try:
+            p.evaluate("() => { try { return !!window.__pyRecInstalled; } catch(_) { return false; } }")
+        except Exception:
+            pass
+        p.wait_for_function("() => window.__pyRecInstalled === true", timeout=timeout_ms)
+    except Exception:
+        # Non-fatal: on some pages (e.g., cross-origin iframes) this may not be reachable
+        pass
+
+
+def _silence_bindings_on_pages(ctx: Optional[BrowserContext]) -> None:
+    """Replace exposed bindings with no-ops to stop cross-process calls during shutdown."""
+    if not ctx:
+        return
+    pages: List[Page]
+    try:
+        pages = list(getattr(ctx, "pages", []))
+    except Exception:
+        pages = []
+    for p in pages:
+        try:
+            if p and not p.is_closed():
+                p.evaluate(
+                    """
+                    () => {
+                        try {
+                            window.__pyRecInstalledStopped = true;
+                            window.pythonRecorderCapture = () => {};
+                            window.pythonRecorderPageContext = () => {};
+                        } catch (_) {}
+                    }
+                    """
+                )
+        except Exception:
+            pass
+
+
 def _build_context(
     playwright: Playwright,
     browser_name: str,
@@ -313,6 +360,8 @@ def main() -> None:
         active_page: Optional[Page] = None
 
         def _enqueue_action(_source, payload):
+            if stop_event.is_set():
+                return
             with q_lock:
                 item = dict(payload or {})
                 try:
@@ -328,6 +377,8 @@ def main() -> None:
                 pending_actions.append(item)
 
         def _enqueue_ctx(_source, payload):
+            if stop_event.is_set():
+                return
             with q_lock:
                 item = dict(payload or {})
                 try:
@@ -361,7 +412,12 @@ def main() -> None:
             page.add_init_script(PAGE_INJECT_SCRIPT)
         except Exception:
             pass
+        # Ensure our bindings are live before user interactions
+        _wait_bindings_ready(page)
         # Console handler with fallback action capture if bindings fail
+        # Track recent pointerdown to synthesize a click if navigation interrupts the native click event
+        _last_pointerdown: Dict[str, Any] = {"url": None, "tag": None, "t": 0.0}
+
         def _on_console_with_fallback(msg: ConsoleMessage) -> None:
             try:
                 text = msg.text
@@ -374,8 +430,26 @@ def main() -> None:
                         act = parts[2]
                         tag = parts[3]
                         url = parts[4]
+                        now = time.time()
+                        # record the raw action
                         fallback = {"action": act, "pageUrl": url, "element": {"tag": tag}, "extra": {"fromConsole": True}}
-                        session.add_action(fallback)
+                        try:
+                            session.add_action(fallback)
+                        except Exception:
+                            pass
+                        # synthesize a click if pointerdown was seen shortly before pointerup and no click surfaced
+                        try:
+                            if act == "pointerdown":
+                                _last_pointerdown.update({"url": url, "tag": tag, "t": now})
+                            elif act == "pointerup":
+                                last_t = float(_last_pointerdown.get("t") or 0.0)
+                                last_url = _last_pointerdown.get("url")
+                                if last_t and (now - last_t) <= 0.6 and (not last_url or last_url == url):
+                                    synth = {"action": "click", "pageUrl": url, "element": {"tag": tag}, "extra": {"synthesized": True, "fromConsole": True}}
+                                    session.add_action(synth)
+                                _last_pointerdown.update({"url": None, "tag": None, "t": 0.0})
+                        except Exception:
+                            pass
             except Exception:
                 pass
         page.on("console", _on_console_with_fallback)
@@ -398,6 +472,7 @@ def main() -> None:
                     p.add_init_script(PAGE_INJECT_SCRIPT)
                 except Exception:
                     pass
+                _wait_bindings_ready(p)
                 try:
                     p.on("framenavigated", lambda f: sys.stderr.write(f"[recorder][framenavigated] {getattr(f, 'url', '')}\n"))
                 except Exception:
@@ -420,6 +495,7 @@ def main() -> None:
                     p.add_init_script(PAGE_INJECT_SCRIPT)
                 except Exception:
                     pass
+                _wait_bindings_ready(p)
                 p.on("console", _on_console_with_fallback)
                 p.on("pageerror", _on_page_error)
                 try:
@@ -610,32 +686,89 @@ def main() -> None:
             print("\n[recorder] Stopping (Ctrl+C detected).")
             stop_event.set()
 
-        # Final minimal drain to avoid dropping last actions when stopping
+        # Stop JS-to-Python calls before we drain to reduce socket errors during teardown
         try:
-            end_deadline = time.time() + 0.8
-            while time.time() < end_deadline:
-                drained = False
-                with q_lock:
-                    evt = pending_ctx.popleft() if pending_ctx else None
-                if evt:
+            _silence_bindings_on_pages(context)
+        except Exception:
+            pass
+
+        # Final aggressive drain to avoid dropping last actions when stopping
+        try:
+            # small settle to allow in-flight JS messages to reach bindings
+            try:
+                time.sleep(0.2)
+            except Exception:
+                pass
+
+            end_deadline = time.time() + 2.0  # allow up to 2s to flush
+            empty_cycles = 0
+            while time.time() < end_deadline and empty_cycles < 3:
+                drained_any = False
+                # Drain context events fully
+                while True:
+                    with q_lock:
+                        evt = pending_ctx.popleft() if pending_ctx else None
+                    if not evt:
+                        break
                     try:
                         session.add_page_event(evt)
                     except Exception:
                         pass
-                    drained = True
-                with q_lock:
-                    act = pending_actions.popleft() if pending_actions else None
-                if act:
+                    drained_any = True
+                # Drain action events fully
+                while True:
+                    with q_lock:
+                        act = pending_actions.popleft() if pending_actions else None
+                    if not act:
+                        break
                     # Strip any internal refs and persist minimal payload
                     act.pop("__frame", None); act.pop("__page", None)
                     try:
                         session.add_action(act)
                     except Exception:
                         pass
-                    drained = True
-                if not drained:
-                    break
-                time.sleep(0.05)
+                    drained_any = True
+                if not drained_any:
+                    empty_cycles += 1
+                else:
+                    empty_cycles = 0
+                try:
+                    time.sleep(0.05)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        # Final best-effort snapshot so the last UI state is present even if no page event fired
+        try:
+            if session and (args.capture_dom or args.capture_screenshots):
+                ap = active_page if (active_page and not active_page.is_closed()) else (page if (page and not page.is_closed()) else None)
+                if ap:
+                    finalize_evt: Dict[str, Any] = {"trigger": "finalize", "pageUrl": getattr(ap, "url", ""), "receivedAt": _iso_now()}
+                    # DOM
+                    if args.capture_dom:
+                        html = _safe_get_outer_html(ap)
+                        if html is not None:
+                            idxp = len(session.page_events) + 1
+                            dp = session.dom_dir / f"P-{idxp:03}.html"
+                            try:
+                                dp.write_text(str(html), encoding="utf-8")
+                                finalize_evt["domSnapshotPath"] = str(dp.relative_to(session.session_dir))
+                            except Exception:
+                                finalize_evt["domSnapshotError"] = "write-failed"
+                    # Screenshot
+                    if args.capture_screenshots:
+                        idxp = len(session.page_events) + 1
+                        sp = session.screenshot_dir / f"P-{idxp:03}.png"
+                        spath = _safe_screenshot(ap, sp)
+                        if spath:
+                            finalize_evt["screenshotPath"] = str(Path(spath).relative_to(session.session_dir))
+                        else:
+                            finalize_evt["screenshotError"] = "shot-failed"
+                    try:
+                        session.add_page_event(finalize_evt)
+                    except Exception:
+                        pass
         except Exception:
             pass
 

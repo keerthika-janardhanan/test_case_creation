@@ -395,9 +395,13 @@ if "rec_capture_screens" not in st.session_state:
 if "rec_capture_trace" not in st.session_state:
     st.session_state["rec_capture_trace"] = True
 if "rec_capture_har" not in st.session_state:
-    st.session_state["rec_capture_har"] = False
+    st.session_state["rec_capture_har"] = True
 if "rec_ignore_https" not in st.session_state:
     st.session_state["rec_ignore_https"] = False
+if "rec_disable_gpu" not in st.session_state:
+    st.session_state["rec_disable_gpu"] = False
+if "rec_proxy" not in st.session_state:
+    st.session_state["rec_proxy"] = ""
 if "rec_timeout" not in st.session_state:
     st.session_state["rec_timeout"] = 0
 
@@ -408,7 +412,7 @@ with opt_cols[0]:
 with opt_cols[1]:
     st.checkbox("Capture Screenshots", key="rec_capture_screens")
 with opt_cols[2]:
-    st.checkbox("Capture Playwright Trace", key="rec_capture_trace", value=True)
+    st.checkbox("Capture Playwright Trace", key="rec_capture_trace")
 with opt_cols[3]:
     st.checkbox("Capture HAR", key="rec_capture_har")
 
@@ -417,6 +421,12 @@ st.checkbox(
     key="rec_ignore_https",
     help="Bypass TLS certificate validation (needed for some internal test environments).",
 )
+
+gpu_col, proxy_col = st.columns([1, 3])
+with gpu_col:
+    st.checkbox("Disable GPU", key="rec_disable_gpu", help="Pass GPU-disabling flags to Chromium to avoid blank rendering on some drivers.")
+with proxy_col:
+    st.text_input("Proxy server (optional)", key="rec_proxy", help="e.g. http://proxy.mycorp:3128")
 
 timeout_col, _ = st.columns([1, 3])
 with timeout_col:
@@ -465,6 +475,10 @@ with col1:
                     cmd.append("--capture-screenshots")
                 if st.session_state["rec_ignore_https"]:
                     cmd.append("--ignore-https-errors")
+                if st.session_state.get("rec_disable_gpu"):
+                    cmd.append("--disable-gpu")
+                if st.session_state.get("rec_proxy"):
+                    cmd.extend(["--proxy", st.session_state["rec_proxy"]])
                 if st.session_state["rec_timeout"]:
                     cmd.extend(["--timeout", str(int(st.session_state["rec_timeout"]))])
 
