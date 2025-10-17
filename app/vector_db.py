@@ -27,17 +27,62 @@ class VectorDBClient:
         results = self.collection.query(query_texts=[query], n_results=top_k)
         if not results or "documents" not in results:
             return []
-        documents = results["documents"][0]
-        ids = results.get("ids", [[None] * len(documents)])[0]
-        metadatas = results.get("metadatas", [[{}] * len(documents)])[0]
-        return [
-            {
-                "id": ids[i],
-                "content": documents[i],
-                "metadata": metadatas[i] if i < len(metadatas) else {},
-            }
-            for i in range(len(documents))
-        ]
+        documents = results["documents"][0] if isinstance(results.get("documents"), list) else results.get("documents")
+        if isinstance(documents, list):
+            docs_list = documents
+        else:
+            docs_list = [documents] if documents is not None else []
+        ids_raw = results.get("ids") or []
+        ids = ids_raw[0] if ids_raw and isinstance(ids_raw[0], list) else (ids_raw if isinstance(ids_raw, list) else [])
+        metas_raw = results.get("metadatas") or []
+        metadatas = metas_raw[0] if metas_raw and isinstance(metas_raw[0], list) else (metas_raw if isinstance(metas_raw, list) else [])
+        out = []
+        n = len(docs_list)
+        for i in range(n):
+            meta = metadatas[i] if i < len(metadatas) else {}
+            if not isinstance(meta, dict):
+                try:
+                    meta = json.loads(meta) if isinstance(meta, str) else {}
+                except Exception:
+                    meta = {}
+            out.append({
+                "id": ids[i] if i < len(ids) else None,
+                "content": docs_list[i],
+                "metadata": meta,
+            })
+        return out
+
+    # ---------------- Query with metadata filter ----------------
+    def query_where(self, query: str, where: dict, top_k: int = 3):
+        """Query with a Chroma metadata filter (e.g., {"type":"recorder_refined","flow_hash":"abc123"})."""
+        try:
+            results = self.collection.query(query_texts=[query], where=where or {}, n_results=top_k)
+        except TypeError:
+            # Older Chroma may not support where in this signature; fallback to unfiltered
+            results = self.collection.query(query_texts=[query], n_results=top_k)
+        if not results or "documents" not in results:
+            return []
+        documents = results["documents"][0] if isinstance(results.get("documents"), list) else results.get("documents")
+        docs_list = documents if isinstance(documents, list) else ([documents] if documents is not None else [])
+        ids_raw = results.get("ids") or []
+        ids = ids_raw[0] if ids_raw and isinstance(ids_raw[0], list) else (ids_raw if isinstance(ids_raw, list) else [])
+        metas_raw = results.get("metadatas") or []
+        metadatas = metas_raw[0] if metas_raw and isinstance(metas_raw[0], list) else (metas_raw if isinstance(metas_raw, list) else [])
+        out = []
+        n = len(docs_list)
+        for i in range(n):
+            meta = metadatas[i] if i < len(metadatas) else {}
+            if not isinstance(meta, dict):
+                try:
+                    meta = json.loads(meta) if isinstance(meta, str) else {}
+                except Exception:
+                    meta = {}
+            out.append({
+                "id": ids[i] if i < len(ids) else None,
+                "content": docs_list[i],
+                "metadata": meta,
+            })
+        return out
 
     # ---------------- Count ----------------
     def count(self) -> int:
@@ -74,6 +119,54 @@ class VectorDBClient:
         ids_to_delete = [d["id"] for d in all_docs if d["id"].startswith(f"{source}-")]
         if ids_to_delete:
             self.collection.delete(ids=ids_to_delete)
+
+    # ---------------- Get by metadata filter ----------------
+    def get_where(self, where: dict, limit: int = 1000):
+        """Return all documents matching a metadata filter, up to limit. Preserves original order returned by Chroma.
+        Example where: {"type": "recorder_refined", "flow_hash": "abc123"}
+        """
+        try:
+            results = self.collection.get(where=where or {}, limit=limit)
+        except (TypeError, ValueError):
+            # Older client may not support where in get; fallback to list_all and filter client-side
+            all_docs = self.list_all(limit=limit)
+            def _match(meta: dict) -> bool:
+                for k, v in (where or {}).items():
+                    if (meta or {}).get(k) != v:
+                        return False
+                return True
+            return [d for d in all_docs if _match(d.get("metadata", {}))]
+        docs = []
+
+        def _flatten(field):
+            if field is None:
+                return []
+            if isinstance(field, list):
+                if field and isinstance(field[0], list):
+                    return field[0]
+                return field
+            return []
+
+        documents = _flatten(results.get("documents"))
+        metadatas = _flatten(results.get("metadatas"))
+        ids = _flatten(results.get("ids"))
+
+        max_len = len(documents)
+        if not documents and isinstance(results.get("documents"), list) and results.get("documents"):
+            # Chroma may return list of strings embedded in JSON; ensure iteration
+            documents = list(results.get("documents"))
+            max_len = len(documents)
+
+        for i in range(max_len):
+            doc = documents[i] if i < len(documents) else None
+            meta = metadatas[i] if i < len(metadatas) else {}
+            doc_id = ids[i] if i < len(ids) else None
+            docs.append({
+                "id": doc_id,
+                "content": doc,
+                "metadata": meta if isinstance(meta, dict) else {},
+            })
+        return docs
 
 
 def _cli_query(client: VectorDBClient, args: argparse.Namespace) -> int:

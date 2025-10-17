@@ -1,4 +1,5 @@
-# orchestrator.py
+"""Script orchestration that prefers local Playwright recordings over deprecated saved_flows."""
+import json
 import re
 from pathlib import Path
 
@@ -20,27 +21,74 @@ class TestScriptOrchestrator:
         self.db = VectorDBClient(path=db_path)
 
     def _load_local_recorder_flow(self, identifier: str):
-        flows_dir = Path("./app/saved_flows")
-        if not flows_dir.exists():
+        """Load newest recording metadata and convert to a simple steps JSON.
+
+        We no longer use app/saved_flows/*.json. Instead, synthesize a steps array from
+        recordings/<session>/metadata.json actions so downstream code can merge steps.
+        """
+        rec_dir = Path("./recordings")
+        if not rec_dir.exists():
             return None
 
         key = re.sub(r"[^a-zA-Z0-9]", "", (identifier or "").lower())
-        candidates = sorted(flows_dir.glob("*.json"))
-        fallback = None
-        for path in candidates:
-            try:
-                content = path.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
+        # Newest sessions first by metadata.json mtime
+        candidates = []
+        for sess in rec_dir.iterdir():
+            if not sess.is_dir():
                 continue
-            normalized_name = re.sub(r"[^a-zA-Z0-9]", "", path.stem.lower())
+            meta = sess / "metadata.json"
+            if meta.exists():
+                try:
+                    mtime = meta.stat().st_mtime
+                except Exception:
+                    mtime = 0
+                candidates.append((mtime, sess.name, meta))
+        candidates.sort(key=lambda t: t[0], reverse=True)
+        if not candidates:
+            return None
+
+        def to_steps(meta_path: Path):
+            try:
+                data = json.loads(meta_path.read_text(encoding="utf-8"))
+            except Exception:
+                return []
+            steps = []
+            for act in data.get("actions", []):
+                action = (act.get("action") or act.get("type") or "").lower()
+                if not action:
+                    continue
+                if action in ("navigate", "navigation"):
+                    # Skip navigation; structure/harness will handle entry URL
+                    continue
+                elem = act.get("element") or {}
+                selector = elem.get("cssPath") or elem.get("xpath") or "body"
+                entry = {"action": action, "selector": selector}
+                extra = act.get("extra") or {}
+                if action in ("input", "change"):
+                    entry["action"] = "fill"
+                    value = extra.get("valueMasked") or extra.get("value") or elem.get("valueMasked") or ""
+                    entry["value"] = value
+                elif action == "press":
+                    key = extra.get("key") or "Enter"
+                    entry["key"] = key
+                steps.append(entry)
+            return steps
+
+        fallback = None
+        for _mtime, sess_name, meta in candidates:
+            steps = to_steps(meta)
+            if not steps:
+                continue
+            content = json.dumps({"steps": steps}, ensure_ascii=False)
             context = {
                 "content": content,
                 "metadata": {
                     "source": "playwright-local",
-                    "flow_name": path.stem,
+                    "flow_name": sess_name,
                     "type": "recorder",
                 },
             }
+            normalized_name = re.sub(r"[^a-zA-Z0-9]", "", sess_name.lower())
             if fallback is None:
                 fallback = context
             if key and key not in normalized_name:

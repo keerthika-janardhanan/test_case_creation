@@ -1,0 +1,3311 @@
+{
+  "stepEnhance:32b0a370381873cf234b388320f665dee7a235a9d0c2fb49a2cc49f954e5f30e": [
+    {
+      "step": 1,
+      "action": "Navigate",
+      "navigation": "Main Menu > Suppliers > Create Supplier",
+      "data": "",
+      "expected": "Supplier creation page is displayed."
+    },
+    {
+      "step": 2,
+      "action": "Enter Supplier Details",
+      "navigation": "Supplier Name field",
+      "data": "Supplier Name: ABC Corp",
+      "expected": "Supplier name is entered correctly."
+    },
+    {
+      "step": 3,
+      "action": "Enter Supplier Details",
+      "navigation": "Contact Information section Email field",
+      "data": "Email: contact@abccorp.com",
+      "expected": "Email address is entered correctly."
+    },
+    {
+      "step": 4,
+      "action": "Enter Supplier Details",
+      "navigation": "Contact Information section Phone Number field",
+      "data": "Phone Number: +1234567890",
+      "expected": "Phone number is entered correctly."
+    },
+    {
+      "step": 5,
+      "action": "Enter Supplier Details",
+      "navigation": "Address section Street Address field",
+      "data": "Street Address: 123 Elm Street",
+      "expected": "Street address is entered correctly."
+    },
+    {
+      "step": 6,
+      "action": "Enter Supplier Details",
+      "navigation": "Address section City field",
+      "data": "City: Springfield",
+      "expected": "City name is entered correctly."
+    },
+    {
+      "step": 7,
+      "action": "Enter Supplier Details",
+      "navigation": "Address section Postal Code field",
+      "data": "Postal Code: 98765",
+      "expected": "Postal code is entered correctly."
+    },
+    {
+      "step": 8,
+      "action": "Save",
+      "navigation": "Save button",
+      "data": "",
+      "expected": "Supplier is successfully created and confirmation message is displayed."
+    },
+    {
+      "step": 9,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 10,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 11,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 12,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 13,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 14,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 15,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 16,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 17,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 18,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 19,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 20,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 21,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 22,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 23,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 24,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 25,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 26,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 27,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 28,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 29,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 30,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 31,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 32,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 33,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 34,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 35,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 36,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 37,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 38,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 39,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 40,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 41,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 42,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 43,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 44,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 45,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 46,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 47,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 48,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 49,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 50,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 51,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 52,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 53,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 54,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 55,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 56,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 57,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 58,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 59,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 60,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 61,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 62,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 63,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 64,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 65,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 66,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 67,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 68,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 69,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 70,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 71,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 72,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 73,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 74,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 75,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 76,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 77,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 78,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 79,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 80,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 81,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 82,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 83,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 84,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 85,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 86,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 87,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 88,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 89,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 90,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 91,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 92,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 93,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 94,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 95,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 96,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 97,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 98,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 99,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 100,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 101,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 102,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 103,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 104,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 105,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 106,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 107,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 108,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 109,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 110,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 111,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 112,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 113,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 114,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 115,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 116,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 117,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 118,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 119,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 120,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 121,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 122,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 123,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 124,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 125,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 126,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 127,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 128,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 129,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 130,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 131,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 132,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 133,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 134,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 135,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 136,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 137,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 138,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 139,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 140,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 141,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 142,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 143,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 144,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 145,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 146,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 147,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 148,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 149,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 150,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 151,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 152,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 153,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 154,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 155,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 156,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 157,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 158,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 159,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 160,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 161,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 162,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 163,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 164,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 165,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 166,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 167,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 168,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 169,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 170,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 171,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 172,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 173,
+      "action": "Type",
+      "navigation": "",
+      "data": "",
+      "expected": "Action completes successfully."
+    }
+  ],
+  "stepEnhance:c24ccf4e91fad876285d293d224224efc42c0202175869cd471806efc57319a9": [
+    {
+      "step": 1,
+      "action": "Navigate",
+      "navigation": "Home > Suppliers > Create Supplier",
+      "data": "",
+      "expected": "Create Supplier page is displayed."
+    },
+    {
+      "step": 2,
+      "action": "Enter Supplier Details",
+      "navigation": "Supplier Name field",
+      "data": "Supplier Name: ABC Corp",
+      "expected": "Supplier Name is entered."
+    },
+    {
+      "step": 3,
+      "action": "Enter Supplier Details",
+      "navigation": "Contact Email field",
+      "data": "Email: contact@abccorp.com",
+      "expected": "Contact Email is entered."
+    },
+    {
+      "step": 4,
+      "action": "Enter Supplier Details",
+      "navigation": "Phone Number field",
+      "data": "Phone: +1234567890",
+      "expected": "Phone Number is entered."
+    },
+    {
+      "step": 5,
+      "action": "Enter Supplier Details",
+      "navigation": "Address field",
+      "data": "Address: 123 Elm Street, Springfield",
+      "expected": "Address is entered."
+    },
+    {
+      "step": 6,
+      "action": "Enter Supplier Details",
+      "navigation": "Tax ID field",
+      "data": "Tax ID: 123-45-6789",
+      "expected": "Tax ID is entered."
+    },
+    {
+      "step": 7,
+      "action": "Enter Supplier Details",
+      "navigation": "Payment Terms dropdown",
+      "data": "Payment Terms: Net 30",
+      "expected": "Payment Terms are selected."
+    },
+    {
+      "step": 8,
+      "action": "Save",
+      "navigation": "Save button",
+      "data": "",
+      "expected": "Supplier is created successfully and confirmation message is displayed."
+    },
+    {
+      "step": 9,
+      "action": "Type",
+      "navigation": "span",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 10,
+      "action": "Type",
+      "navigation": "#ui-id-4",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByText('Sign In')",
+        "stable": "#ui-id-4",
+        "xpath": "//*[normalize-space(.)='Sign In'] | //label[normalize-space(.)='Sign In']/following::*[self::input or self::textarea or self::select][1] | //*[normalize-space(.)='Sign In']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span] | /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "xpath_candidates": [
+          "//*[normalize-space(.)='Sign In']",
+          "//label[normalize-space(.)='Sign In']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[normalize-space(.)='Sign In']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span]",
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "css": "span#ui-id-4",
+        "title": "",
+        "labels": "Sign In",
+        "role": "",
+        "name": "Sign In",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 11,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 12,
+      "action": "Type",
+      "navigation": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Enter Passcode' })",
+        "stable": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+        "xpath": "//label[normalize-space(.)='Enter Passcode']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Enter Passcode']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "css": "input#idcs-mfa-mfa-auth-sms-email-code-input|input",
+        "title": "",
+        "labels": "Enter Passcode",
+        "role": "textbox",
+        "name": "Enter Passcode",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 13,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 14,
+      "action": "Type",
+      "navigation": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Enter Passcode' })",
+        "stable": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+        "xpath": "//label[normalize-space(.)='Enter Passcode']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Enter Passcode']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "css": "input#idcs-mfa-mfa-auth-sms-email-code-input|input",
+        "title": "",
+        "labels": "Enter Passcode",
+        "role": "textbox",
+        "name": "Enter Passcode",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 15,
+      "action": "Type",
+      "navigation": "div",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 16,
+      "action": "Type",
+      "navigation": "Click the 'Verify' control",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByText(\"Verify\")",
+        "stable": "getByText(\"Verify\")",
+        "xpath": "//*[normalize-space(.)='Verify'] | //label[normalize-space(.)='Verify']/following::*[self::input or self::textarea or self::select][1] | //*[normalize-space(.)='Verify']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span] | /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]",
+        "xpath_candidates": [
+          "//*[normalize-space(.)='Verify']",
+          "//label[normalize-space(.)='Verify']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[normalize-space(.)='Verify']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span]",
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]",
+        "css": "oj-button#idcs-mfa-mfa-auth-sms-email-submit-button > button:nth-child(1) > div:nth-child(1)",
+        "title": "",
+        "labels": "Verify",
+        "role": "",
+        "name": "Verify",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 17,
+      "action": "Type",
+      "navigation": "path",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "path",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 18,
+      "action": "Type",
+      "navigation": "svg#pt1:_UISmmLink::icon > g:nth-child(5) > path:nth-child(1)",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "svg#pt1:_UISmmLink::icon > g:nth-child(5) > path:nth-child(1)",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]/g[4]/path[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]/g[4]/path[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]/g[4]/path[1]",
+        "css": "svg#pt1:_UISmmLink::icon > g:nth-child(5) > path:nth-child(1)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "path",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 19,
+      "action": "Type",
+      "navigation": "div",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 20,
+      "action": "Type",
+      "navigation": "#pt1\\:_UISnvr\\:0\\:nvgpgl2_groupNode_procurement",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByText('Procurement')",
+        "stable": "#pt1\\:_UISnvr\\:0\\:nvgpgl2_groupNode_procurement",
+        "xpath": "//*[normalize-space(.)='Procurement'] | //label[normalize-space(.)='Procurement']/following::*[self::input or self::textarea or self::select][1] | //*[normalize-space(.)='Procurement']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span] | /html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[1]/div[1]",
+        "xpath_candidates": [
+          "//*[normalize-space(.)='Procurement']",
+          "//label[normalize-space(.)='Procurement']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[normalize-space(.)='Procurement']/ancestor::*[self::section or self::div or self::td or self::li][1]//*[self::input or self::button or self::a or self::span]",
+          "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[1]/div[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[1]/div[1]",
+        "css": "div#pt1:_UISnvr:0:nvgpgl2_groupNode_procurement",
+        "title": "Procurement",
+        "labels": "Procurement",
+        "role": "",
+        "name": "Procurement",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 21,
+      "action": "Type",
+      "navigation": "svg",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "svg",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 22,
+      "action": "Create a Supplier",
+      "navigation": "#pt1\\:_UISnvr\\:0\\:nv_itemNode_procurement_suppliers\\:\\:icon",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "#pt1\\:_UISnvr\\:0\\:nv_itemNode_procurement_suppliers\\:\\:icon",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[2]/div[1]/div[8]/a[1]/svg[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[2]/div[1]/div[8]/a[1]/svg[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[2]/div[1]/div[8]/a[1]/svg[1]",
+        "css": "svg#pt1:_UISnvr:0:nv_itemNode_procurement_suppliers::icon",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "svg",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 23,
+      "action": "Create a Supplier",
+      "navigation": "img",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "img",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 24,
+      "action": "Create a Supplier",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTsdiPrcPozSuppliersDashboard__FndTasksList\\:\\:icon",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('img', { name: 'Tasks' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTsdiPrcPozSuppliersDashboard__FndTasksList\\:\\:icon",
+        "xpath": "//*[@role='img' and normalize-space(.)='Tasks'] | /html[1]/body[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[5]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/a[1]/img[1]",
+        "xpath_candidates": [
+          "//*[@role='img' and normalize-space(.)='Tasks']",
+          "/html[1]/body[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[5]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/a[1]/img[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[5]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/a[1]/img[1]",
+        "css": "img#_FOpt1:_FOr1:0:_FONSr2:0:_FOTsdiPrcPozSuppliersDashboard__FndTasksList::icon",
+        "title": "Tasks",
+        "labels": "Tasks",
+        "role": "img",
+        "name": "Tasks",
+        "tag": "img",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 25,
+      "action": "Create a Supplier",
+      "navigation": "a",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "a",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 26,
+      "action": "Create a Supplier",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:RAtl5",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('link', { name: 'Create Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:RAtl5",
+        "xpath": "//a[normalize-space(.)='Create Supplier'] | //*[@role='link' and normalize-space(.)='Create Supplier'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/ul[1]/li[3]/a[1]",
+        "xpath_candidates": [
+          "//a[normalize-space(.)='Create Supplier'] | //*[@role='link' and normalize-space(.)='Create Supplier']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/ul[1]/li[3]/a[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/ul[1]/li[3]/a[1]",
+        "css": "a#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:RAtl5",
+        "title": "",
+        "labels": "Create Supplier",
+        "role": "link",
+        "name": "Create Supplier",
+        "tag": "a",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 27,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 28,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:it1::content",
+        "title": "",
+        "labels": "Supplier",
+        "role": "textbox",
+        "name": "Supplier",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 29,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 30,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:it1::content",
+        "title": "",
+        "labels": "Supplier",
+        "role": "textbox",
+        "name": "Supplier",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 31,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 32,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:it1::content",
+        "title": "",
+        "labels": "Supplier",
+        "role": "textbox",
+        "name": "Supplier",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 33,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 34,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:it1::content",
+        "title": "",
+        "labels": "Supplier",
+        "role": "textbox",
+        "name": "Supplier",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 35,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 36,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Supplier' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1] | //*[@role='textbox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Supplier']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='textbox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:it1::content",
+        "title": "",
+        "labels": "Supplier",
+        "role": "textbox",
+        "name": "Supplier",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 37,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 38,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Business Relationship' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc2::content",
+        "title": "",
+        "labels": "Business Relationship",
+        "role": "combobox",
+        "name": "Business Relationship",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 39,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 40,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Business Relationship' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc2::content",
+        "title": "",
+        "labels": "Business Relationship",
+        "role": "combobox",
+        "name": "Business Relationship",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 41,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Business Relationship' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc2::content",
+        "title": "",
+        "labels": "Business Relationship",
+        "role": "combobox",
+        "name": "Business Relationship",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 42,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 43,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Business Relationship' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Business Relationship']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[3]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc2::content",
+        "title": "Spend Authorized",
+        "labels": "Business Relationship",
+        "role": "combobox",
+        "name": "Business Relationship",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 44,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 45,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Organization Type' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc1::content",
+        "title": "",
+        "labels": "Tax Organization Type",
+        "role": "combobox",
+        "name": "Tax Organization Type",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 46,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 47,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Organization Type' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc1::content",
+        "title": "",
+        "labels": "Tax Organization Type",
+        "role": "combobox",
+        "name": "Tax Organization Type",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 48,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Organization Type' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc1::content",
+        "title": "",
+        "labels": "Tax Organization Type",
+        "role": "combobox",
+        "name": "Tax Organization Type",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 49,
+      "action": "Type",
+      "navigation": "select",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 50,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Organization Type' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Organization Type']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/select[1]",
+        "css": "select#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:soc1::content",
+        "title": "Corporation",
+        "labels": "Tax Organization Type",
+        "role": "combobox",
+        "name": "Tax Organization Type",
+        "tag": "select",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 51,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 52,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 53,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 54,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 55,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 56,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 57,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 58,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 59,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 60,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 61,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 62,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 63,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 64,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 65,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 66,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 67,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 68,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 69,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 70,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 71,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 72,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 73,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 74,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 75,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 76,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 77,
+      "action": "Type",
+      "navigation": "input",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 78,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 79,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('combobox', { name: 'Tax Country' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+        "xpath": "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1] | //*[@role='combobox'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "//label[normalize-space(.)='Tax Country']/following::*[self::input or self::textarea or self::select][1]",
+          "//*[@role='combobox']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[5]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::content",
+        "title": "",
+        "labels": "Tax Country",
+        "role": "combobox",
+        "name": "Tax Country",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 80,
+      "action": "Type",
+      "navigation": "li",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "li",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 81,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:su0",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('option', { name: 'United States US' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:su0",
+        "xpath": "//*[@role='option' and normalize-space(.)='United States US'] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/ul[1]/li[1]",
+        "xpath_candidates": [
+          "//*[@role='option' and normalize-space(.)='United States US']",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/ul[1]/li[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[4]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/ul[1]/li[1]",
+        "css": "li#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:countryNameId::su0",
+        "title": "",
+        "labels": "United States US",
+        "role": "option",
+        "name": "United States US",
+        "tag": "li",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 82,
+      "action": "Type",
+      "navigation": "button",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "",
+        "stable": "",
+        "xpath": "",
+        "xpath_candidates": [],
+        "raw_xpath": "",
+        "css": "",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "",
+        "tag": "button",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 83,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:cb1",
+      "data": "",
+      "expected": "Action completes successfully.",
+      "locators": {
+        "playwright": "getByRole('button', { name: 'Create' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:cb1",
+        "xpath": "//button[normalize-space(.)='Create'] | //*[@role='button' and normalize-space(.)='Create'] | //span[normalize-space(.)='Create']/ancestor::*[self::button or self::a][1] | /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[2]/button[1]",
+        "xpath_candidates": [
+          "//button[normalize-space(.)='Create']",
+          "//*[@role='button' and normalize-space(.)='Create']",
+          "//span[normalize-space(.)='Create']/ancestor::*[self::button or self::a][1]",
+          "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[2]/button[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/div[1]/div[1]/span[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[2]/button[1]",
+        "css": "button#_FOpt1:_FOr1:0:_FONSr2:0:_FOTRaT:0:dynam1:0:cb1",
+        "title": "",
+        "labels": "Create",
+        "role": "button",
+        "name": "Create",
+        "tag": "button",
+        "heading": "",
+        "page_heading": ""
+      }
+    }
+  ],
+  "stepEnhance:8404208bebf2bf696e096b2d1d89d2758f5b97b63d3a183c4595ae7f97db5b9c": [
+    {
+      "step": 1,
+      "action": "Navigate",
+      "navigation": "Home > Login Page Username Field",
+      "data": "username: johndoe@example.com",
+      "expected": "Username is entered in the field."
+    },
+    {
+      "step": 2,
+      "action": "Navigate",
+      "navigation": "Home > Login Page Password Field",
+      "data": "password: ********",
+      "expected": "Password is entered in the field."
+    },
+    {
+      "step": 6,
+      "action": "Navigate",
+      "navigation": "Home > Login Page Sign In Button",
+      "data": "",
+      "expected": "User is redirected to the MFA verification page."
+    },
+    {
+      "step": 10,
+      "action": "Navigate",
+      "navigation": "MFA Verification Page SMS Code Field",
+      "data": "sms_code: 123456",
+      "expected": "SMS code is entered in the field."
+    },
+    {
+      "step": 12,
+      "action": "Navigate",
+      "navigation": "MFA Verification Page Verify Button",
+      "data": "",
+      "expected": "User is successfully logged in and redirected to the dashboard."
+    },
+    {
+      "step": 16,
+      "action": "Navigate",
+      "navigation": "Dashboard > Procurement Menu Suppliers Link",
+      "data": "",
+      "expected": "Suppliers page is displayed."
+    },
+    {
+      "step": 18,
+      "action": "Navigate",
+      "navigation": "Suppliers Page Create Supplier Button",
+      "data": "",
+      "expected": "Create Supplier form is opened."
+    },
+    {
+      "step": 20,
+      "action": "Enter Supplier Details",
+      "navigation": "Create Supplier Form Supplier Name Field",
+      "data": "supplier_name: ABC Corp",
+      "expected": "Supplier name is entered in the field."
+    },
+    {
+      "step": 22,
+      "action": "Enter Supplier Details",
+      "navigation": "Create Supplier Form Supplier Type Dropdown",
+      "data": "supplier_type: Manufacturer",
+      "expected": "Supplier type is selected from the dropdown."
+    },
+    {
+      "step": 23,
+      "action": "Enter Supplier Details",
+      "navigation": "Create Supplier Form Country Dropdown",
+      "data": "country: United States",
+      "expected": "Country is selected from the dropdown."
+    },
+    {
+      "step": 24,
+      "action": "Enter Supplier Details",
+      "navigation": "Create Supplier Form Active Checkbox",
+      "data": "active: true",
+      "expected": "Active checkbox is checked."
+    },
+    {
+      "step": 25,
+      "action": "Save",
+      "navigation": "Create Supplier Form Save Button",
+      "data": "",
+      "expected": "Supplier is successfully created and listed in the suppliers table."
+    },
+    {
+      "step": 26,
+      "action": "Create a Supplier",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:RAtl5",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 28,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:it1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 38,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 43,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc2\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 45,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 50,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:soc1\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 52,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:content",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 81,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:countryNameId\\:\\:su0",
+      "data": "",
+      "expected": "Action completes successfully."
+    },
+    {
+      "step": 83,
+      "action": "Type",
+      "navigation": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTRaT\\:0\\:dynam1\\:0\\:cb1",
+      "data": "",
+      "expected": "Action completes successfully."
+    }
+  ],
+  "stepEnhance:539643b8c247a420863b985425334fbf280815859abfb98b06f5ec977c360670": [
+    {
+      "step": 1,
+      "action": "Navigate",
+      "navigation": "Home > Procurement > Suppliers",
+      "data": "",
+      "expected": "Supplier page is displayed."
+    },
+    {
+      "step": 2,
+      "action": "Enter Supplier Details",
+      "navigation": "Supplier Name: input[name='supplierName'] Address: input[name='address'] Contact Email: input[name='contactEmail']",
+      "data": "Supplier Name: ABC Corp Address: 123 Elm Street Contact Email: contact@abccorp.com",
+      "expected": "Supplier details are entered correctly."
+    },
+    {
+      "step": 3,
+      "action": "Save",
+      "navigation": "button[name='saveSupplier']",
+      "data": "",
+      "expected": "Supplier is saved successfully and confirmation message is displayed."
+    },
+    {
+      "step": 4,
+      "action": "Verify",
+      "navigation": "Supplier List > Search: input[name='searchSupplier'] button[name='searchButton']",
+      "data": "Search Query: ABC Corp",
+      "expected": "ABC Corp appears in the supplier list."
+    },
+    {
+      "step": 5,
+      "action": "Type",
+      "navigation": "#idcs-mfa-mfa-auth-sms-email-code-input\\\\|input\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1] | Title/Label: Enter Passcode'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 6,
+      "action": "Type",
+      "navigation": "Click the 'Verify' control\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1] | Title/Label: Verify\"}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 7,
+      "action": "Type",
+      "navigation": "svg#pt1:_UISmmLink::icon > g:nth-child(5) > path:nth-child(1)\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]/g[4]/path[1] | Title/Label:'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 9,
+      "action": "Create a Supplier",
+      "navigation": "#pt1\\\\:_UISnvr\\\\:0\\\\:nv_itemNode_procurement_suppliers\\\\:\\\\:icon\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[24]/div[1]/div[2]/div[1]/div[8]/a[1]/svg[1] | Title/Label:'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 10,
+      "action": "Create a Supplier",
+      "navigation": "img\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath:  | Title/Label:'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 11,
+      "action": "Create a Supplier",
+      "navigation": "#_FOpt1\\\\:_FOr1\\\\:0\\\\:_FONSr2\\\\:0\\\\:_FOTsdiPrcPozSuppliersDashboard__FndTasksList\\\\:\\\\:icon\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[1]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[5]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/a[1]/img[1] | Title/Label: Tasks'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 12,
+      "action": "Create a Supplier",
+      "navigation": "a\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath:  | Title/Label:'}",
+      "data": "",
+      "expected": ""
+    },
+    {
+      "step": 13,
+      "action": "Create a Supplier",
+      "navigation": "#_FOpt1\\\\:_FOr1\\\\:0\\\\:_FONSr2\\\\:0\\\\:_FOTRaT\\\\:0\\\\:RAtl5\\nData: \\nExpected: Action completes successfully.\\nPage Heading:  | Heading: \\nXPath: /html[1]/body[1]/div[1]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/div[1]/ul[1]/li[3]/a[1] | Title/Label: Create Supplier'}",
+      "data": "",
+      "expected": ""
+    }
+  ]
+}

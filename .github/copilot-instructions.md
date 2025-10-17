@@ -1,45 +1,46 @@
 # Copilot instructions for this repo
 
-Purpose: AI-assisted creation of test assets for enterprise web apps (Oracle Fusion focus). It records rich Playwright metadata, ingests artifacts into a Chroma vector DB, generates manual test cases and Playwright scripts via Azure OpenAI, and can push scripts into existing automation frameworks.
+Goal: Help AI agents generate high‑quality manual test cases and Playwright scripts for enterprise web apps (Oracle Fusion focus) by using the recorder output, a Chroma vector DB, and Azure OpenAI. The Streamlit app orchestrates most flows end‑to‑end.
 
-## Architecture
-- Recording (Python + Playwright): `app/run_playwright_recorder.py` launches a browser and writes `recordings/<session>/metadata.json` plus optional `dom/*.html`, `screenshots/*.png`, `network.har`, `trace.zip`.
-- Ingestion + Vector DB: `app/ingest.py`, `app/ingest_utils.py`, `app/vector_db.py` add artifacts (Jira, website crawl, recorder flows, repo scaffolds) to Chroma with stable ids and flattened metadata.
-- Test case generation: `app/test_case_generator.py` pulls relevant context from the vector DB and prompts Azure OpenAI to produce structured manual test cases; includes template mappers to Excel.
-- Agentic script generation: `app/orchestrator.py`, `app/llm_client.py`, `app/framework_adapter.py`, and `app/streamlit_app.py` gather context, call the LLM, attempt self-healing of selectors, and can persist into framework repos.
-- Utilities: locators (`app/locator_generator.py`), TS code parsing (`app/parse_playwright.py`), browser helpers (`app/browser_utils.py`), metadata + hashing (`app/metadata_utils.py`, `app/hashstore.py`).
+## Big picture
+- Recorder (Python + Playwright): `app/run_playwright_recorder_v2.py` (preferred) or `app/run_playwright_recorder.py` writes `recordings/<session>/metadata.json`, plus `dom/*.html`, `screenshots/*.png`, `network.har`, `trace.zip`.
+- Ingestion + Vector DB: `app/ingest.py`, `app/ingest_utils.py`, `app/vector_db.py` load Jira/docs/UI crawl/recorder flows/repo scaffolds into Chroma with stable ids and flattened metadata.
+- Manual test cases: `app/test_case_generator.py` queries the vector DB and crafts structured cases; `map_llm_to_template()` maps to Excel columns.
+- Agentic scripts: `app/agentic_script_agent.py`, `app/llm_client.py`, `app/framework_adapter.py`, and `app/streamlit_app.py` build previews, generate TS assets, self‑heal selectors, and push to external framework repos.
+- Utilities: locators (`app/locator_generator.py`), TS parsing (`app/parse_playwright.py`), browser utils (`app/browser_utils.py`), metadata + hashing (`app/metadata_utils.py`, `app/hashstore.py`).
 
-## Core workflows
-- Recorder (Windows PowerShell example):
-  - Start: `python -m app.run_playwright_recorder --url "https://..." --output-dir recordings --session-name demo --capture-dom`
-  - Stop via Ctrl+C/Ctrl+Break; finalize writes `metadata.json` summarizing `actions`, `pageContextEvents`, and `artifacts`.
-- Vector DB CLI (persists under `./vector_store`):
+## Core workflows (PowerShell examples)
+- Recorder: `python -m app.run_playwright_recorder_v2 --url "https://..." --output-dir recordings --session-name demo --capture-dom` (Ctrl+C to finalize `metadata.json`).
+- Streamlit UI: `streamlit run app/streamlit_app.py` to record, ingest, generate manual cases (Excel), and run the agentic flow.
+- Vector DB CLI (data under `./vector_store` or `VECTOR_DB_PATH`):
   - Query: `python -m app.vector_db query "Create Supplier" --top-k 5`
   - List: `python -m app.vector_db list --limit 50`
-- Streamlit UI: `python -m streamlit run app/streamlit_app.py` to control the recorder, ingest sources, generate manual cases (Excel), and run the agentic script flow.
-- Trial-run a generated Playwright script: `app/executor.py::run_trial()` writes a temp `*.spec.ts` then runs `npx playwright test`.
+- Trial a generated script: `app/executor.py::run_trial()` writes a temp `*.spec.ts` and runs `npx playwright test`.
+- Tests: run the VS Code task “Run tests with Python” (pytest -q) or `python -m pytest -q`.
 
-## Conventions that matter
-- Vector entries: call `VectorDBClient.add_document(source, doc_id, content, metadata)`; ids are stored as `<source>-<doc_id>`. Use `hashstore.is_changed()` for idempotence.
-- Flatten metadata (lists/dicts → JSON strings) prior to add; see `flatten_metadata()` in `app/ingest.py` and usage in Streamlit.
-- Saved recorder flows: JSON at `app/saved_flows/*.json` shaped as `{ flow_name, source, steps }`. Consumers expect this shape.
-- Sanitization: redact sensitive values (`app/metadata_utils.sanitize_events`, recorder masks `valueMasked`) and record `sensitive_fields_masked` in metadata.
-- Browser selection: always normalize via `browser_utils.normalize_browser_name()`; it auto-corrects close typos.
-- LLM: use Azure OpenAI via `langchain_openai.AzureChatOpenAI`; env vars required: `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `OPENAI_API_VERSION`, `AZURE_OPENAI_DEPLOYMENT`.
-- Framework prompt: when calling `llm_client.ask_llm_for_script(...)`, pass a prompt from `framework_adapter.get_framework_prompt('playwright'|'selenium-java'|'cypress')`.
+## Conventions and data shapes
+- Vector IDs: `VectorDBClient.add_document(source, doc_id, content, metadata)` stores ids as `<source>-<doc_id>`; use `hashstore.is_changed()` to avoid dup writes.
+- Metadata: flatten lists/dicts to JSON strings before ingest; see `flatten_metadata()` in `app/ingest.py`.
+- Saved recorder flows: JSON at `app/saved_flows/*.json` with shape `{ flow_name, source, steps }`.
+- Sanitization: redact sensitive inputs via `metadata_utils.sanitize_events` (recorder emits `valueMasked`); record `sensitive_fields_masked` in metadata.
+- Browser selection: normalize via `browser_utils.normalize_browser_name()`.
+- LLM config: use Azure via `langchain_openai.AzureChatOpenAI` with env vars `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `OPENAI_API_VERSION`, `AZURE_OPENAI_DEPLOYMENT`.
+- Selector strategy: prefer Playwright `getByRole/getByLabel/getByText`; only fall back to resilient XPath unions from `locator_generator.to_union_xpath()`.
 
-## Integration points
-- Jira, website docs, UI crawl: routed through `app/ingest.py` and stored with `artifact_type`/`type` metadata (e.g., `repo_scaffold`, `ui_crawl`, `test_case`).
-- TS repo parsing: `app/ts_parser.js` (ts-morph) writes `parsed_repo_scaffold.json` which is then ingested via Streamlit.
-- Recorder enrichment: `recorder_enricher` and `template_utils` produce CSV/XLSX columns (`SL, Action, Navigation Steps, Key Data Element Examples, Expected Results`) that mappers expect.
+## Agentic script flow (Streamlit)
+1) Describe scenario → preview steps (Markdown) via `AgenticScriptAgent.generate_preview`.
+2) Confirm preview (“confirm/yes”) → LLM produces JSON of files (`locators/pages/tests`) aligned to `FrameworkProfile` discovery of pages/locators/tests dirs in the target repo.
+3) “push” writes files to the detected repo structure and optionally pushes via `git_utils.push_to_git`.
+4) Self‑heal failures: `llm_client.ask_llm_to_self_heal` uses execution logs + UI crawl; updates `locator_cache.json`.
 
-## Tips and pitfalls
-- Ensure Playwright for Python is installed for the chosen interpreter and browsers are installed (`playwright install chromium`); Node is required for `npx playwright` and ts-morph.
-- Recorder’s signal handling finalizes metadata; if missing, check process termination or permissions on the output dir.
-- Some legacy tests reference non-existent modules (e.g., `app.recorder.FlowRecorder`); maintain tests around existing modules (`browser_utils`, `metadata_utils`, `vector_db`).
-- Prefer resilient XPath unions via `locator_generator.to_union_xpath()`; avoid brittle ids.
+## Integrations and ingestion
+- Jira/docs/UI crawl: handled in `app/ingest.py` → store with `artifact_type`/`type` (e.g., `repo_scaffold`, `ui_crawl`, `test_case`).
+- TS repo scaffold: `app/ts_parser.js` (ts‑morph) writes `parsed_repo_scaffold.json`; ingest with `app/ingest_scaffold.py`.
+- Recorder enrichment: `recorder_enricher` + `template_utils` produce Excel‑friendly columns: SL, Action, Navigation Steps, Key Data Element Examples, Expected Results.
 
-## Example: inject recorder steps into manual case
-- `TestCaseGenerator._load_saved_flows()` loads `app/saved_flows/*.json` and `_inject_flow_details()` ensures the first positive case mirrors recorder `step_details` and `steps`.
+## Gotchas
+- Chroma client versions differ: `query_where/get_where` handle fallbacks if filters aren’t supported. Prefer `query_where` for filtered search.
+- Ensure Playwright for Python and browsers are installed; Node is required for `npx playwright` and ts‑morph.
+- Some legacy references (e.g., `app.recorder.FlowRecorder`) don’t exist; focus tests on `browser_utils`, `metadata_utils`, `vector_db`, etc.
 
-Unclear or missing? Tell me which part (recorder output shape, ingestion metadata, LLM env, or framework push flow) you want expanded and I’ll refine this file.
+Questions or gaps? If you need deeper detail, say which area to expand: recorder output shape, ingestion metadata, LLM env, agentic push flow, or vector DB filters.

@@ -15,11 +15,24 @@ def extract_structure(script_content: str):
     return structure
 
 def merge_recorder_flow(structure, recorder_json: str):
-    """Merge recorder flow steps into script structure."""
+    """Merge recorder flow steps into script structure.
+
+    Expects a JSON with shape {"steps": [{"action": "click|fill|press", "selector": "...", ...}]}.
+    """
     flow = json.loads(recorder_json)
     steps = []
     for step in flow.get("steps", []):
-        steps.append(f'await page.{step["action"]}("{step["selector"]}");')
+        action = step.get("action")
+        selector = step.get("selector", "body")
+        if action == "fill":
+            value = step.get("value", "")
+            steps.append(f'await page.fill("{selector}", "{value}");')
+        elif action == "press":
+            key = step.get("key", "Enter")
+            steps.append(f'await page.locator("{selector}").press("{key}");')
+        else:
+            # default to click
+            steps.append(f'await page.click("{selector}");')
     return steps
 
 def apply_ui_crawl_locators(steps, ui_crawl_json: str):

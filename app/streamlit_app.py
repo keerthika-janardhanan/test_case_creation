@@ -447,6 +447,12 @@ with col1:
             output_root = Path(st.session_state["rec_output_dir"]).expanduser().resolve()
             output_root.mkdir(parents=True, exist_ok=True)
             session_dir = output_root / session_name
+            # Create session folder early and persist a human-friendly flow label for better matching later
+            try:
+                session_dir.mkdir(parents=True, exist_ok=True)
+                (session_dir / "flow_name.txt").write_text(flow_name or "", encoding="utf-8")
+            except Exception:
+                pass
             python_exec = st.session_state.get("rec_python_executable") or sys.executable
 
             runtime_error = _validate_recorder_runtime(python_exec)
@@ -724,6 +730,7 @@ if st.button("📥 Convert, Ingest & Generate Locators", key="btn_convert_ingest
 # -------------------------- Test Case Generator Panel --------------------------
 st.markdown("---")
 st.subheader("Generate Test Cases from Jira / Keywords / Stories")
+jira_llm_only = st.checkbox("LLM-only (skip deterministic injection)", value=False, help="When enabled, the generator will rely solely on the LLM output without injecting deterministic steps from recorder/refined flows.")
 jira_input = st.text_area("Paste Jira story, description, or keywords", key="jira_input_area")
 template_file = st.file_uploader(
     "Upload Template File (JSON / Excel / Text / Doc)",
@@ -734,7 +741,7 @@ template_file = st.file_uploader(
 if st.button("Generate & Download Test Cases", key="btn_generate_tc") and jira_input.strip():
     try:
         tcg = TestCaseGenerator(db)
-        results = tcg.generate_test_cases(jira_input.strip())
+        results = tcg.generate_test_cases(jira_input.strip(), llm_only=jira_llm_only)
         if template_file:
             ext = os.path.splitext(template_file.name)[1].lower()
             if ext in [".xlsx", ".xls"]:
@@ -757,6 +764,58 @@ if st.button("Generate & Download Test Cases", key="btn_generate_tc") and jira_i
         )
     except Exception as e:
         st.error(f"Failed to generate test cases: {e}")
+
+# -------------------------- Manual Table (Markdown) Generator --------------------------
+st.markdown("---")
+st.subheader("Generate Manual Table (Markdown)")
+mt_story = st.text_area(
+    "Scenario / Story for manual table",
+    key="mt_story_input",
+    help="Provide a brief scenario title or paste a story. We'll use refined recorder steps and vector context if available.",
+)
+mt_query_col, mt_scope_col = st.columns(2)
+with mt_query_col:
+    mt_query = st.text_input(
+        "Retrieval hint (optional)",
+        value="",
+        key="mt_query_input",
+        help="Keywords to help retrieve related flows from the vector DB.",
+    )
+with mt_scope_col:
+    mt_scope = st.text_input(
+        "Scope filter (optional)",
+        value="",
+        key="mt_scope_input",
+        help="Optional narrowing hint like 'supplier creation only'.",
+    )
+
+mt_cols = st.columns([1, 1, 2])
+with mt_cols[0]:
+    gen_mt = st.button("Generate Manual Table", key="btn_generate_manual_table")
+with mt_cols[1]:
+    dl_mt = st.button("Download as .md", key="btn_download_manual_table")
+
+if gen_mt and mt_story.strip():
+    try:
+        tcg = TestCaseGenerator(db)
+        md = tcg.generate_manual_table(mt_story.strip(), db_query=mt_query.strip() or None, scope=mt_scope.strip() or None)
+        st.session_state["_last_manual_table_md"] = md
+        st.markdown(md)
+    except Exception as e:
+        st.error(f"Failed to generate manual table: {e}")
+
+if dl_mt:
+    md_text = st.session_state.get("_last_manual_table_md", "")
+    if not md_text:
+        st.warning("No manual table generated yet. Click 'Generate Manual Table' first.")
+    else:
+        st.download_button(
+            label="📥 Download Manual Table",
+            data=md_text.encode("utf-8"),
+            file_name="manual_test_table.md",
+            mime="text/markdown",
+            key="download_manual_table_btn",
+        )
 
 # -------------------------- Test Script Generator Panel --------------------------
 # st.title("AI-Powered Test Script Generator")
@@ -821,6 +880,12 @@ if st.button("📥 Pull & Ingest Repo", key="btn_pull_ingest_repo"):
             with st.spinner("Cloning repo and parsing with TS-Morph..."):
                 parsed_json = pull_and_ingest_repo(repo_url, branch)
             st.success(f"✅ Repo scaffold ingested successfully: {len(parsed_json.get('modules', []))} modules")
+            # Make the agentic generator use this same repository by default
+            try:
+                st.session_state.framework_repo_path = repo_url.strip()
+                st.info("Framework Repo Path updated to the provided Git URL for agentic script generation.")
+            except Exception:
+                pass
         except subprocess.CalledProcessError as e:
             st.error(f"Git/Parser command failed: {e}")
         except Exception as ex:
@@ -1020,6 +1085,37 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
         state["feedback"] = []
         context = agent.gather_context(message)
         state["context"] = context
+        # Prefer existing framework assets if available
+        existing_assets = agent.find_existing_framework_assets(message, framework)
+        if existing_assets:
+            state["status"] = "complete"
+            state["active"] = False
+            state["existing_files"] = [str(asset["path"].relative_to(framework.root)) for asset in existing_assets]
+            files_list = []
+            for asset in existing_assets:
+                rel = asset["path"].relative_to(framework.root)
+                files_list.append(str(rel))
+                try:
+                    content = asset["path"].read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    content = "(Binary or non-UTF-8 content omitted)"
+                responses.append({"role": "assistant", "content": f"// {rel}\n{content}", "type": "script"})
+            summary = "Existing framework files located (repo scan):\n" + "\n".join(f"- {path}" for path in files_list)
+            responses.append({"role": "assistant", "content": summary, "type": "text"})
+            return responses
+        # If there is zero usable context (no repo assets, no recorder flow, no vector-derived steps), do not hallucinate.
+        has_flow = context.get("flow_available")
+        has_enriched = bool(context.get("enriched_steps"))
+        if not existing_assets and not has_flow and not has_enriched:
+            responses.append({
+                "role": "assistant",
+                "content": "No relevant data found in framework repo, recorder flows, or vector DB for this scenario. Please record a flow or ingest context, then try again.",
+                "type": "text",
+            })
+            state["status"] = "complete"
+            state["active"] = False
+            return responses
+
         preview = agent.generate_preview(message, framework, context)
         state["preview"] = preview
         responses.append({"role": "assistant", "content": preview, "type": "preview"})
@@ -1212,8 +1308,8 @@ if st.button("Send") and user_input.strip():
     for reply in replies:
         st.session_state.conversation.append(reply)
 
-# ------------------- Display Conversation -------------------
-for msg in st.session_state.conversation:
+# ------------------- Display Conversation (latest first) -------------------
+for msg in reversed(st.session_state.conversation):
     if msg["role"] == "user":
         st.markdown(f"**You:** {msg['content']}")
     else:

@@ -40,6 +40,9 @@ Rules:
 - Use enriched steps and test cases to create flows.
 - If selectors are invalid, self-heal using the UI crawl data.
 - Output only valid code.
+ - Prefer Playwright getByRole/getByLabel/getByText when locator metadata is provided.
+ - If a step provides a union XPath candidate, use it only as a fallback when getBy* is not viable.
+ - Do not invent selectors; use provided 'locators' if present in steps. If missing, attempt minimal inference from UI crawl.
 
 Existing structure:
 {structure or "N/A"}
@@ -50,7 +53,7 @@ Existing Script:
 Test Case:
 {test_case or "N/A"}
 
-Enriched Steps:
+Enriched Steps (each may include a 'locators' object with 'playwright', 'xpath', 'css', etc.):
 {enriched_steps or "N/A"}
 
 UI Crawl Data:

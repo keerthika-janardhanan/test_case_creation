@@ -301,19 +301,137 @@ class AgenticScriptAgent:
     ) -> List[Dict[str, Any]]:
         results = self.vector_db.query(scenario, top_k=top_k)
         assets: List[Dict[str, Any]] = []
+        min_score = 6  # threshold to avoid unrelated matches
+        scenario_tokens = self._tokenize(scenario)
         for entry in results:
             metadata = entry.get("metadata", {}) or {}
             meta_type = str(metadata.get("type", "")) + str(metadata.get("artifact_type", ""))
             if not any(token in meta_type.lower() for token in ["script", "scaffold", "locator", "page", "test"]):
                 continue
-            path = self._locate_framework_file(framework, metadata, entry.get("content", ""))
+            content_str = entry.get("content", "")
+            path = self._locate_framework_file(framework, metadata, content_str)
             if path and path.exists():
-                assets.append({
-                    "path": path,
-                    "metadata": metadata,
-                    "id": entry.get("id"),
-                })
+                try:
+                    file_content = path.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    file_content = ""
+                score = self._compute_relevance_score(path, file_content, scenario_tokens)
+                if score >= min_score:
+                    assets.append({
+                        "path": path,
+                        "metadata": {**metadata, "relevance_score": score, "source": "vector+repo"},
+                        "id": entry.get("id"),
+                    })
+        # Fallback: direct repo scan if vector search found nothing
+        if not assets:
+            assets = self._filesystem_search_assets(framework, scenario, max_results=top_k)
         return assets
+
+    def _filesystem_search_assets(self, framework: FrameworkProfile, scenario: str, max_results: int = 8) -> List[Dict[str, Any]]:
+        """Search the framework repo for likely matching files when vector DB has no hits.
+        Heuristics: match by filename and file content tokens under tests/pages/locators.
+        """
+        root = framework.root
+        search_dirs: List[Path] = []
+        for d in [framework.tests_dir, framework.pages_dir, framework.locators_dir]:
+            if d and d.exists():
+                search_dirs.append(d)
+        search_dirs.extend(framework.additional_dirs.values())
+        if not search_dirs:
+            search_dirs = [root]
+
+        tokens = self._tokenize(scenario)
+        slug = _slugify(scenario)
+        slug_parts = self._tokenize(slug)
+
+        candidates: List[Tuple[int, Path]] = []
+        seen: set[Path] = set()
+        min_score = 6
+        penalty_terms = {"supplier", "receipt", "invoice", "arinvoice", "apinvoice", "ap", "po", "procurement"}
+
+        for base in search_dirs:
+            for path in base.rglob("*.ts"):
+                if path in seen:
+                    continue
+                seen.add(path)
+                score = 0
+                name = path.name.lower()
+                # Filename match
+                for t in slug_parts + tokens:
+                    if t and t in name:
+                        score += 3
+                # Content match (lightweight)
+                try:
+                    content = path.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    content = ""
+                low = content.lower()
+                # Exact phrase boost
+                phrase = " ".join(tokens)
+                if phrase and phrase in low:
+                    score += 4
+                # Token overlap
+                for t in tokens[:6]:  # cap tokens for perf
+                    if t and t in low:
+                        score += 1
+                # Domain penalty if unrelated terms appear but not in scenario tokens
+                for p in penalty_terms:
+                    if p in low and p not in tokens:
+                        score -= 2
+                # Prefer tests over pages/locators in tie
+                try:
+                    rel = path.relative_to(root)
+                    rel_low = str(rel).lower()
+                    if any(seg in rel_low for seg in ["/tests/", "/specs/", "/e2e/"]):
+                        score += 1
+                except Exception:
+                    pass
+                if score > 0:
+                    candidates.append((score, path))
+
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        # Apply threshold to avoid unrelated matches
+        filtered = [(s, p) for s, p in candidates if s >= min_score]
+        results: List[Dict[str, Any]] = []
+        for score, p in filtered[:max_results]:
+            results.append({
+                "path": p,
+                "metadata": {"source": "filesystem", "relevance_score": score},
+                "id": None,
+            })
+        return results
+
+    @staticmethod
+    def _tokenize(text: str) -> List[str]:
+        return [tok for tok in re.split(r"[^a-zA-Z0-9]+", (text or "").lower()) if len(tok) >= 3]
+
+    def _compute_relevance_score(self, path: Path, content: str, scenario_tokens: List[str]) -> int:
+        """Compute a simple relevance score combining filename and content overlaps.
+        Adds a boost for exact phrase and test locations; penalizes common unrelated domains.
+        """
+        name = path.name.lower()
+        score = 0
+        for t in scenario_tokens:
+            if t in name:
+                score += 3
+        low = (content or "").lower()
+        phrase = " ".join(scenario_tokens)
+        if phrase and phrase in low:
+            score += 4
+        for t in scenario_tokens[:6]:
+            if t in low:
+                score += 1
+        try:
+            rel_low = str(path).lower()
+            if any(seg in rel_low for seg in ["/tests/", "/specs/", "/e2e/"]):
+                score += 1
+        except Exception:
+            pass
+        penalty_terms = {"supplier", "receipt", "invoice", "arinvoice", "apinvoice", "ap", "po", "procurement"}
+        for p in penalty_terms:
+            if p in low and p not in scenario_tokens:
+                score -= 2
+        return score
 
     def generate_script_payload(
         self,

@@ -51,12 +51,22 @@ def reset_vector_store(dry_run: bool):
     rm(chroma2, dry_run)
 
 
+def clean_pycache(dry_run: bool):
+    """Remove __pycache__ folders and *.pyc/*.pyo files under the repo root."""
+    for p in ROOT.rglob("__pycache__"):
+        rm(p, dry_run)
+    for ext in ("*.pyc", "*.pyo"):
+        for f in ROOT.rglob(ext):
+            rm(f, dry_run)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Cleanup old recordings and artifacts so generator stops referencing stale flows.")
     parser.add_argument("--keep-latest", type=int, default=1, help="Number of most recent recordings to keep")
     parser.add_argument("--clear-saved-flows", action="store_true", help="Delete app/saved_flows/*.json")
     parser.add_argument("--clear-generated", action="store_true", help="Delete app/generated_flows directory")
     parser.add_argument("--reset-vector-store", action="store_true", help="Delete local Chroma/vector_store persistence to force a fresh ingest")
+    parser.add_argument("--clear-pycache", action="store_true", help="Delete __pycache__ folders and Python bytecode files")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be deleted without deleting")
     args = parser.parse_args()
 
@@ -67,6 +77,8 @@ def main():
         clean_generated_flows(args.dry_run)
     if args.reset_vector_store:
         reset_vector_store(args.dry_run)
+    if args.clear_pycache:
+        clean_pycache(args.dry_run)
 
     print("Cleanup complete.")
 
