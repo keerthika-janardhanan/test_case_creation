@@ -110,7 +110,13 @@ class AgenticScriptAgent:
         self.vector_db = VectorDBClient()
 
         self.preview_prompt = PromptTemplate(
-            input_variables=["scenario", "enriched_steps", "existing_script_excerpt", "framework_summary"],
+            input_variables=[
+                "scenario",
+                "enriched_steps",
+                "existing_script_excerpt",
+                "scaffold_snippet",
+                "framework_summary",
+            ],
             template=(
                 "You are an autonomous QA planning agent.\n"
                 "Design a concise, numbered list of Playwright automation steps for the scenario described below.\n"
@@ -119,17 +125,27 @@ class AgenticScriptAgent:
                 "Scenario:\n{scenario}\n\n"
                 "Contextual steps:\n{enriched_steps}\n\n"
                 "Existing script reference (may be empty):\n{existing_script_excerpt}\n\n"
+                "Scaffold snippets from the automation repository:\n{scaffold_snippet}\n\n"
                 "Framework summary:\n{framework_summary}\n"
             ),
         )
 
         self.refine_prompt = PromptTemplate(
-            input_variables=["scenario", "previous_preview", "feedback", "framework_summary"],
+            input_variables=[
+                "scenario",
+                "previous_preview",
+                "feedback",
+                "enriched_steps",
+                "scaffold_snippet",
+                "framework_summary",
+            ],
             template=(
                 "You are refining previously proposed Playwright automation steps.\n"
                 "Original scenario:\n{scenario}\n\n"
                 "Previous preview steps:\n{previous_preview}\n\n"
                 "User feedback:\n{feedback}\n\n"
+                "Latest contextual recorder/UI steps:\n{enriched_steps}\n\n"
+                "Relevant scaffold snippets:\n{scaffold_snippet}\n\n"
                 "Framework summary:\n{framework_summary}\n\n"
                 "Generate an improved numbered list of steps that addresses the feedback while preserving strong steps."
             ),
@@ -173,9 +189,17 @@ class AgenticScriptAgent:
         if existing_script and existing_script.get("content"):
             existing_excerpt = str(existing_script["content"])[:1200]
 
+        vector_steps = self._collect_vector_flow_steps(scenario)
+        if vector_steps:
+            enriched_text = self._format_steps_for_prompt(vector_steps)
+
+        scaffold_snippet = self._fetch_scaffold_snippet(scenario)
+
         return {
             "enriched_steps": enriched_text,
             "existing_script_excerpt": existing_excerpt,
+            "scaffold_snippet": scaffold_snippet,
+            "vector_steps": vector_steps,
             "artifacts": {
                 "existing_script": existing_script,
                 "recorder_flow": recorder_flow,
@@ -183,7 +207,7 @@ class AgenticScriptAgent:
                 "test_case": test_case,
                 "structure": structure,
             },
-            "flow_available": bool(recorder_flow),
+            "flow_available": bool(recorder_flow) or bool(vector_steps),
         }
 
     def generate_preview(self, scenario: str, framework: FrameworkProfile, context: Dict[str, Any]) -> str:
@@ -191,6 +215,7 @@ class AgenticScriptAgent:
             scenario=scenario,
             enriched_steps=context.get("enriched_steps", ""),
             existing_script_excerpt=context.get("existing_script_excerpt", ""),
+            scaffold_snippet=context.get("scaffold_snippet", ""),
             framework_summary=framework.summary(),
         )
         response = self.llm.invoke(prompt)
@@ -202,15 +227,116 @@ class AgenticScriptAgent:
         framework: FrameworkProfile,
         previous_preview: str,
         feedback: str,
+        context: Dict[str, Any],
     ) -> str:
         prompt = self.refine_prompt.format(
             scenario=scenario,
             previous_preview=previous_preview,
             feedback=feedback,
+            enriched_steps=context.get("enriched_steps", ""),
+            scaffold_snippet=context.get("scaffold_snippet", ""),
             framework_summary=framework.summary(),
         )
         response = self.llm.invoke(prompt)
         return _strip_code_fences(getattr(response, "content", str(response)))
+
+    def _collect_vector_flow_steps(self, scenario: str, top_k: int = 256) -> List[Dict[str, str]]:
+        slug = _slugify(scenario)
+        specs = [
+            {"query": scenario, "where": {"type": "recorder_refined", "flow_slug": slug}},
+            {"query": slug, "where": {"type": "recorder_refined", "flow_slug": slug}},
+            {"query": scenario, "where": {"type": "recorder_refined", "flow_name": scenario}},
+        ]
+        steps_map: Dict[int, Dict[str, str]] = {}
+        for spec in specs:
+            try:
+                results = self.vector_db.query_where(spec["query"], spec["where"], top_k=top_k)
+            except Exception:
+                results = []
+            for entry in results or []:
+                meta = entry.get("metadata") or {}
+                content = self._parse_content_snapshot(entry.get("content") or "")
+                record_kind = (meta.get("record_kind") or (content or {}).get("record_kind") or "").lower()
+                if record_kind == "element":
+                    continue
+                step_index = (content or {}).get("step_index") or meta.get("step_index")
+                try:
+                    step_index = int(step_index)
+                except (TypeError, ValueError):
+                    continue
+                action = (content or {}).get("action") or meta.get("action") or ""
+                navigation = (content or {}).get("navigation") or meta.get("navigation") or ""
+                data_val = (content or {}).get("data") or meta.get("data") or ""
+                expected = (content or {}).get("expected") or meta.get("expected") or ""
+                if not any([action, navigation]):
+                    continue
+                steps_map.setdefault(
+                    step_index,
+                    {
+                        "step": step_index,
+                        "action": action,
+                        "navigation": navigation,
+                        "data": data_val,
+                        "expected": expected,
+                    },
+                )
+            if steps_map:
+                break
+        return [steps_map[idx] for idx in sorted(steps_map)]
+
+    @staticmethod
+    def _format_steps_for_prompt(steps: List[Dict[str, str]]) -> str:
+        lines = []
+        for item in steps:
+            step_no = item.get("step")
+            nav = item.get("navigation") or ""
+            action = item.get("action") or ""
+            data_val = item.get("data") or ""
+            expected = item.get("expected") or ""
+            parts = [part for part in [action, nav] if part]
+            if data_val:
+                parts.append(f"Data: {data_val}")
+            if expected:
+                parts.append(f"Expected: {expected}")
+            if parts:
+                lines.append(f"{step_no}. " + " | ".join(parts))
+        return "\n".join(lines[:40])
+
+    def _fetch_scaffold_snippet(self, scenario: str, limit: int = 3, max_chars: int = 1500) -> str:
+        try:
+            results = self.vector_db.query_where(
+                scenario,
+                where={"type": "script_scaffold"},
+                top_k=limit,
+            )
+        except Exception:
+            results = []
+
+        snippets: List[str] = []
+        for entry in results or []:
+            metadata = entry.get("metadata") or {}
+            content_obj = self._parse_content_snapshot(entry.get("content", ""))
+            path = metadata.get("file_path") or ""
+            code = ""
+            if isinstance(content_obj, dict):
+                path = content_obj.get("filePath") or content_obj.get("path") or path
+                code = content_obj.get("content") or content_obj.get("body") or ""
+            elif isinstance(content_obj, list):
+                for item in content_obj:
+                    if isinstance(item, dict) and not code:
+                        path = item.get("filePath") or path
+                        code = item.get("content") or item.get("body") or ""
+            if not code:
+                code = str(entry.get("content") or "")
+            snippet = ""
+            if path:
+                snippet += f"// {path}\n"
+            snippet += code.strip()
+            if snippet:
+                snippets.append(snippet[:max_chars])
+            if sum(len(s) for s in snippets) >= max_chars:
+                break
+        return "\n\n".join(snippets)[:max_chars]
 
     @staticmethod
     def _parse_content_snapshot(content: str) -> Optional[Dict[str, Any]]:

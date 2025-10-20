@@ -17,6 +17,7 @@ from ingest_utils import ingest_artifact
 from ingest import ingest_jira, ingest_web_site, ingest_ui_crawl, ingest_document
 from parse_playwright import parse_playwright_code
 from locator_generator import generate_xpath_candidates, to_union_xpath
+from recorder_auto_ingest import auto_refine_and_ingest
 from recorder_enricher import enrich_recorder_flow, persist_enriched_artifacts
 from template_utils import load_excel_template
 import tempfile
@@ -373,6 +374,34 @@ def _finalize_recorder_session() -> None:
                 "Recorder metadata loaded but some expected artefacts appear to be missing: "
                 + ", ".join(missing_parts)
             )
+
+        auto_state_key = f"auto_ingest::{session_dir}"
+        if auto_state_key not in st.session_state:
+            try:
+                auto_result = auto_refine_and_ingest(session_dir, metadata)
+                st.session_state[auto_state_key] = {
+                    "status": "success",
+                    "result": auto_result,
+                }
+            except Exception as exc:  # noqa: BLE001
+                st.session_state[auto_state_key] = {
+                    "status": "error",
+                    "error": str(exc),
+                }
+
+        auto_state = st.session_state.get(auto_state_key)
+        if auto_state:
+            if auto_state["status"] == "success":
+                result = auto_state["result"]
+                stats = result.get("ingest_stats") or {}
+                added = stats.get("added")
+                if added is not None:
+                    message = f"Refined flow ingested into vector DB ({added} steps)."
+                else:
+                    message = "Refined flow saved locally."
+                st.success(f"{message} Saved to `{result['refined_path']}`.")
+            else:
+                st.warning(f"Automatic refinement failed: {auto_state['error']}")
     else:
         existing = listing.get("top_level", []) if listing else []
         st.warning(
@@ -1083,9 +1112,7 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
         state["scenario"] = message
         state["status"] = "preview-awaiting"
         state["feedback"] = []
-        context = agent.gather_context(message)
-        state["context"] = context
-        # Prefer existing framework assets if available
+        # Prefer existing framework assets if available before invoking LLM context collection
         existing_assets = agent.find_existing_framework_assets(message, framework)
         if existing_assets:
             state["status"] = "complete"
@@ -1103,6 +1130,8 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
             summary = "Existing framework files located (repo scan):\n" + "\n".join(f"- {path}" for path in files_list)
             responses.append({"role": "assistant", "content": summary, "type": "text"})
             return responses
+        context = agent.gather_context(message)
+        state["context"] = context
         # If there is zero usable context (no repo assets, no recorder flow, no vector-derived steps), do not hallucinate.
         has_flow = context.get("flow_available")
         has_enriched = bool(context.get("enriched_steps"))
@@ -1204,7 +1233,25 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
             ]
 
         state.setdefault("feedback", []).append(message)
-        refined = agent.refine_preview(state["scenario"], framework, state["preview"], message)
+        previous_context = state.get("context", {})
+        refreshed_context = agent.gather_context(state["scenario"])
+        state["context"] = refreshed_context
+        if refreshed_context.get("flow_available") and not (previous_context or {}).get("flow_available"):
+            responses.append(
+                {
+                    "role": "assistant",
+                    "content": "A newer recorder flow was found and will be incorporated into the updated preview.",
+                    "type": "text",
+                }
+            )
+        state.setdefault("feedback", []).append(message)
+        refined = agent.refine_preview(
+            state["scenario"],
+            framework,
+            state["preview"],
+            message,
+            refreshed_context,
+        )
         state["preview"] = refined
         responses.append({"role": "assistant", "content": refined, "type": "preview"})
         responses.append(
@@ -1256,8 +1303,25 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
             return responses
 
         if interpret_feedback(message):
+            prev_context = state.get("context", {})
+            refreshed_context = agent.gather_context(state["scenario"])
+            state["context"] = refreshed_context
+            if refreshed_context.get("flow_available") and not (prev_context or {}).get("flow_available"):
+                responses.append(
+                    {
+                        "role": "assistant",
+                        "content": "A recorder flow is now available and will be used for the updated preview.",
+                        "type": "text",
+                    }
+                )
             state.setdefault("feedback", []).append(message)
-            refined = agent.refine_preview(state["scenario"], framework, state["preview"], message)
+            refined = agent.refine_preview(
+                state["scenario"],
+                framework,
+                state["preview"],
+                message,
+                refreshed_context,
+            )
             state["preview"] = refined
             state["status"] = "preview-awaiting"
             state["payload"] = {}

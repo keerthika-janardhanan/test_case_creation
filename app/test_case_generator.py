@@ -114,11 +114,12 @@ class TestCaseGenerator:
 
     def _agentic_generate(self, story: str, context_text: str, flow_steps: List[dict], context_sources: List[str], max_attempts: int = 2, llm_only: bool = False) -> List[dict]:
         last_error = ""
+        flow_steps_prompt_json = self._flow_steps_prompt_json(flow_steps)
         for attempt in range(1, max_attempts + 1):
             prompt = self._build_generation_prompt(
                 story,
                 context_text,
-                json.dumps(flow_steps, ensure_ascii=False) if flow_steps else "[]",
+                flow_steps_prompt_json,
             )
             if attempt > 1:
                 strict_suffix = (
@@ -1221,6 +1222,30 @@ class TestCaseGenerator:
             return text_match.group(1)
         return ""
 
+    def _flow_steps_prompt_json(self, flow_steps: List[dict]) -> str:
+        summary: List[dict] = []
+        for idx, step in enumerate(flow_steps, start=1):
+            locators = step.get("locators") if isinstance(step, dict) else {}
+            label_value: str = ""
+            if isinstance(locators, dict):
+                labels_field = locators.get("labels")
+                if isinstance(labels_field, (list, tuple, set)):
+                    label_value = ", ".join(str(part).strip() for part in labels_field if part)
+                elif labels_field:
+                    label_value = str(labels_field).strip()
+                if not label_value and locators.get("playwright"):
+                    label_value = str(locators.get("playwright")).strip()
+            if not label_value:
+                label_value = str(step.get("navigation") or step.get("action") or "").strip()
+            summary.append(
+                {
+                    "step": idx,
+                    "action": step.get("action"),
+                    "label": label_value,
+                }
+            )
+        return json.dumps(summary, ensure_ascii=False)
+
     def _build_generation_prompt(self, story: str, context: str, flow_steps_json: str) -> str:
         fields = ", ".join(self.default_fields)
         return (
@@ -1229,11 +1254,11 @@ class TestCaseGenerator:
             f"The user supplied keywords or artifact name: '{story}'.\n"
             "Context snippets (prioritise Playwright flows, repo scaffolds, Jira docs):\n"
             f"{context}\n\n"
-            "You are also provided the recorder flow steps (each item has step index, action, navigation description, data hints, expected hints). "
-            "For the primary positive scenario, you MUST mirror these steps exactly, expanding them into detailed test actions with explicit navigation, data entry, and observable expected outcomes.\n"
-            f"Recorder flow steps JSON:\n{flow_steps_json}\n\n"
+            "You are also provided recorder element labels per step. Each item contains the recorder step index, the intended action verb, and the human-visible UI label captured during recording.\n"
+            "For the primary positive scenario, mirror these steps in order, deriving navigation wording directly from the element labels (do not invent new UI names). Expand the labels into detailed actions with explicit navigation, data entry, and observable expected outcomes.\n"
+            f"Recorder element labels JSON:\n{flow_steps_json}\n\n"
             "Additionally, for EACH core step in the positive flow (up to 6-8 main steps), generate at least one negative and one edge case focusing on that step's validation (e.g., required field empty, invalid format, unauthorized action, boundary values). Keep these as separate cases with precise 'type' values and step-by-step actions.\n\n"
-            "Output strictly as a JSON array. Respond with ONLY the JSON array — no prose, no explanations, no code fences. Each element must contain the fields: "
+            "Output strictly as a JSON array. Respond with ONLY the JSON array - no prose, no explanations, no code fences. Each element must contain the fields: "
             f"{fields}, plus an additional field 'step_details'.\n"
             "'step_details' must be an ordered list of objects with keys:\n"
             "- action: High-level activity label (e.g., 'Log into Oracle', 'Navigate to Payables', 'Create Supplier').\n"
@@ -1487,6 +1512,27 @@ class TestCaseGenerator:
             raise ValueError("LLM output must be a JSON array of cases.")
         cleaned: List[dict] = []
         allowed_types = {"positive", "negative", "edge"}
+
+        def _ensure_title_with_type(title: str, ctype: str) -> str:
+            text = title.strip()
+            lower = text.lower()
+            if ctype == "positive":
+                if "positive" not in lower:
+                    suffix = "Positive Scenario"
+                else:
+                    return text or "Positive Scenario"
+            elif ctype == "negative":
+                if "negative" not in lower:
+                    suffix = "Negative Scenario"
+                else:
+                    return text or "Negative Scenario"
+            else:
+                if "edge" not in lower:
+                    suffix = "Edge Scenario"
+                else:
+                    return text or "Edge Scenario"
+            return f"{text + ' - ' if text else ''}{suffix}"
+
         for idx, case in enumerate(cases, start=1):
             if not isinstance(case, dict):
                 continue
@@ -1497,6 +1543,7 @@ class TestCaseGenerator:
             if ctype not in allowed_types:
                 ctype = "edge" if "edge" in ctype else "negative" if "fail" in ctype else "positive"
             normalized["type"] = ctype
+            normalized["title"] = _ensure_title_with_type(normalized["title"], ctype)
 
             preconditions = case.get("preconditions") or []
             if isinstance(preconditions, str):
