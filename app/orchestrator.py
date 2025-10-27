@@ -74,7 +74,6 @@ class TestScriptOrchestrator:
                 steps.append(entry)
             return steps
 
-        fallback = None
         for _mtime, sess_name, meta in candidates:
             steps = to_steps(meta)
             if not steps:
@@ -89,12 +88,10 @@ class TestScriptOrchestrator:
                 },
             }
             normalized_name = re.sub(r"[^a-zA-Z0-9]", "", sess_name.lower())
-            if fallback is None:
-                fallback = context
             if key and key not in normalized_name:
                 continue
             return context
-        return fallback
+        return None
 
     def generate_script(self, test_case_id: str):
         # 1️⃣ Fetch relevant artifacts

@@ -1,0 +1,594 @@
+{
+  "refinedVersion": "2025.10",
+  "flow_name": "employee wellness",
+  "flow_id": "20251023_170721",
+  "generated_at": "2025-10-23T17:11:01.764428+00:00",
+  "pages": [
+    {
+      "pageId": "page-1",
+      "pageUrl": "about:blank",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-2",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-3",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=GuaL0E9V3LvT19185TeCtB4bVoQr-SDdA7pw3Tffti4&nonce=s-q4PYkv7W3p4BEuCqmyqNtCBWshyT-PZEJlMTCvGeE&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D46658689436182223%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D14fu3y3yhm_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=SJa2c_b2u3v6AwAAwAMAABAgwAMAAKYDAAAQAJM4EJ_Ex2uI2I0XLWK4q0FJOElXG1OkZu6dd1900MloT2pqQxir8JftInvDX3gs90bMvfy9pwdPo7gsvw-HY6ef1Ol1TiOn1NWGsURTFxbYzUHVVfmkqFpPveRIrlKyAfcC6O7ckYbRQ6Ecp0D9-6l-u2xSzy8uh5mEr-pdjGsWpgveqeVh-r9ocDyJ8Tev46yfxqcY6_dSFGhyZZLG6i3MvoNrHarHTu83EUzCvhkVh4J4FTRbZcpw73hm-rt2S02b2hkRlUa7HR7YGP9ABIMjvlbpZlXDWzR5anOrmXCLjrt-sWXFpvSENLv8FTuJKmKMAjZ874eAwfEsX7ZL1W42BN9R1frHpIZfnEWRLjDHBNFyk5EtL8TJrK0t6tOxVQOwWZ4Sa_gMqlUma9Fzh3dDq0kdz51qn-gwBAIf5fiBdcTsnt5c_aooHqwwPWyClB40n1zIV66QCe__xKgdugn8iZzliYd8nqNwCfDxdRT-ph5BRiLeNCvzQ5w-QKRa82JpVfLI8sTzjYYMn-CMDmoBMOapnJudKGHuP3ZLxnjwa-kBVxcuE3spPgcW2iVdONAM3EKBp6XlCPDpvYZ9iRkJn_vBZju3ifj3KWsX567KxJeprN3tItHXt_dGyBpMKDYUHUEgFWXK2_MdUhYKHVRR1nYVa5uBhjz7PQcER7PFEmle9T9vmcSsh0YoZ92e0MNuQ0Beuzbuu_UwabUW0qK6_S-XjGkutD2KqqvjxSYbfNFC6mPd09xh92qBjPExf_KLyKk4WYBvM-Vy11VAMGLQBBtXtB0AMsfxSWvq4CihRl09MxwfKh_2HTszuwzjgy3bZkS05YyjM-dHZ-5Fu92j3qLKUz7DRUlmAoLPafoqYiuMELLm8eCY47Q30nk2-CNT7Ytw_ZemE6u_HGfjecD-bzDXNz5em0Onj12bm_qkr-nbbfez1K6oAhAkI5FJHjljvRDI73ePyw9XGL2g0-OOhe4ctYqvszSVPAFtFlXvF1l4Fi2iuEcSPKBBkOg9EKEpQNXuRlIKZzOmkDUVN3b1RCu2hdI0Jx6TG733GcjQ_I-xGx2jnCdWYWzR-M0IuYmXrKHuVrWqjSNkeJw1hlWxEX8-ZMYOIzBJM4DJb6OYYDPt1cGBLSePcCleqpz-CK_bOR8DHAhDsY0aCUuKSvWakrCNkG9RTtXoyUG2XqvI9tPhBx_J2TO7IqyZB4Eav-utgl7EfD7EGZ-TcjG6P_2Vwg4Kn46csjljBWZXbyTgPfNU8KdBr563Xy79vFEF3e3rDfEQbArWLQKyaZt_-Zm6SOdINdaL_FRIBxC10JCiDNHQTqgN",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-4",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-5",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome?_adf.ctrl-state=14fu3y3yhm_1&_adf.no-new-window-redirect=true&_afrLoop=46658727269987133&_afrWindowMode=2&_afrWindowId=null&_afrFS=16&_afrMT=screen&_afrMFW=1280&_afrMFH=720&_afrMFDW=1280&_afrMFDH=720&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0",
+      "pageTitle": "Welcome",
+      "mainHeading": null
+    },
+    {
+      "pageId": "page-6",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/hcmUI/faces/FndOverview?fnd=%3B%3B%3B%3Bfalse%3B256%3B%3B%3B&fndGlobalItemNodeId=BENEFITS_ADMINISTRATION_HWR_WELLNESS&_afrLoop=46658734432246747&_afrWindowMode=0&_afrWindowId=18ivdjw8y2&_adf.ctrl-state=ly8df7ri4_1&_afrFS=16&_afrMT=screen&_afrMFW=1280&_afrMFH=720&_afrMFDW=1280&_afrMFDH=720&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0",
+      "pageTitle": "Create a Corporate Goal - Employee Wellness - Oracle Fusion Cloud Applications",
+      "mainHeading": null
+    },
+    {
+      "pageId": "page-7",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome?_adf.ctrl-state=14fu3y3yhm_1&_adf.no-new-window-redirect=true&_afrLoop=46658727269987133&_afrWindowMode=2&_afrWindowId=null&_afrFS=16&_afrMT=screen&_afrMFW=1280&_afrMFH=720&_afrMFDW=1280&_afrMFDH=720&_afrMFC=8&_afrMFCI=0&_afrMFM=0&_afrMFR=96&_afrMFG=0&_afrMFS=0&_afrMFO=0",
+      "pageTitle": null,
+      "mainHeading": null
+    }
+  ],
+  "elements": [
+    {
+      "tag": "input",
+      "title": "",
+      "label": "User Name",
+      "role": "textbox",
+      "name": "User Name",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+      "css": "input#idcs-signin-basic-signin-form-username",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "Password",
+      "role": "textbox",
+      "name": "Password",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+      "css": "input#idcs-signin-basic-signin-form-password|input",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "span",
+      "title": "",
+      "label": "Sign In",
+      "role": "",
+      "name": "Sign In",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+      "css": "span#ui-id-4",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "Enter Passcode",
+      "role": "textbox",
+      "name": "Enter Passcode",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+      "css": "input#idcs-mfa-mfa-auth-sms-email-code-input|input",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "div",
+      "title": "",
+      "label": "Verify",
+      "role": "",
+      "name": "Verify",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]",
+      "css": "oj-button#idcs-mfa-mfa-auth-sms-email-submit-button > button:nth-child(1) > div:nth-child(1)",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "svg",
+      "title": "",
+      "label": "Navigator",
+      "role": "img",
+      "name": "Navigator",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]",
+      "css": "svg#pt1:_UISmmLink::icon",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "div",
+      "title": "",
+      "label": "Benefits Administration",
+      "role": "",
+      "name": "Benefits Administration",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]",
+      "css": "div#pt1:_UISnvr:0:nvgpgl2_groupNode_benefits > div:nth-child(1)",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "span",
+      "title": "",
+      "label": "Employee Wellness",
+      "role": "",
+      "name": "Employee Wellness",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[2]/div[1]/div[1]/a[1]/span[1]",
+      "css": "a#pt1:_UISnvr:0:nv_BENEFITS_ADMINISTRATION_HWR_WELLNESS > span:nth-child(2)",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "img",
+      "title": "Create a Corporate Goal",
+      "label": "Create a Corporate Goal",
+      "role": "img",
+      "name": "Create a Corporate Goal",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/a[1]/img[1]",
+      "css": "img#_FOpt1:_FOr1:0:_FONSr2:0:_FOTsr1:0:appPnl:r1:0:ITPdtl:0:pt1:ctb1::icon",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "Name",
+      "role": "textbox",
+      "name": "Name",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]",
+      "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:it4::content",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "Daily Target Minutes",
+      "role": "textbox",
+      "name": "Daily Target Minutes",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]",
+      "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:targetIText::content",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "span",
+      "title": "",
+      "label": "Save and Close",
+      "role": "",
+      "name": "Save and Close",
+      "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/a[1]/span[1]",
+      "css": "div#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:ctb1 > a:nth-child(1) > span:nth-child(1)",
+      "heading": "",
+      "page_heading": ""
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "Click",
+      "navigation": "Click the User Name field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'User Name' })",
+        "stable": "#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "title": "",
+        "labels": "User Name",
+        "role": "textbox",
+        "name": "User Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 2,
+      "action": "Fill",
+      "navigation": "Enter User Name",
+      "data": "User Name: <email>",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'User Name' })",
+        "stable": "#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "title": "",
+        "labels": "User Name",
+        "role": "textbox",
+        "name": "User Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 3,
+      "action": "Click",
+      "navigation": "Click the Password field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Password' })",
+        "stable": "#idcs-signin-basic-signin-form-password\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "title": "",
+        "labels": "Password",
+        "role": "textbox",
+        "name": "Password",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 4,
+      "action": "Fill",
+      "navigation": "Enter Password",
+      "data": "Password: True",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Password' })",
+        "stable": "#idcs-signin-basic-signin-form-password\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "title": "",
+        "labels": "Password",
+        "role": "textbox",
+        "name": "Password",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 5,
+      "action": "Click",
+      "navigation": "Click the element element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "#ui-id-4",
+        "stable": "#ui-id-4",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "css": "span#ui-id-4",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Sign In",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 6,
+      "action": "Click",
+      "navigation": "Click the Enter Passcode field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Enter Passcode' })",
+        "stable": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "css": "input#idcs-mfa-mfa-auth-sms-email-code-input|input",
+        "title": "",
+        "labels": "",
+        "role": "textbox",
+        "name": "Enter Passcode",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 7,
+      "action": "Fill",
+      "navigation": "Enter Enter Passcode",
+      "data": "Enter Passcode: 912176 ",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Enter Passcode' })",
+        "stable": "#idcs-mfa-mfa-auth-sms-email-code-input\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[4]/oj-input-text[1]/input[1]",
+        "css": "input#idcs-mfa-mfa-auth-sms-email-code-input|input",
+        "title": "",
+        "labels": "",
+        "role": "textbox",
+        "name": "Enter Passcode",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 8,
+      "action": "Click",
+      "navigation": "Click the Verify element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByText(\"Verify\")",
+        "stable": "getByText(\"Verify\")",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/oj-idaas-module-adapter[1]/oj-module[1]/div[1]/div[6]/oj-button[1]/button[1]/div[1]",
+        "css": "oj-button#idcs-mfa-mfa-auth-sms-email-submit-button > button:nth-child(1) > div:nth-child(1)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Verify",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 9,
+      "action": "Click",
+      "navigation": "Click the Navigator img",
+      "data": "",
+      "expected": "Navigator opened.",
+      "locators": {
+        "playwright": "getByRole('img', { name: 'Navigator' })",
+        "stable": "#pt1\\:_UISmmLink\\:\\:icon",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/a[1]/svg[1]",
+        "css": "svg#pt1:_UISmmLink::icon",
+        "title": "",
+        "labels": "",
+        "role": "img",
+        "name": "Navigator",
+        "tag": "svg",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 10,
+      "action": "Click",
+      "navigation": "Click the Benefits Administration element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByText(\"Benefits Administration\")",
+        "stable": "getByText(\"Benefits Administration\")",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[1]/div[1]/div[1]",
+        "css": "div#pt1:_UISnvr:0:nvgpgl2_groupNode_benefits > div:nth-child(1)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Benefits Administration",
+        "tag": "div",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 11,
+      "action": "Click",
+      "navigation": "Click the Employee Wellness element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByText(\"Employee Wellness\")",
+        "stable": "getByText(\"Employee Wellness\")",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[2]/div[1]/div[1]/a[1]/span[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[2]/div[1]/div[1]/a[1]/span[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[2]/div[2]/div[1]/table[1]/tbody[1]/tr[2]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/div[1]/div[2]/div[1]/div[1]/a[1]/span[1]",
+        "css": "a#pt1:_UISnvr:0:nv_BENEFITS_ADMINISTRATION_HWR_WELLNESS > span:nth-child(2)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Employee Wellness",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 12,
+      "action": "Click",
+      "navigation": "Click the Create a Corporate Goal img",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('img', { name: 'Create a Corporate Goal' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:_FOTsr1\\:0\\:appPnl\\:r1\\:0\\:ITPdtl\\:0\\:pt1\\:ctb1\\:\\:icon",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/a[1]/img[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/a[1]/img[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[3]/a[1]/img[1]",
+        "css": "img#_FOpt1:_FOr1:0:_FONSr2:0:_FOTsr1:0:appPnl:r1:0:ITPdtl:0:pt1:ctb1::icon",
+        "title": "Create a Corporate Goal",
+        "labels": "",
+        "role": "img",
+        "name": "Create a Corporate Goal",
+        "tag": "img",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 13,
+      "action": "Click",
+      "navigation": "Click the Name field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Name' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAnt2\\:1\\:sp1\\:it4\\:\\:content",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:it4::content",
+        "title": "",
+        "labels": "Name",
+        "role": "textbox",
+        "name": "Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 14,
+      "action": "Fill",
+      "navigation": "Enter Name",
+      "data": "Name: active test",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Name' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAnt2\\:1\\:sp1\\:it4\\:\\:content",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[2]/td[2]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:it4::content",
+        "title": "",
+        "labels": "Name",
+        "role": "textbox",
+        "name": "Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 15,
+      "action": "Click",
+      "navigation": "Click the Daily Target Minutes field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Daily Target Minutes' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAnt2\\:1\\:sp1\\:targetIText\\:\\:content",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:targetIText::content",
+        "title": "",
+        "labels": "Daily Target Minutes",
+        "role": "textbox",
+        "name": "Daily Target Minutes",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 16,
+      "action": "Fill",
+      "navigation": "Enter Daily Target Minutes",
+      "data": "Daily Target Minutes: 35",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Daily Target Minutes' })",
+        "stable": "#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAnt2\\:1\\:sp1\\:targetIText\\:\\:content",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[4]/td[2]/table[1]/tbody[1]/tr[1]/td[1]/span[1]/input[1]",
+        "css": "input#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:targetIText::content",
+        "title": "",
+        "labels": "Daily Target Minutes",
+        "role": "textbox",
+        "name": "Daily Target Minutes",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 17,
+      "action": "Click",
+      "navigation": "Click the Save and Close element",
+      "data": "",
+      "expected": "Confirmation dialog is displayed.",
+      "locators": {
+        "playwright": "getByText(\"Save and Close\")",
+        "stable": "getByText(\"Save and Close\")",
+        "xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/a[1]/span[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/a[1]/span[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[2]/form[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/a[1]/span[1]",
+        "css": "div#_FOpt1:_FOr1:0:_FONSr2:0:MAnt2:1:sp1:ctb1 > a:nth-child(1) > span:nth-child(1)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Save and Close",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import posixpath
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
@@ -32,6 +34,58 @@ def _slugify(value: str, default: str = "scenario") -> str:
     value = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower())
     value = re.sub(r"-+", "-", value).strip("-")
     return value or default
+
+
+def _to_camel_case(value: str) -> str:
+    if not value:
+        return ""
+    cleaned = re.sub(r"['\"_]+", " ", str(value))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip().lower()
+    if not cleaned:
+        return ""
+    return re.sub(r"[^a-z0-9]+(.)?", lambda m: m.group(1).upper() if m.group(1) else "", cleaned)
+
+
+def _normalize_selector(selector: str) -> str:
+    if not selector:
+        return ""
+    raw = str(selector).strip()
+    hash_index = raw.find("#")
+    if hash_index != -1:
+        fragment = raw[hash_index + 1 :]
+        cut_index = re.search(r'[ \t\r\n>+~,.\[]', fragment)
+        if cut_index:
+            fragment = fragment[: cut_index.start()]
+        fragment = fragment.strip()
+        if fragment:
+            escaped = fragment.replace('"', r"\"")
+            return f'xpath=//*[@id="{escaped}"]'
+    normalized = re.sub(r"\|[a-zA-Z][\w-]*", "", raw)
+    normalized = re.sub(r"\s+", " ", normalized)
+    normalized = re.sub(r"\s*([>+~,])\s*", r"\1", normalized)
+    normalized = normalized.strip()
+    return normalized
+
+
+def _extract_data_value(step: Dict[str, Any]) -> str:
+    data = step.get("data")
+    if isinstance(data, str):
+        trimmed = data.strip()
+        if not trimmed:
+            return ""
+        if ":" in trimmed:
+            key, value = trimmed.split(":", 1)
+            return value.strip()
+        return trimmed
+    return ""
+
+
+def _relative_import(from_path: Path, to_path: Path) -> str:
+    rel = os.path.relpath(to_path, start=from_path.parent)
+    rel_posix = posixpath.normpath(rel.replace("\\", "/"))
+    if not rel_posix.startswith("."):
+        rel_posix = f"./{rel_posix}"
+    return rel_posix
 
 
 @dataclass
@@ -119,9 +173,11 @@ class AgenticScriptAgent:
             ],
             template=(
                 "You are an autonomous QA planning agent.\n"
-                "Design a concise, numbered list of Playwright automation steps for the scenario described below.\n"
-                "Incorporate relevant context when available, but ensure each step is action-oriented and precise.\n"
-                "Respond with Markdown numbered steps only.\n\n"
+                "STRICT GROUNDING: Only use the 'Contextual steps' provided below.\n"
+                "- Do NOT invent steps from prior knowledge or assumptions.\n"
+                "- If 'Contextual steps' is empty or clearly unrelated, reply EXACTLY with: INSUFFICIENT_CONTEXT: <one-sentence guidance to record or ingest>.\n"
+                "- Otherwise, design a concise, numbered list of Playwright automation steps using only the grounded context.\n"
+                "- Respond with Markdown numbered steps only (no prose).\n\n"
                 "Scenario:\n{scenario}\n\n"
                 "Contextual steps:\n{enriched_steps}\n\n"
                 "Existing script reference (may be empty):\n{existing_script_excerpt}\n\n"
@@ -190,6 +246,8 @@ class AgenticScriptAgent:
             existing_excerpt = str(existing_script["content"])[:1200]
 
         vector_steps = self._collect_vector_flow_steps(scenario)
+        vector_flow_name = vector_steps[0].get("flow_name") if vector_steps else ""
+        vector_flow_slug = vector_steps[0].get("flow_slug") if vector_steps else ""
         if vector_steps:
             enriched_text = self._format_steps_for_prompt(vector_steps)
 
@@ -208,9 +266,21 @@ class AgenticScriptAgent:
                 "structure": structure,
             },
             "flow_available": bool(recorder_flow) or bool(vector_steps),
+            "vector_flow": {
+                "flow_name": vector_flow_name,
+                "flow_slug": vector_flow_slug,
+            } if vector_flow_name or vector_flow_slug else None,
         }
 
     def generate_preview(self, scenario: str, framework: FrameworkProfile, context: Dict[str, Any]) -> str:
+        # Hard stop: if no grounded steps from recorder/vector, do not ask the LLM at all.
+        enriched = context.get("enriched_steps", "").strip()
+        vector_steps = context.get("vector_steps") or []
+        if not enriched and not vector_steps:
+            return (
+                "INSUFFICIENT_CONTEXT: No recorder or vector-backed steps found. "
+                "Please record the scenario or ingest relevant docs before generating a preview."
+            )
         prompt = self.preview_prompt.format(
             scenario=scenario,
             enriched_steps=context.get("enriched_steps", ""),
@@ -240,14 +310,261 @@ class AgenticScriptAgent:
         response = self.llm.invoke(prompt)
         return _strip_code_fences(getattr(response, "content", str(response)))
 
-    def _collect_vector_flow_steps(self, scenario: str, top_k: int = 256) -> List[Dict[str, str]]:
-        slug = _slugify(scenario)
-        specs = [
-            {"query": scenario, "where": {"type": "recorder_refined", "flow_slug": slug}},
-            {"query": slug, "where": {"type": "recorder_refined", "flow_slug": slug}},
-            {"query": scenario, "where": {"type": "recorder_refined", "flow_name": scenario}},
+    @staticmethod
+    def _scenario_variants(scenario: str) -> Tuple[List[str], List[str]]:
+        """Derive likely flow names and slugs from a free-form scenario request."""
+        raw = (scenario or "").strip()
+        if not raw:
+            return [], []
+
+        variants: List[str] = []
+        seen_lower: set[str] = set()
+
+        def _add_variant(text: str) -> None:
+            cleaned = (text or "").strip(" -:,\n\t")
+            if not cleaned:
+                return
+            lowered = cleaned.lower()
+            if lowered not in seen_lower:
+                seen_lower.add(lowered)
+                variants.append(cleaned)
+
+        _add_variant(raw)
+
+        prefixes = [
+            "generate automation script for",
+            "generate test script for",
+            "create automation script for",
+            "create test script for",
+            "automation script for",
+            "automation scripts for",
+            "automation for",
+            "test scripts for",
+            "test script for",
+            "test cases for",
+            "test case for",
+            "script for",
+            "scripts for",
         ]
+
+        working = raw
+        lowered = working.lower()
+        for prefix in sorted(prefixes, key=len, reverse=True):
+            if lowered.startswith(prefix):
+                working = working[len(prefix) :].strip(" -:,\n\t")
+                _add_variant(working)
+                lowered = working.lower()
+                break
+
+        cleanup_patterns = [
+            r"\bfrom\s+refined\s+recorder\s+flow\b",
+            r"\bfrom\s+refined\s+flow\b",
+            r"\bfrom\s+recorder\s+flow\b",
+            r"\brefined\s+recorder\s+flow\b",
+            r"\brefined\s+flow\b",
+            r"\brecorder\s+flow\b",
+            r"\bagentic\s+flow\b",
+        ]
+        cleaned = working
+        for pattern in cleanup_patterns:
+            cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE).strip(" -:,\n\t")
+
+        trailing_suffixes = [
+            " ui",
+            " flow",
+            " flows",
+            " scenario",
+            " test",
+            " script",
+        ]
+        lower_cleaned = cleaned.lower()
+        for suffix in trailing_suffixes:
+            if lower_cleaned.endswith(suffix):
+                cleaned = cleaned[: -len(suffix)].strip(" -:,\n\t")
+                lower_cleaned = cleaned.lower()
+                break
+
+        _add_variant(cleaned)
+
+        # Include a variant with the last segment after "for" if any text remains noisy.
+        if " for " in raw.lower():
+            tail = raw.lower().split(" for ", 1)[-1]
+            _add_variant(tail)
+
+        slug_variants: List[str] = []
+        seen_slugs: set[str] = set()
+        for text in variants:
+            slug = _slugify(text)
+            if slug and slug not in seen_slugs:
+                slug_variants.append(slug)
+                seen_slugs.add(slug)
+
+        return variants, slug_variants
+
+    @staticmethod
+    def _select_best_slug(slug_hits: Counter, preferred_slugs: List[str]) -> Optional[str]:
+        if not slug_hits:
+            return None
+        preferred_lower = [s.lower() for s in preferred_slugs]
+
+        def _score(slug: str) -> Tuple[int, int]:
+            try:
+                idx = preferred_lower.index(slug.lower())
+            except ValueError:
+                idx = len(preferred_lower)
+            return slug_hits[slug], -idx
+
+        best = max(slug_hits, key=_score)
+        return best if slug_hits[best] > 0 else None
+
+    def _steps_from_vector_docs(
+        self,
+        docs: List[Dict[str, Any]],
+        default_flow_slug: Optional[str] = None,
+    ) -> List[Dict[str, str]]:
         steps_map: Dict[int, Dict[str, str]] = {}
+        resolved_name: Optional[str] = None
+        resolved_slug = _slugify(default_flow_slug) if default_flow_slug else None
+        for entry in docs or []:
+            meta = (entry or {}).get("metadata") or {}
+            record_kind = str(meta.get("record_kind") or "").lower()
+            if record_kind and record_kind != "step":
+                continue
+            content = self._parse_content_snapshot(entry.get("content") or "")
+            payload = content.get("payload") if isinstance(content, dict) else {}
+            step_index = meta.get("step_index") or (payload or {}).get("step_index")
+            try:
+                step_no = int(step_index)
+            except (TypeError, ValueError):
+                continue
+            action = (meta.get("action") or (payload or {}).get("action") or "").strip()
+            navigation = (meta.get("navigation") or (payload or {}).get("navigation") or "").strip()
+            data_val = (meta.get("data") or (payload or {}).get("data") or "").strip()
+            expected = (meta.get("expected") or (payload or {}).get("expected") or "").strip()
+            if not (action or navigation):
+                continue
+            flow_slug = meta.get("flow_slug") or (payload or {}).get("flow_slug") or resolved_slug or ""
+            flow_name = meta.get("flow_name") or (payload or {}).get("flow") or resolved_name or ""
+            resolved_name = flow_name or resolved_name
+            resolved_slug = _slugify(flow_slug) if flow_slug else resolved_slug
+            locator_info = (payload or {}).get("locators") or {}
+            element_info = (payload or {}).get("element") or {}
+            steps_map[step_no] = {
+                "step": step_no,
+                "action": action,
+                "navigation": navigation,
+                "data": data_val,
+                "expected": expected,
+                "flow_name": flow_name,
+                "flow_slug": resolved_slug,
+                "locators": locator_info,
+                "element": element_info,
+            }
+        return [steps_map[idx] for idx in sorted(steps_map)]
+
+    def _load_refined_flow_from_disk(
+        self,
+        slug_candidates: List[str],
+        name_candidates: List[str],
+    ) -> List[Dict[str, str]]:
+        generated_dir = Path(__file__).resolve().parent / "generated_flows"
+        if not generated_dir.exists():
+            return []
+        slug_lower = [s.lower() for s in slug_candidates if s]
+        name_lower = [n.lower() for n in name_candidates if n]
+        try:
+            candidates = sorted(
+                generated_dir.glob("*.refined.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )
+        except Exception:
+            return []
+        for path in candidates:
+            stem_lower = path.stem.lower()
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            flow_name = str(data.get("flow_name") or path.stem)
+            flow_slug = _slugify(flow_name)
+            if slug_lower and flow_slug.lower() not in slug_lower:
+                if not any(slug in stem_lower for slug in slug_lower):
+                    if name_lower and flow_name.lower() not in name_lower:
+                        continue
+            steps = data.get("steps") or []
+            formatted: List[Dict[str, str]] = []
+            for idx, step in enumerate(steps, start=1):
+                step_no = step.get("step") or idx
+                try:
+                    step_no = int(step_no)
+                except (TypeError, ValueError):
+                    step_no = idx
+                action = str(step.get("action") or "").strip()
+                navigation = str(step.get("navigation") or "").strip()
+                data_val = str(step.get("data") or "").strip()
+                expected = str(step.get("expected") or "").strip()
+                locators = step.get("locators") or {}
+                if not isinstance(locators, dict):
+                    locators = {}
+                element = step.get("element") or {}
+                if not isinstance(element, dict):
+                    element = {}
+                if not (action or navigation):
+                    continue
+                formatted.append(
+                    {
+                        "step": step_no,
+                        "action": action,
+                        "navigation": navigation,
+                        "data": data_val,
+                        "expected": expected,
+                        "flow_name": flow_name,
+                        "flow_slug": flow_slug,
+                        "locators": locators,
+                        "element": element,
+                    }
+                )
+            if formatted:
+                return sorted(formatted, key=lambda item: item["step"])
+        return []
+
+    def _collect_vector_flow_steps(self, scenario: str, top_k: int = 256) -> List[Dict[str, str]]:
+        name_variants, slug_variants = self._scenario_variants(scenario)
+        raw_specs: List[Dict[str, Any]] = []
+
+        def _add_spec(query: str, where: Dict[str, Any]) -> None:
+            if not query:
+                return
+            raw_specs.append({"query": query, "where": where})
+
+        for slug in slug_variants:
+            _add_spec(scenario, {"type": "recorder_refined", "flow_slug": slug})
+            _add_spec(slug.replace("-", " "), {"type": "recorder_refined", "flow_slug": slug})
+
+        for name in name_variants:
+            slug = _slugify(name)
+            _add_spec(name, {"type": "recorder_refined", "flow_slug": slug})
+            _add_spec(name, {"type": "recorder_refined", "flow_name": name})
+
+        fallback_queries = [scenario] + name_variants
+        for query in fallback_queries:
+            _add_spec(query, {"type": "recorder_refined"})
+
+        specs: List[Dict[str, Any]] = []
+        seen_spec: set[Tuple[str, str]] = set()
+        for spec in raw_specs:
+            key = (spec["query"], json.dumps(spec["where"], sort_keys=True))
+            if key in seen_spec:
+                continue
+            seen_spec.add(key)
+            specs.append(spec)
+
+        slug_hits: Counter[str] = Counter()
+        candidate_set = {slug.lower() for slug in slug_variants}
+        selected_slug: Optional[str] = None
+        flow_name_map: Dict[str, str] = {}
+
         for spec in specs:
             try:
                 results = self.vector_db.query_where(spec["query"], spec["where"], top_k=top_k)
@@ -256,33 +573,50 @@ class AgenticScriptAgent:
             for entry in results or []:
                 meta = entry.get("metadata") or {}
                 content = self._parse_content_snapshot(entry.get("content") or "")
-                record_kind = (meta.get("record_kind") or (content or {}).get("record_kind") or "").lower()
+                payload = content.get("payload") if isinstance(content, dict) else {}
+                record_kind = (meta.get("record_kind") or (payload or {}).get("record_kind") or "").lower()
                 if record_kind == "element":
                     continue
-                step_index = (content or {}).get("step_index") or meta.get("step_index")
-                try:
-                    step_index = int(step_index)
-                except (TypeError, ValueError):
-                    continue
-                action = (content or {}).get("action") or meta.get("action") or ""
-                navigation = (content or {}).get("navigation") or meta.get("navigation") or ""
-                data_val = (content or {}).get("data") or meta.get("data") or ""
-                expected = (content or {}).get("expected") or meta.get("expected") or ""
-                if not any([action, navigation]):
-                    continue
-                steps_map.setdefault(
-                    step_index,
-                    {
-                        "step": step_index,
-                        "action": action,
-                        "navigation": navigation,
-                        "data": data_val,
-                        "expected": expected,
-                    },
+                flow_slug = (
+                    meta.get("flow_slug")
+                    or (payload or {}).get("flow_slug")
+                    or meta.get("flowSlug")
+                    or (payload or {}).get("flowSlug")
+                    or ""
                 )
-            if steps_map:
+                flow_slug = _slugify(flow_slug) if flow_slug else ""
+                if not flow_slug:
+                    continue
+                slug_hits[flow_slug] += 1
+                flow_name = meta.get("flow_name") or (payload or {}).get("flow") or ""
+                flow_name_map.setdefault(flow_slug, flow_name)
+                if flow_slug.lower() in candidate_set:
+                    selected_slug = flow_slug
+            if selected_slug:
                 break
-        return [steps_map[idx] for idx in sorted(steps_map)]
+
+        if not selected_slug:
+            selected_slug = self._select_best_slug(slug_hits, slug_variants)
+
+        if selected_slug:
+            try:
+                docs = self.vector_db.list_where(
+                    where={"type": "recorder_refined", "flow_slug": selected_slug},
+                    limit=top_k,
+                )
+            except Exception:
+                docs = []
+            steps = self._steps_from_vector_docs(docs, default_flow_slug=selected_slug)
+            if steps:
+                flow_name = flow_name_map.get(selected_slug) or steps[0].get("flow_name") or ""
+                # Ensure flow metadata is present on each step for downstream consumers.
+                for step in steps:
+                    step.setdefault("flow_slug", selected_slug)
+                    if flow_name and not step.get("flow_name"):
+                        step["flow_name"] = flow_name
+                return steps
+
+        return self._load_refined_flow_from_disk(slug_variants, name_variants)
 
     @staticmethod
     def _format_steps_for_prompt(steps: List[Dict[str, str]]) -> str:
@@ -429,6 +763,12 @@ class AgenticScriptAgent:
         assets: List[Dict[str, Any]] = []
         min_score = 6  # threshold to avoid unrelated matches
         scenario_tokens = self._tokenize(scenario)
+        scenario_terms = {tok for tok in scenario_tokens if tok}
+
+        def _path_matches(path_obj: Path) -> bool:
+            lowered = str(path_obj).lower()
+            return any(term in lowered for term in scenario_terms)
+
         for entry in results:
             metadata = entry.get("metadata", {}) or {}
             meta_type = str(metadata.get("type", "")) + str(metadata.get("artifact_type", ""))
@@ -437,6 +777,8 @@ class AgenticScriptAgent:
             content_str = entry.get("content", "")
             path = self._locate_framework_file(framework, metadata, content_str)
             if path and path.exists():
+                if scenario_terms and not _path_matches(path):
+                    continue
                 try:
                     file_content = path.read_text(encoding="utf-8", errors="ignore")
                 except Exception:
@@ -517,7 +859,11 @@ class AgenticScriptAgent:
 
         candidates.sort(key=lambda x: x[0], reverse=True)
         # Apply threshold to avoid unrelated matches
-        filtered = [(s, p) for s, p in candidates if s >= min_score]
+        filtered = [
+            (s, p)
+            for s, p in candidates
+            if s >= min_score and (not tokens or any(t in str(p).lower() for t in tokens))
+        ]
         results: List[Dict[str, Any]] = []
         for score, p in filtered[:max_results]:
             results.append({
@@ -565,32 +911,204 @@ class AgenticScriptAgent:
         framework: FrameworkProfile,
         accepted_preview: str,
     ) -> Dict[str, List[Dict[str, str]]]:
+        context = self.gather_context(scenario)
+        vector_steps = context.get("vector_steps") or []
+        if not vector_steps:
+            raise ValueError(
+                "No refined recorder steps available for this scenario. "
+                "Please ingest the refined flow or record the scenario again."
+            )
+        return self._build_deterministic_payload(scenario, framework, vector_steps)
+
+    def _build_deterministic_payload(
+        self,
+        scenario: str,
+        framework: FrameworkProfile,
+        vector_steps: List[Dict[str, Any]],
+    ) -> Dict[str, List[Dict[str, str]]]:
         slug = _slugify(scenario)
-        prompt = self.script_prompt.format(
-            scenario=scenario,
-            accepted_preview=accepted_preview,
-            framework_summary=framework.summary(),
-            locators_snippet=framework.sample_snippet(framework.locators_dir),
-            pages_snippet=framework.sample_snippet(framework.pages_dir),
-            tests_snippet=framework.sample_snippet(framework.tests_dir),
-            slug=slug,
-        )
-        response = self.llm.invoke(prompt)
-        raw = _strip_code_fences(getattr(response, "content", str(response)))
-        try:
-            payload = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"LLM did not return valid JSON: {exc}\nRaw output:\n{raw}") from exc
+        root = framework.root
 
-        for section in ["locators", "pages", "tests"]:
-            payload.setdefault(section, [])
-            if not isinstance(payload[section], list):
-                raise ValueError(f"Payload section '{section}' must be a list")
-            for file_obj in payload[section]:
-                if "path" not in file_obj or "content" not in file_obj:
-                    raise ValueError(f"Each file entry must include 'path' and 'content': {file_obj}")
+        def resolve_relative(target: Path) -> str:
+            return str(target.relative_to(root)).replace("\\", "/")
 
-        return payload
+        if framework.locators_dir:
+            locators_path = framework.locators_dir / f"{slug}.ts"
+        else:
+            locators_path = root / "locators" / f"{slug}.ts"
+        if framework.pages_dir:
+            page_filename = f"{_to_camel_case(slug).capitalize() or 'Generated'}Page.ts"
+            page_path = framework.pages_dir / page_filename
+        else:
+            page_path = root / "pages" / f"{_to_camel_case(slug).capitalize() or 'Generated'}Page.ts"
+        if framework.tests_dir:
+            test_path = framework.tests_dir / f"{slug}.spec.ts"
+        else:
+            test_path = root / "tests" / f"{slug}.spec.ts"
+
+        selector_to_key: Dict[str, str] = {}
+        used_keys: set[str] = set()
+        entries: List[Tuple[str, str]] = []
+        step_refs: List[Dict[str, Any]] = []
+
+        for index, step in enumerate(vector_steps):
+            locators = step.get("locators") or {}
+            selector = _normalize_selector(
+                locators.get("css")
+                or locators.get("playwright")
+                or locators.get("stable")
+                or locators.get("xpath")
+                or locators.get("raw_xpath")
+                or locators.get("selector")
+                or ""
+            )
+            if not selector:
+                element = step.get("element") or {}
+                selector = _normalize_selector(
+                    element.get("css")
+                    or element.get("playwright")
+                    or element.get("stable")
+                    or element.get("xpath")
+                    or element.get("raw_xpath")
+                )
+            if not selector:
+                raise ValueError(
+                    f"No selector resolved for step {index + 1} "
+                    f"(action={step.get('action')!r}, navigation={step.get('navigation')!r}). "
+                    "Ensure the refined recorder flow includes CSS or stable selectors."
+                )
+
+            if selector in selector_to_key:
+                key = selector_to_key[selector]
+            else:
+                base_name = (
+                    locators.get("name")
+                    or locators.get("title")
+                    or locators.get("labels")
+                    or step.get("navigation")
+                    or step.get("action")
+                    or f"step{index + 1}"
+                )
+                base_key = _to_camel_case(base_name) or f"step{index + 1}"
+                key = base_key
+                suffix = 2
+                while key in used_keys:
+                    key = f"{base_key}{suffix}"
+                    suffix += 1
+                selector_to_key[selector] = key
+                used_keys.add(key)
+                entries.append((key, selector))
+
+            step_refs.append(
+                {
+                    "key": key,
+                    "action": (step.get("action") or "").lower(),
+                    "data": _extract_data_value(step),
+                    "raw": step,
+                }
+            )
+
+        locators_lines = ["const locators = {"] + [
+            f"  {key}: {json.dumps(selector)}," for key, selector in entries
+        ] + ["};", "", "export default locators;"]
+        locators_content = "\n".join(locators_lines) + os.linesep
+
+        page_class = _to_camel_case(Path(page_path).stem).capitalize() or "GeneratedPage"
+        page_lines = [
+            "import { Page, Locator } from '@playwright/test';",
+            f'import locators from "{_relative_import(page_path, locators_path)}";',
+            "",
+            f"class {page_class} {{",
+            "  page: Page;",
+        ]
+        for key, _ in entries:
+            page_lines.append(f"  {key}: Locator;")
+        page_lines.append("")
+        page_lines.append("  constructor(page: Page) {")
+        page_lines.append("    this.page = page;")
+        for key, _ in entries:
+            page_lines.append(f"    this.{key} = page.locator(locators.{key});")
+        page_lines.append("  }")
+        page_lines.append("}")
+        page_lines.append("")
+        page_lines.append(f"export default {page_class};")
+        page_content = "\n".join(page_lines) + os.linesep
+
+        scenario_literal = json.dumps(scenario)
+        spec_lines = [
+            'import { test } from "./testSetup.ts";',
+            f'import PageObject from "{_relative_import(test_path, page_path)}";',
+            'import { getTestToRun, shouldRun } from "../util/csvFileManipulation.ts";',
+            'import { namedStep } from "../util/screenshot.ts";',
+            "import * as dotenv from 'dotenv';",
+            "",
+            "const path = require('path');",
+            "",
+            "dotenv.config();",
+            "let executionList: any[];",
+            "",
+            "test.beforeAll(() => {",
+            "  executionList = getTestToRun(path.join(__dirname, '../testmanager.xlsx'));",
+            "});",
+            "",
+            f"test.describe({scenario_literal}, () => {{",
+            "  let flow: PageObject;",
+            "",
+            "  const run = (name: string, fn: ({ page }, testinfo: any) => Promise<void>) =>",
+            "    (shouldRun(name) ? test : test.skip)(name, fn);",
+            "",
+            f"  run({scenario_literal}, async ({{ page }}, testinfo) => {{",
+            "    flow = new PageObject(page);",
+            "    const testCaseId = testinfo.title;",
+            "    const testRow: any = executionList?.find((row: any) => row['TestCaseID'] === testCaseId) ?? {};",
+            "    void testRow;",
+            "",
+        ]
+        for idx, ref in enumerate(step_refs, start=1):
+            raw = ref.get("raw") or {}
+            note = raw.get("navigation") or raw.get("action") or raw.get("expected") or f"Step {idx}"
+            step_title = json.dumps(f"Step {idx} - {note}")
+            comment = raw.get("navigation") or raw.get("action") or ""
+            key = ref.get("key")
+            action = ref.get("action") or ""
+            data_value = ref.get("data") or ""
+            locator_expr = f"flow.{key}" if key else ""
+            spec_lines.append(f"    await namedStep({step_title}, page, testinfo, async () => {{")
+            if comment:
+                spec_lines.append(f"      // {comment}")
+            if key:
+                if any(token in action for token in ["fill", "type", "enter"]):
+                    spec_lines.append(f"      await {locator_expr}.fill({json.dumps(data_value)});")
+                elif "select" in action:
+                    spec_lines.append(f"      await {locator_expr}.selectOption({json.dumps(data_value)});")
+                elif "press" in action:
+                    press_value = json.dumps(data_value or "Enter")
+                    spec_lines.append(f"      await {locator_expr}.press({press_value});")
+                elif "goto" in action or "navigate" in action:
+                    spec_lines.append(f"      await page.goto({json.dumps(data_value)});")
+                else:
+                    spec_lines.append(f"      await {locator_expr}.click();")
+            else:
+                spec_lines.append("      // TODO: No selector provided by refined flow.")
+            if raw.get("expected"):
+                spec_lines.append(f"      // Expected: {raw['expected']}")
+            spec_lines.append("    });")
+            spec_lines.append("")
+        spec_lines.append("  });")
+        spec_lines.append("});")
+        spec_content = "\n".join(spec_lines).rstrip() + os.linesep
+
+        return {
+            "locators": [
+                {"path": resolve_relative(locators_path), "content": locators_content}
+            ],
+            "pages": [
+                {"path": resolve_relative(page_path), "content": page_content}
+            ],
+            "tests": [
+                {"path": resolve_relative(test_path), "content": spec_content}
+            ],
+        }
 
     @staticmethod
     def persist_payload(framework: FrameworkProfile, payload: Dict[str, List[Dict[str, str]]]) -> List[Path]:

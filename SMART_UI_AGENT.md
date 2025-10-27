@@ -2,6 +2,8 @@
 
 The **SmartUIAgent** is a browser-side intelligent recorder that observes user interactions, scores their significance in real time, and selectively captures only the highest value events with rich metadata. It is designed to plug into existing web applications without external framework dependencies.
 
+[For the complementary agentic playback/generation pipeline, see `docs/AGENTIC_TEST_SCRIPT_ENGINEER.md`.]
+
 ## Getting Started
 
 1. Copy `app/SmartUIAgent.js` into your web project and ensure it is loaded as an ES module:

@@ -55,11 +55,13 @@ class VectorDBClient:
     # ---------------- Query with metadata filter ----------------
     def query_where(self, query: str, where: dict, top_k: int = 3):
         """Query with a Chroma metadata filter (e.g., {"type":"recorder_refined","flow_hash":"abc123"})."""
+        server_filtered = True
         try:
             results = self.collection.query(query_texts=[query], where=where or {}, n_results=top_k)
         except TypeError:
             # Older Chroma may not support where in this signature; fallback to unfiltered
             results = self.collection.query(query_texts=[query], n_results=top_k)
+            server_filtered = False
         if not results or "documents" not in results:
             return []
         documents = results["documents"][0] if isinstance(results.get("documents"), list) else results.get("documents")
@@ -82,6 +84,20 @@ class VectorDBClient:
                 "content": docs_list[i],
                 "metadata": meta,
             })
+        # Apply client-side filtering as a safeguard when server-side 'where' wasn't applied,
+        # or to double-check equality matches.
+        if where:
+            def _match(meta: dict) -> bool:
+                try:
+                    for k, v in (where or {}).items():
+                        if (meta or {}).get(k) != v:
+                            return False
+                    return True
+                except Exception:
+                    return False
+            # If server didn't filter, or if any mismatches exist, enforce client-side filter
+            if (not server_filtered) or any(not _match(item.get("metadata", {})) for item in out):
+                out = [item for item in out if _match(item.get("metadata", {}))]
         return out
 
     # ---------------- Count ----------------
@@ -167,6 +183,11 @@ class VectorDBClient:
                 "metadata": meta if isinstance(meta, dict) else {},
             })
         return docs
+
+    # ---------------- List by metadata filter ----------------
+    def list_where(self, where: dict, limit: int = 1000):
+        """Compatibility wrapper preferred by agentic components; delegates to get_where."""
+        return self.get_where(where=where, limit=limit)
 
 
 def _cli_query(client: VectorDBClient, args: argparse.Namespace) -> int:

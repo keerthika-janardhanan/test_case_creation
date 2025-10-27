@@ -11,7 +11,13 @@ def run_trial(script_content: str):
             tmp_path = tmp.name
 
         cmd = ["npx", "playwright", "test", tmp_path, "--reporter=line"]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",  # avoid Windows codepage decode failures
+        )
 
         success = result.returncode == 0
         logs = result.stdout + "\n" + result.stderr

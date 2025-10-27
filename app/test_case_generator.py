@@ -471,11 +471,10 @@ class TestCaseGenerator:
 
         return repaired
 
-    def _collect_context(self, story: str, top_k: int = 8) -> Tuple[List[str], List[dict], List[str]]:
+    def _fetch_supporting_artifacts(self, story: str, top_k: int) -> Tuple[List[str], List[str]]:
         chunks: List[str] = []
-        matched_flow_steps: List[dict] = []
         context_sources: List[str] = []
-        seen_ids = set()
+        seen_ids: set[str] = set()
         queries = [story]
         tokens = [tok for tok in re.split(r"[^a-zA-Z0-9]+", story) if tok and len(tok) >= 3]
         for tok in tokens:
@@ -485,15 +484,23 @@ class TestCaseGenerator:
         for term in queries:
             if not term:
                 continue
-            results = self.db.query(term, top_k=top_k)
+            try:
+                results = self.db.query(term, top_k=top_k)
+            except Exception as exc:
+                logger.debug("Vector query failed for %s: %s", term, exc)
+                continue
+
             for entry in results:
                 is_dict = isinstance(entry, dict)
                 entry_id = entry.get("id") if is_dict else str(entry)
                 if entry_id in seen_ids:
                     continue
                 seen_ids.add(entry_id)
+
                 metadata = entry.get("metadata", {}) if is_dict else {}
                 artifact_type = str(metadata.get("artifact_type") or metadata.get("type") or "").lower()
+                if artifact_type == "recorder_refined":
+                    continue
                 if artifact_type and all(token not in artifact_type for token in self.relevant_types):
                     continue
 
@@ -501,6 +508,7 @@ class TestCaseGenerator:
                 snippet = str(snippet)
                 if len(snippet) > 1200:
                     snippet = snippet[:1200] + "..."
+
                 descriptor = (
                     metadata.get("flow_name")
                     or metadata.get("title")
@@ -510,14 +518,21 @@ class TestCaseGenerator:
                 )
                 source_label = artifact_type or "unknown"
                 descriptor_label = descriptor or entry_id
-                chunks.append(
-                    f"Source: {source_label} | Descriptor: {descriptor_label}\n{snippet}"
-                )
+                chunks.append(f"Source: {source_label} | Descriptor: {descriptor_label}\n{snippet}")
                 context_sources.append(f"{source_label}:{descriptor_label}")
+
                 if len(chunks) >= top_k:
                     break
+
             if len(chunks) >= top_k:
                 break
+
+        return chunks, context_sources
+
+    def _collect_context(self, story: str, top_k: int = 8) -> Tuple[List[str], List[dict], List[str]]:
+        chunks: List[str] = []
+        matched_flow_steps: List[dict] = []
+        context_sources: List[str] = []
 
         vector_chunks, vector_steps = self._load_vector_flow(story)
         if not vector_steps and self._ensure_vector_flow_ingested(story):
@@ -525,25 +540,42 @@ class TestCaseGenerator:
 
         if vector_steps:
             matched_flow_steps = vector_steps
-            chunks.extend(vector_chunks)
-            for item in vector_steps[:3]:
-                descriptor = item.get("navigation") or item.get("action") or str(item.get("step"))
-                context_sources.append(f"vector:{descriptor}")
-        else:
-            flow_chunks, flow_steps = self._load_saved_flows(story)
-            chunks.extend(flow_chunks)
-            if flow_steps:
-                matched_flow_steps = flow_steps
-                for item in flow_steps[:3]:
-                    context_sources.append(f"recorder:{item.get('navigation') or item.get('action')}")
+            element_chunks, element_sources = self._build_recorder_element_chunks(vector_steps)
+            if element_chunks:
+                chunks.extend(element_chunks)
+                context_sources.extend(element_sources[:top_k])
+            else:
+                chunks.extend(vector_chunks)
+                for item in vector_steps[:3]:
+                    descriptor = item.get("navigation") or item.get("action") or str(item.get("step"))
+                    context_sources.append(f"recorder_refined:{descriptor}")
+            return chunks, matched_flow_steps, context_sources
 
-            if not matched_flow_steps:
-                gen_chunks, gen_steps = self._load_refined_generated_flow(story)
-                chunks.extend(gen_chunks)
-                if gen_steps:
-                    matched_flow_steps = gen_steps
+        support_chunks, support_sources = self._fetch_supporting_artifacts(story, top_k)
+        chunks.extend(support_chunks)
+        context_sources.extend(support_sources)
+
+        flow_chunks, flow_steps = self._load_saved_flows(story)
+        chunks.extend(flow_chunks)
+        if flow_steps:
+            matched_flow_steps = flow_steps
+            for item in flow_steps[:3]:
+                context_sources.append(f"recorder:{item.get('navigation') or item.get('action')}")
+
+        if not matched_flow_steps:
+            gen_chunks, gen_steps = self._load_refined_generated_flow(story)
+            if gen_steps:
+                matched_flow_steps = gen_steps
+                element_chunks, element_sources = self._build_recorder_element_chunks(gen_steps)
+                if element_chunks:
+                    chunks.extend(element_chunks)
+                    context_sources.extend(element_sources[:top_k])
+                else:
+                    chunks.extend(gen_chunks)
                     for item in gen_steps[:3]:
                         context_sources.append(f"refined:{item.get('navigation') or item.get('action')}")
+            else:
+                chunks.extend(gen_chunks)
 
         return chunks, matched_flow_steps, context_sources
 
@@ -745,22 +777,6 @@ class TestCaseGenerator:
             if len(snippets) >= limit:
                 break
 
-        # Fallback: if nothing matched, take first few most recent flows
-        if not matched_any:
-            for path in flow_files[:limit]:
-                try:
-                    raw = path.read_text(encoding="utf-8")
-                    data = json.loads(raw)
-                except Exception:
-                    continue
-                flow_title = str(data.get("flow_name") or "")
-                steps = data.get("steps") or []
-                humanized = build_humanized(path, flow_title, steps)
-                if humanized and not structured_steps:
-                    structured_steps = humanized
-                if len(snippets) >= limit:
-                    break
-
         return snippets, structured_steps
 
     def _load_refined_generated_flow(self, story: str, limit: int = 3) -> Tuple[List[str], List[dict]]:
@@ -811,31 +827,6 @@ class TestCaseGenerator:
                 snippets.append(f"Refined flow: {path.name}\n" + "\n".join(lines))
                 chosen_steps = combined_steps
                 break
-
-        # Fallback: if no name match, take latest few
-        if not chosen_steps:
-            for path in files[:limit]:
-                try:
-                    raw = path.read_text(encoding="utf-8")
-                    data = json.loads(raw)
-                except Exception:
-                    continue
-                steps = data.get("steps") or []
-                elements = data.get("elements") or []
-                combined_steps = self._merge_refined_steps_with_elements(steps, elements)
-                if combined_steps:
-                    lines = []
-                    for s in combined_steps[:12]:
-                        nav = s.get("navigation") or ""
-                        act = s.get("action") or ""
-                        pl = (s.get("locators") or {}).get("playwright") or ""
-                        label = (s.get("locators") or {}).get("labels") or ""
-                        piece = act or nav or label or str(pl)
-                        if piece:
-                            lines.append(f"- {piece}")
-                    snippets.append(f"Refined flow: {path.name}\n" + "\n".join(lines))
-                    chosen_steps = combined_steps
-                    break
 
         return snippets, chosen_steps
 
@@ -1227,6 +1218,8 @@ class TestCaseGenerator:
         for idx, step in enumerate(flow_steps, start=1):
             locators = step.get("locators") if isinstance(step, dict) else {}
             label_value: str = ""
+            role_value: str = ""
+            locator_hint: str = ""
             if isinstance(locators, dict):
                 labels_field = locators.get("labels")
                 if isinstance(labels_field, (list, tuple, set)):
@@ -1235,16 +1228,67 @@ class TestCaseGenerator:
                     label_value = str(labels_field).strip()
                 if not label_value and locators.get("playwright"):
                     label_value = str(locators.get("playwright")).strip()
+                role_value = str(locators.get("role") or "").strip()
+                locator_hint = str(locators.get("playwright") or "").strip()
+                if not role_value and locator_hint:
+                    match = re.search(r"getByRole\(\s*['\"]([^'\"]+)['\"]", locator_hint)
+                    if match:
+                        role_value = match.group(1)
             if not label_value:
                 label_value = str(step.get("navigation") or step.get("action") or "").strip()
+
             summary.append(
                 {
                     "step": idx,
                     "action": step.get("action"),
                     "label": label_value,
+                    "role": role_value,
+                    "locator": locator_hint,
                 }
             )
         return json.dumps(summary, ensure_ascii=False)
+
+    def _build_recorder_element_chunks(self, steps: List[dict]) -> Tuple[List[str], List[str]]:
+        def sanitize_label(value: Optional[str]) -> str:
+            if value is None:
+                return ""
+            text = str(value).strip()
+            if not text:
+                return ""
+            primary = text.split("|", 1)[0].strip()
+            return primary.rstrip(":").strip()
+
+        lines: List[str] = []
+        sources: List[str] = []
+
+        for idx, step in enumerate(steps, start=1):
+            locators = step.get("locators") or {}
+            role = str(locators.get("role") or "").strip()
+            labels_field = locators.get("labels") or locators.get("label") or locators.get("name")
+            if isinstance(labels_field, (list, tuple, set)):
+                label = ", ".join(sanitize_label(part) for part in labels_field if part)
+            else:
+                label = sanitize_label(labels_field)
+            if not label and locators.get("playwright"):
+                label = sanitize_label(locators.get("playwright"))
+
+            action = str(step.get("action") or "").strip()
+            navigation = str(step.get("navigation") or "").strip()
+
+            if not (label or role):
+                if navigation:
+                    label = navigation
+                else:
+                    continue
+
+            role_display = role or "unknown"
+            lines.append(f"{idx:02d}. role={role_display} | label={label or '(missing label)'} | action={action}")
+            descriptor = label or action or f"step-{idx}"
+            sources.append(f"recorder_refined:{descriptor}")
+
+        if not lines:
+            return [], sources
+        return ["Recorder refined element cues:\n" + "\n".join(lines)], sources
 
     def _build_generation_prompt(self, story: str, context: str, flow_steps_json: str) -> str:
         fields = ", ".join(self.default_fields)
@@ -1254,9 +1298,9 @@ class TestCaseGenerator:
             f"The user supplied keywords or artifact name: '{story}'.\n"
             "Context snippets (prioritise Playwright flows, repo scaffolds, Jira docs):\n"
             f"{context}\n\n"
-            "You are also provided recorder element labels per step. Each item contains the recorder step index, the intended action verb, and the human-visible UI label captured during recording.\n"
-            "For the primary positive scenario, mirror these steps in order, deriving navigation wording directly from the element labels (do not invent new UI names). Expand the labels into detailed actions with explicit navigation, data entry, and observable expected outcomes.\n"
-            f"Recorder element labels JSON:\n{flow_steps_json}\n\n"
+            "You are also provided recorder element cues per step. Each item contains: the recorder step index, the intended action verb, the captured UI label(s), the ARIA role (if available), and the original Playwright locator snippet.\n"
+            "For the primary positive scenario, mirror these steps in order, deriving navigation wording directly from the element labels and role context (do not invent new UI names). Expand the labels into detailed actions with explicit navigation, data entry, and observable expected outcomes.\n"
+            f"Recorder element cues JSON:\n{flow_steps_json}\n\n"
             "Additionally, for EACH core step in the positive flow (up to 6-8 main steps), generate at least one negative and one edge case focusing on that step's validation (e.g., required field empty, invalid format, unauthorized action, boundary values). Keep these as separate cases with precise 'type' values and step-by-step actions.\n\n"
             "Output strictly as a JSON array. Respond with ONLY the JSON array - no prose, no explanations, no code fences. Each element must contain the fields: "
             f"{fields}, plus an additional field 'step_details'.\n"
@@ -2246,7 +2290,16 @@ def _map_to_detailed_flow_template(llm_output, template_df, columns, normalized_
         if not details_iterable:
             continue
 
-        default_action = case.get("title", "Scenario")
+        case_title = str(case.get("title") or "").strip() or "Scenario"
+        rows.append({
+            sl_col: "",
+            action_col: case_title,
+            nav_col: "",
+            data_col: "",
+            expected_col: "",
+        })
+
+        default_action = case_title
         previous_action = ""
         case_expected = normalise_expected(case.get("expected", ""))
         last_action_written = None
