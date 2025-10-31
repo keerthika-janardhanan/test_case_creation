@@ -21,7 +21,7 @@ from locator_generator import generate_xpath_candidates, to_union_xpath
 from recorder_auto_ingest import auto_refine_and_ingest
 from recorder_enricher import enrich_recorder_flow, persist_enriched_artifacts
 from template_utils import load_excel_template
-from trial_spec_adapter import prepare_trial_spec_path
+from trial_spec_adapter import prepare_trial_spec_path, trial_env_overrides
 import tempfile
 import shutil
 from pathlib import Path
@@ -287,11 +287,90 @@ def find_test_manager_path(framework: FrameworkProfile) -> Optional[Path]:
     return candidates[0] if candidates else None
 
 
+def persist_uploaded_data_file(framework: FrameworkProfile) -> List[Dict[str, str]]:
+    payload = st.session_state.get("pending_data_upload")
+    if not payload:
+        return []
+
+    messages: List[Dict[str, str]] = []
+    try:
+        data_dir = framework.additional_dirs.get("data") or (framework.root / "data")
+        data_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = Path(str(payload.get("name", "data.xlsx"))).name
+        data_bytes = payload.get("bytes")
+        if isinstance(data_bytes, memoryview):
+            data_bytes = data_bytes.tobytes()
+        if not isinstance(data_bytes, (bytes, bytearray)):
+            raise ValueError("Uploaded data payload missing bytes content.")
+        target_path = data_dir / safe_name
+        target_path.write_bytes(bytes(data_bytes))
+        rel_path = target_path.relative_to(framework.root)
+        messages.append(
+            {
+                "role": "assistant",
+                "content": f"Uploaded data file saved to '{rel_path}'.",
+                "type": "text",
+            }
+        )
+    except Exception as exc:  # noqa: BLE001
+        messages.append(
+            {
+                "role": "assistant",
+                "content": f"Failed to save uploaded data file '{payload.get('name', 'data')}' to data folder: {exc}",
+                "type": "text",
+            }
+        )
+    finally:
+        st.session_state["pending_data_upload"] = None
+    return messages
+
+
+def derive_default_datasheet_fields(test_case_name: str) -> Dict[str, str]:
+    core = re.sub(r"[^a-zA-Z0-9]+", " ", (test_case_name or "").strip()).strip()
+    if not core:
+        stem = "TestData"
+    else:
+        parts = [part.capitalize() for part in core.split()]
+        stem = "".join(parts) or "TestData"
+    return {
+        "datasheet": f"{stem}Data.xlsx",
+        "reference_id": f"{stem}001",
+        "id_name": f"{stem}ID",
+    }
+
+
+def parse_datasheet_message(message: str, defaults: Dict[str, str]) -> Optional[Dict[str, str]]:
+    lowered = message.strip().lower()
+    if not lowered:
+        return None
+    if "use default" in lowered or lowered in {"default", "defaults"}:
+        return defaults.copy()
+
+    patterns = {
+        "datasheet": r"(?:datasheet(?:name)?|sheet)\s*[:=]?\s*([^\s,;]+)",
+        "reference_id": r"(?:reference(?:id)?|ref)\s*[:=]?\s*([^\s,;]+)",
+        "id_name": r"(?:id\s*name|idname|rowid)\s*[:=]?\s*([^\s,;]+)",
+    }
+    result = defaults.copy()
+    found_any = False
+    for key, pattern in patterns.items():
+        match = re.search(pattern, message, flags=re.IGNORECASE)
+        if match:
+            value = match.group(1).strip().strip("'\"")
+            if value:
+                result[key] = value
+                found_any = True
+    return result if found_any else None
+
+
 def update_test_manager_entry(
     framework: FrameworkProfile,
     scenario: str,
     execute_value: str = "Yes",
     create_if_missing: bool = True,
+    datasheet: Optional[str] = None,
+    reference_id: Optional[str] = None,
+    id_name: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     tm_path = find_test_manager_path(framework)
     if not tm_path:
@@ -320,6 +399,9 @@ def update_test_manager_entry(
     desc_col = _find_column("TestCaseDescription", "Scenario", "Description")
     execute_col = _find_column("Execute", "Run", "Enabled")
     id_col = _find_column("TestCaseID", "ID", "Identifier")
+    datasheet_col = _find_column("DatasheetName", "DataSheet", "Data Sheet")
+    reference_col = _find_column("ReferenceID", "Reference Id", "Reference")
+    idname_col = _find_column("IDName", "IdentifierName", "RowIdentifier")
 
     if not desc_col or not execute_col:
         return None
@@ -372,8 +454,26 @@ def update_test_manager_entry(
     if matched_row is not None:
         exec_cell = ws.cell(row=matched_row, column=execute_col)
         previous_value = str(exec_cell.value).strip() if exec_cell.value is not None else ""
-        if previous_value != execute_value:
+        changed = False
+        if execute_value is not None and previous_value != execute_value:
             exec_cell.value = execute_value
+            changed = True
+        if datasheet_col and datasheet is not None:
+            cell = ws.cell(row=matched_row, column=datasheet_col)
+            if (cell.value or "").strip() != str(datasheet).strip():
+                cell.value = datasheet
+                changed = True
+        if reference_col and reference_id is not None:
+            cell = ws.cell(row=matched_row, column=reference_col)
+            if (cell.value or "").strip() != str(reference_id).strip():
+                cell.value = reference_id
+                changed = True
+        if idname_col and id_name is not None:
+            cell = ws.cell(row=matched_row, column=idname_col)
+            if (cell.value or "").strip() != str(id_name).strip():
+                cell.value = id_name
+                changed = True
+        if changed:
             wb.save(tm_path)
             return {
                 "path": rel_path,
@@ -399,6 +499,12 @@ def update_test_manager_entry(
     ws.cell(row=new_row, column=execute_col).value = execute_value
     if id_col:
         ws.cell(row=new_row, column=id_col).value = scenario_text
+    if datasheet_col and datasheet is not None:
+        ws.cell(row=new_row, column=datasheet_col).value = datasheet
+    if reference_col and reference_id is not None:
+        ws.cell(row=new_row, column=reference_col).value = reference_id
+    if idname_col and id_name is not None:
+        ws.cell(row=new_row, column=idname_col).value = id_name
     wb.save(tm_path)
     return {
         "path": rel_path,
@@ -760,6 +866,8 @@ def _build_playwright_command(spec_path: Path | str, headed: bool = False) -> Li
     base_cmd = ["npx", "playwright", "test", spec_arg]
     if os.name == "nt":
         base_cmd[0] = "npx.cmd"
+    # Trial runs default to a single worker to avoid multiple browsers competing for shared credentials/session.
+    base_cmd.append("--workers=1")
     if headed:
         base_cmd.append("--headed")
     return base_cmd
@@ -777,6 +885,10 @@ def run_spec_file(spec_path: Path, repo_root: Path, headed: bool = False) -> Tup
             spec_arg = prepared_path
 
         cmd = _build_playwright_command(spec_arg, headed=headed)
+        env_vars = os.environ.copy()
+        try_env = trial_env_overrides(repo_root)
+        if try_env:
+            env_vars.update(try_env)
         try:
             result = subprocess.run(
                 cmd,
@@ -785,6 +897,7 @@ def run_spec_file(spec_path: Path, repo_root: Path, headed: bool = False) -> Tup
                 text=True,
                 encoding="utf-8",
                 errors="replace",
+                env=env_vars,
             )
             success = result.returncode == 0
             stdout = (result.stdout or "").strip()
@@ -805,6 +918,7 @@ def run_spec_file(spec_path: Path, repo_root: Path, headed: bool = False) -> Tup
                         text=True,
                         encoding="utf-8",
                         errors="replace",
+                        env=env_vars,
                     )
                     success = result.returncode == 0
                     stdout = (result.stdout or "").strip()
@@ -1794,8 +1908,8 @@ if "conversation" not in st.session_state:
 # ------------------- User Input -------------------
 user_input = st.text_input("Ask or type scenario / feedback:", key="chat_input")
 uploaded_file = st.file_uploader(
-    "Optional: Upload scenario/template file (JSON/Excel/Doc)", 
-    type=["json","xlsx","xls","txt","doc","docx"],
+    "Optional: Upload scenario/template/test data file", 
+    type=["json","xlsx","xls","xlsm","csv","txt","doc","docx","testdata"],
     key="chat_file_uploader"
 )
 
@@ -1805,7 +1919,7 @@ def flatten_file_keywords(uploaded_file):
     if uploaded_file:
         fname = uploaded_file.name
         ext = fname.split(".")[-1].lower()
-        if ext in ["xlsx", "xls"]:
+        if ext in ["xlsx", "xls", "xlsm"]:
             df = load_excel_template(uploaded_file, dtype=str)
             keywords = df.fillna("").astype(str).to_numpy().flatten().tolist()
         elif ext == "json":
@@ -1814,6 +1928,12 @@ def flatten_file_keywords(uploaded_file):
                 keywords = list(data.values())
             elif isinstance(data, list):
                 keywords = data
+        elif ext == "csv":
+            content = uploaded_file.getvalue().decode(errors="ignore")
+            keywords = [row for row in content.splitlines() if row.strip()]
+        elif ext == "testdata":
+            content = uploaded_file.getvalue().decode(errors="ignore")
+            keywords = [row for row in content.splitlines() if row.strip()]
         else:
             # txt/doc/docx fallback
             content = uploaded_file.getvalue().decode(errors="ignore")
@@ -1834,8 +1954,10 @@ def stream_ai_response(content: str, lang="typescript"):
 
 def detect_intent(msg: str):
     msg_lower = msg.lower()
+    msg_normalized = re.sub(r"\btrail\b", "trial", msg_lower)
+    source_text = msg_normalized
     if any(
-        k in msg_lower
+        k in source_text
         for k in [
             "trial run",
             "run trial",
@@ -1849,14 +1971,14 @@ def detect_intent(msg: str):
         ]
     ):
         return "trial_run"
-    if any(k in msg_lower for k in ["compare", "difference", "diff"]) and "flow" in msg_lower:
+    if any(k in source_text for k in ["compare", "difference", "diff"]) and "flow" in source_text:
         return "compare_flow"
-    if any(k in msg_lower for k in ["latest flow", "recent flow", "show latest", "newest flow"]):
+    if any(k in source_text for k in ["latest flow", "recent flow", "show latest", "newest flow"]):
         return "latest_flow"
-    if any(k in msg_lower for k in ["push", "commit", "publish to git", "push to github"]):
+    if any(k in source_text for k in ["push", "commit", "publish to git", "push to github"]):
         return "push_code"
     if any(
-        k in msg_lower
+        k in source_text
         for k in [
             "generate script",
             "create test script",
@@ -1869,11 +1991,11 @@ def detect_intent(msg: str):
         ]
     ):
         return "agentic_script"
-    if any(k in msg_lower for k in ["generate draft", "draft", "flow", "scenario"]):
+    if any(k in source_text for k in ["generate draft", "draft", "flow", "scenario"]):
         return "draft"
-    if any(k in msg_lower for k in ["apply feedback", "modify", "change"]):
+    if any(k in source_text for k in ["apply feedback", "modify", "change"]):
         return "feedback"
-    if any(k in msg_lower for k in ["preview script", "show script", "script"]):
+    if any(k in source_text for k in ["preview script", "show script", "script"]):
         return "agentic_script"
     return "unknown"
 
@@ -1993,20 +2115,90 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
     framework = FrameworkProfile.from_root(resolved_path)
 
     agent = agentic_engine
-    responses: List[Dict[str, str]] = []
+    data_upload_messages = persist_uploaded_data_file(framework)
+    responses: List[Dict[str, str]] = list(data_upload_messages)
+
+    status = state.get("status")
+
+    if status == "awaiting-datasheet":
+        defaults = state.get("pending_datasheet_defaults") or derive_default_datasheet_fields(state.get("scenario", ""))
+        state["pending_datasheet_defaults"] = defaults
+
+        parsed = parse_datasheet_message(message, defaults)
+        if parsed:
+            pending_ids = state.get("pending_test_ids") or []
+            if not pending_ids:
+                pending_ids = [state.get("scenario", "").strip()] if state.get("scenario") else []
+
+            update_messages: List[Dict[str, str]] = []
+            for test_id in pending_ids:
+                if not test_id:
+                    continue
+                update_info = update_test_manager_entry(
+                    framework,
+                    test_id,
+                    execute_value="Yes",
+                    create_if_missing=True,
+                    datasheet=parsed["datasheet"],
+                    reference_id=parsed["reference_id"],
+                    id_name=parsed["id_name"],
+                )
+                if update_info:
+                    register_config_update(state, update_messages, update_info)
+                else:
+                    update_messages.append(
+                        {
+                            "role": "assistant",
+                            "content": f"Could not update testmanager.xlsx for '{test_id}'. Please update it manually.",
+                            "type": "text",
+                        }
+                    )
+
+            responses.extend(update_messages)
+            state["datasheet_values"] = parsed
+            state["status"] = "script-ready"
+            state["awaiting_datasheet"] = False
+            state["pending_test_ids"] = []
+
+            confirmation_message = (
+                "Datasheet mapping recorded: "
+                f"{parsed['datasheet']} / {parsed['reference_id']} / {parsed['id_name']}. "
+                "Upload the workbook to the data/ folder if you haven't already. "
+                "You can now run `trial run` or provide additional feedback."
+            )
+            responses.append({"role": "assistant", "content": confirmation_message, "type": "text"})
+
+        else:
+            responses.append(
+                {
+                    "role": "assistant",
+                    "content": (
+                        "Datasheet mapping is optional. You can reply now with "
+                        "`datasheet <file> reference <id> idname <column>` (or `use defaults`) to update testmanager.xlsx. "
+                        "Otherwise, you may proceed with `trial run` or continue providing feedback. "
+                        "If the workbook is missing at runtime, the script will prompt you to upload it."
+                    ),
+                    "type": "text",
+                }
+            )
+            state["status"] = "script-ready"
+            state["awaiting_datasheet"] = False
+            state["pending_test_ids"] = []
+        return responses
 
     if intent == "trial_run":
         headed = "headed" in message.lower()
         scenario_hint = re.sub(r"\b(trial|run|execute|flow|scenario|in|mode|headed)\b", " ", message, flags=re.IGNORECASE).strip()
-        return execute_trial_run(state, framework, scenario_hint, headed=headed)
+        trial_responses = execute_trial_run(state, framework, scenario_hint, headed=headed)
+        return responses + trial_responses
 
     if intent == "compare_flow":
-        return compare_repo_and_refined(message, framework)
+        return responses + compare_repo_and_refined(message, framework)
 
     if intent == "push_code":
         if state.get("status") in {"ready-for-push", "script-ready"}:
-            return execute_push_to_github(state, framework)
-        return [
+            return responses + execute_push_to_github(state, framework)
+        return responses + [
             {
                 "role": "assistant",
                 "content": "No script payload is ready to push. Confirm the preview and generate the code before pushing.",
@@ -2159,7 +2351,7 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
                 ]
 
             state["payload"] = payload
-            state["status"] = "script-ready"
+            state["status"] = "awaiting-datasheet"
             state["written_files"] = []
 
             generated_test_ids: List[str] = []
@@ -2171,22 +2363,21 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
                     if section == "tests":
                         generated_test_ids.extend(extract_test_ids_from_content(file_obj.get('content', '')))
 
-            if generated_test_ids:
-                enable_tests_for_ids(framework, generated_test_ids, state, responses)
-            else:
-                update_info = update_test_manager_entry(framework, state["scenario"], execute_value="Yes", create_if_missing=True)
-                if update_info:
-                    register_config_update(state, responses, update_info)
-                else:
-                    responses.append({"role": "assistant", "content": "Could not locate testmanager.xlsx to enable this scenario; please review the repo manually.", "type": "text"})
+            pending_ids = generated_test_ids or [state["scenario"]]
+            state["pending_test_ids"] = pending_ids
+            defaults = derive_default_datasheet_fields(pending_ids[0] if pending_ids else state["scenario"])
+            state["pending_datasheet_defaults"] = defaults
+            state["awaiting_datasheet"] = True
+            state["datasheet_values"] = None
 
-            responses.append(
-                {
-                    "role": "assistant",
-                    "content": "Script generated. Run 'trial run' to validate, then reply 'push' to write the files and push to Git, or provide feedback to regenerate.",
-                    "type": "text",
-                }
+            instruction_message = (
+                "Script generated. Before running a trial, provide the datasheet mapping so I can update "
+                "testmanager.xlsx. Upload the Excel file to the framework's data/ folder if needed, then reply with "
+                "`datasheet <file> reference <id> idname <column>` or say `use defaults`.\n"
+                f"Suggested defaults → DatasheetName: {defaults['datasheet']}, "
+                f"ReferenceID: {defaults['reference_id']}, IDName: {defaults['id_name']}."
             )
+            responses.append({"role": "assistant", "content": instruction_message, "type": "text"})
             return responses
 
         if interpret_push(message):
@@ -2257,6 +2448,10 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
             state["status"] = "preview-awaiting"
             state["payload"] = {}
             state["written_files"] = []
+            state["pending_test_ids"] = []
+            state["pending_datasheet_defaults"] = None
+            state["datasheet_values"] = None
+            state["awaiting_datasheet"] = False
             responses.append({"role": "assistant", "content": refined, "type": "preview"})
             responses.append(
                 {
@@ -2287,6 +2482,13 @@ def handle_agentic_message(message: str, intent: str) -> List[Dict[str, str]]:
 
 # ------------------- Process User Input -------------------
 if st.button("Send") and user_input.strip():
+    if uploaded_file:
+        ext = Path(uploaded_file.name).suffix.lower()
+        if ext in {".xlsx", ".xls", ".xlsm", ".csv", ".testdata"}:
+            st.session_state["pending_data_upload"] = {
+                "name": Path(uploaded_file.name).name,
+                "bytes": uploaded_file.getvalue(),
+            }
     file_keywords = flatten_file_keywords(uploaded_file)
     combined_keywords = " ".join([user_input] + file_keywords).strip()
 

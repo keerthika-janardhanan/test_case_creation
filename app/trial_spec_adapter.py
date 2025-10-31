@@ -4,7 +4,7 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class TrialCredentials:
     password: str
 
 
-def _load_trial_credentials(repo_root: Path, case_id: str = TRY_CASE_ID) -> Optional[TrialCredentials]:
+def load_trial_credentials(repo_root: Path, case_id: str = TRY_CASE_ID) -> Optional[TrialCredentials]:
     workbook_path = repo_root / "testmanager.xlsx"
     if not workbook_path.exists():
         logger.debug("Trial adapter: testmanager.xlsx not found at %s", workbook_path)
@@ -71,6 +71,29 @@ def _load_trial_credentials(repo_root: Path, case_id: str = TRY_CASE_ID) -> Opti
     if not credentials:
         logger.warning("Trial adapter: credentials for %s not found in %s", case_id, workbook_path)
     return credentials
+
+
+def trial_env_overrides(repo_root: Path, case_id: str = TRY_CASE_ID) -> Dict[str, str]:
+    """
+    Build environment variable overrides for trial executions using credentials stored
+    in the TestConfiguration sheet. This enables specs that rely on process.env to use
+    consistent values without editing source files.
+    """
+    credentials = load_trial_credentials(repo_root, case_id)
+    if not credentials:
+        return {}
+
+    overrides: Dict[str, str] = {}
+    if credentials.username:
+        overrides["USERID"] = credentials.username
+        overrides["TRIAL_USER"] = credentials.username
+    if credentials.password:
+        overrides["PASSWORD"] = credentials.password
+        overrides["TRIAL_PASSWORD"] = credentials.password
+    if credentials.base_url:
+        overrides["BASE_URL"] = credentials.base_url
+        overrides["TRIAL_BASE_URL"] = credentials.base_url
+    return overrides
 
 
 def _replace_fill_call(source: str, pattern: str, replacement_value: str) -> Tuple[str, bool]:
@@ -156,7 +179,7 @@ def _ensure_navigation(source: str, base_url: str) -> Tuple[str, bool]:
 
 def adapt_spec_content_for_trial(source: str, repo_root: Path) -> Tuple[str, bool]:
     """Return transformed spec content for trial run; bool indicates change."""
-    credentials = _load_trial_credentials(repo_root)
+    credentials = load_trial_credentials(repo_root)
     if not credentials:
         return source, False
 

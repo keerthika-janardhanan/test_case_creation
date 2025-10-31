@@ -5,7 +5,7 @@ import ast
 import copy
 import logging
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 
 import pandas as pd
 from vector_db import VectorDBClient
@@ -90,12 +90,13 @@ class TestCaseGenerator:
 
     def generate_test_cases(self, story: str, per_step_negatives: int = 1, per_step_edges: int = 1, max_steps_for_variants: int = 8, llm_only: bool = False):
         try:
-            context_chunks, flow_steps, context_sources = self._collect_context(story)
+            context_chunks, raw_flow_steps, context_sources = self._collect_context(story)
         except re.error as exc:
             pattern = getattr(exc, "pattern", None)
             raise ValueError(
                 f"Regex failure while collecting context (pattern={pattern!r}): {exc}"
             ) from exc
+        flow_steps = self._normalize_flow_steps(raw_flow_steps)
         self.cached_flow_steps = flow_steps
         context_text = "\n\n---\n".join(context_chunks) if context_chunks else "(No direct context retrieved. Provide best-effort scenarios and state assumptions.)"
 
@@ -110,21 +111,409 @@ class TestCaseGenerator:
             max_steps=max_steps_for_variants,
             story=story,
         )
+        if not llm_only:
+            cases = self._humanize_cases(cases)
+            cases = self._ensure_steps_alignment(cases)
         return cases
 
-    def _agentic_generate(self, story: str, context_text: str, flow_steps: List[dict], context_sources: List[str], max_attempts: int = 2, llm_only: bool = False) -> List[dict]:
-        last_error = ""
-        flow_steps_prompt_json = self._flow_steps_prompt_json(flow_steps)
+    @staticmethod
+    def _normalize_story_title(story: str) -> str:
+        if not story:
+            return ""
+        text = str(story).strip()
+        if not text:
+            return ""
+        # Remove common suffixes like "- Positive Flow", "Positive Scenario", etc.
+        patterns = [
+            r"[\-\u2013\u2014]\s*(positive|negative|edge)\s+(flow|scenario)\b.*$",
+            r"\b(positive|negative|edge)\s+(flow|scenario)\b.*$",
+            r"[\-\u2013\u2014]\s*(happy|main|primary)\s+path\b.*$",
+        ]
+        cleaned = text
+        for pattern in patterns:
+            cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE).strip()
+        # Drop leftover trailing separators
+        cleaned = re.sub(r"[\-\u2013\u2014\s_]+$", "", cleaned).strip()
+        return cleaned or text
+
+    def _normalize_flow_steps(self, flow_steps: Optional[List[dict]]) -> List[dict]:
+        if not flow_steps:
+            return []
+
+        normalized: List[dict] = []
+        for idx, raw in enumerate(flow_steps, start=1):
+            if not isinstance(raw, dict):
+                continue
+            step_index = raw.get("step") or raw.get("step_index") or idx
+            try:
+                step_index = int(step_index)
+            except (TypeError, ValueError):
+                step_index = idx
+
+            locators = self._sanitize_locators(raw.get("locators"))
+            element_block = raw.get("element")
+            if not isinstance(element_block, dict):
+                element_block = {}
+
+            action = str(raw.get("action") or element_block.get("label") or "").strip()
+            navigation = str(raw.get("navigation") or "").strip()
+            data_value = str(raw.get("data") or "").strip()
+            expected_value = str(raw.get("expected") or "").strip()
+            label = self._derive_label(locators, raw, element_block)
+            role = str(
+                locators.get("role")
+                or element_block.get("role")
+                or raw.get("role")
+                or ""
+            ).strip()
+            locator_hint = self._derive_locator_hint(locators)
+
+            normalized.append(
+                {
+                    "step": step_index,
+                    "action": action,
+                    "navigation": navigation,
+                    "data": data_value,
+                    "expected": expected_value,
+                    "label": label,
+                    "role": role,
+                    "locator": locator_hint,
+                    "locators": locators,
+                    "record_kind": str(raw.get("record_kind") or ""),
+                }
+            )
+
+        normalized.sort(key=lambda item: item.get("step", 0))
+        return normalized
+
+    def _sanitize_locators(self, locators) -> dict:
+        if not isinstance(locators, dict):
+            return {}
+
+        allowed_keys = {
+            "playwright",
+            "stable",
+            "css",
+            "labels",
+            "label",
+            "name",
+            "role",
+            "tag",
+            "heading",
+            "page_heading",
+            "title",
+        }
+        sanitized: dict = {}
+
+        for key, value in locators.items():
+            key_text = str(key)
+            key_lower = key_text.lower()
+            if "xpath" in key_lower:
+                continue
+
+            if isinstance(value, str):
+                trimmed = value.strip()
+                if trimmed.startswith("/html"):
+                    continue
+                if key_lower in allowed_keys:
+                    sanitized[key_text] = trimmed
+                elif key_lower == "css":
+                    sanitized[key_text] = trimmed
+                continue
+
+            if isinstance(value, (int, float, bool)) and key_lower in allowed_keys:
+                sanitized[key_text] = value
+                continue
+
+            if isinstance(value, dict):
+                nested = self._sanitize_locators(value)
+                if nested and (key_lower in allowed_keys or nested):
+                    sanitized[key_text] = nested
+                continue
+
+            if isinstance(value, list):
+                filtered_list = []
+                for item in value:
+                    if isinstance(item, str) and item.strip().startswith("/html"):
+                        continue
+                    if isinstance(item, dict):
+                        nested_item = self._sanitize_locators(item)
+                        if nested_item:
+                            filtered_list.append(nested_item)
+                    else:
+                        filtered_list.append(item)
+                if filtered_list and (key_lower in allowed_keys or filtered_list):
+                    sanitized[key_text] = filtered_list
+                continue
+
+            if key_lower in allowed_keys:
+                sanitized[key_text] = value
+
+        return sanitized
+
+    def _derive_label(self, locators: dict, raw_step: dict, element_block: dict) -> str:
+        candidates: List[str] = []
+
+        def _collect(value):
+            if not value:
+                return
+            if isinstance(value, (list, tuple, set)):
+                for part in value:
+                    _collect(part)
+                return
+            if isinstance(value, dict):
+                return
+            text = str(value).strip()
+            if text:
+                candidates.append(text)
+
+        if isinstance(locators, dict):
+            _collect(locators.get("labels") or locators.get("label"))
+            _collect(locators.get("name"))
+        _collect(element_block.get("label"))
+        _collect(element_block.get("name"))
+        _collect(raw_step.get("label"))
+
+        if not candidates:
+            for fallback in (raw_step.get("navigation"), raw_step.get("action")):
+                text = str(fallback or "").strip()
+                if text:
+                    candidates.append(text)
+                    break
+
+        if not candidates:
+            return ""
+
+        primary = candidates[0]
+        primary = primary.split("|", 1)[0].strip()
+        return primary.rstrip(":").strip()
+
+    def _derive_locator_hint(self, locators: dict) -> str:
+        if not isinstance(locators, dict):
+            return ""
+
+        candidate = locators.get("playwright") or locators.get("stable") or ""
+        if isinstance(candidate, str):
+            return candidate.strip()
+        if isinstance(candidate, dict):
+            by_role = candidate.get("byRole")
+            if isinstance(by_role, dict):
+                role = by_role.get("role")
+                name = by_role.get("name")
+                if role and name:
+                    return f"byRole(role={role}, name={name})"
+            try:
+                return json.dumps(candidate, ensure_ascii=False)
+            except TypeError:
+                return str(candidate)
+        return ""
+
+    def _chunk_flow_steps(self, steps: List[dict], chunk_size: int = 8, overlap: int = 1) -> List[dict]:
+        if not steps:
+            return []
+
+        if chunk_size <= 0:
+            chunk_size = 8
+        if overlap >= chunk_size:
+            overlap = max(0, chunk_size - 1)
+
+        ordered = sorted(steps, key=lambda item: item.get("step", 0))
+        stride = chunk_size - overlap
+        stride = stride if stride > 0 else chunk_size
+
+        chunks: List[dict] = []
+        for start in range(0, len(ordered), stride):
+            subset = ordered[start : start + chunk_size]
+            if not subset:
+                continue
+            chunks.append(
+                {
+                    "start": subset[0]["step"],
+                    "end": subset[-1]["step"],
+                    "steps": subset,
+                }
+            )
+            if start + chunk_size >= len(ordered):
+                break
+        return chunks
+
+    def _sanitize_llm_response(self, response) -> str:
+        output = response.content if hasattr(response, "content") else str(response)
+        try:
+            output = re.sub(r"^```(?:json)?\s*", "", output, flags=re.DOTALL)
+            output = re.sub(r"\s*```$", "", output, flags=re.DOTALL)
+        except re.error as exc:
+            pattern = getattr(exc, "pattern", None)
+            raise ValueError(
+                f"Regex failure while sanitising LLM output (pattern={pattern!r}): {exc}"
+            ) from exc
+        return output.strip()
+
+    def _invoke_llm_json(self, prompt: str):
+        resp = self.llm.invoke(prompt)
+        output = self._sanitize_llm_response(resp)
+        try:
+            normalized = self._normalize_llm_json(output)
+        except re.error as exc:
+            pattern = getattr(exc, "pattern", None)
+            raise ValueError(
+                f"Regex failure while normalising LLM JSON (pattern={pattern!r}): {exc}"
+            ) from exc
+
+        try:
+            return json.loads(normalized)
+        except json.JSONDecodeError:
+            repaired = self._repair_llm_output_to_json_array(normalized)
+            if repaired is not None:
+                return repaired
+            raise
+
+    def _generate_chunk_outline(
+        self,
+        story: str,
+        chunk_payload: dict,
+        chunk_index: int,
+        total_chunks: int,
+    ) -> List[dict]:
+        steps = chunk_payload.get("steps") or []
+        if not steps:
+            return []
+        payload = []
+        for item in steps:
+            payload.append(
+                {
+                    "step": item.get("step"),
+                    "label": item.get("label"),
+                    "action": item.get("action"),
+                    "navigation": item.get("navigation"),
+                    "data": item.get("data"),
+                    "expected": item.get("expected"),
+                    "role": item.get("role"),
+                    "locator": item.get("locator"),
+                }
+            )
+
+        prompt = self._build_chunk_prompt(story, payload, chunk_index, total_chunks)
+        result = self._invoke_llm_json(prompt)
+        if not isinstance(result, list):
+            return []
+
+        outline: List[dict] = []
+        for item in result:
+            if not isinstance(item, dict):
+                continue
+            step_no = item.get("step")
+            if step_no is None:
+                step_no = steps[0].get("step")
+            try:
+                step_no = int(step_no)
+            except (TypeError, ValueError):
+                step_no = steps[0].get("step")
+            outline.append(
+                {
+                    "step": step_no,
+                    "action": str(item.get("action") or "").strip(),
+                    "navigation": str(item.get("navigation") or "").strip(),
+                    "data": str(item.get("data") or "").strip(),
+                    "expected": str(item.get("expected") or "").strip(),
+                }
+            )
+        outline.sort(key=lambda entry: entry.get("step", 0))
+        return outline
+
+    def _build_chunk_prompt(
+        self,
+        story: str,
+        payload: List[dict],
+        chunk_index: int,
+        total_chunks: int,
+    ) -> str:
+        payload_json = json.dumps(payload, ensure_ascii=False)
+        return (
+            "You are preparing manual QA step details for an Oracle Fusion workflow.\n"
+            f"Flow identifier: '{story}'. This is chunk {chunk_index} of {total_chunks}.\n"
+            "Each input object contains recorder metadata for a contiguous step range. "
+            "Rewrite each item into a detailed manual step while preserving order and coverage.\n"
+            "Rules:\n"
+            "- Do not drop or merge steps.\n"
+            "- Use imperative navigation phrasing grounded in labels.\n"
+            "- Populate 'action', 'navigation', 'data', and 'expected'. Refer to recorder labels and actions.\n"
+            "- If a field is missing, infer the minimal text ('data' may be empty).\n"
+            "- Keep step numbers identical to input 'step'.\n"
+            "- Output ONLY a JSON array (no prose, no code fences).\n\n"
+            "Input JSON:\n"
+            f"{payload_json}\n\n"
+            "Return format example:\n"
+            '[{"step": 1, "action": "...", "navigation": "...", "data": "...", "expected": "..."}]'
+        )
+
+    def _map_reduce_generate(
+        self,
+        story: str,
+        context_text: str,
+        flow_steps: List[dict],
+        context_sources: List[str],
+        max_attempts: int,
+        llm_only: bool,
+    ) -> List[dict]:
+        chunks = self._chunk_flow_steps(flow_steps)
+        if len(chunks) <= 1:
+            return []
+
+        positive_outline: List[dict] = []
+        total_chunks = len(chunks)
+        for idx, chunk in enumerate(chunks, start=1):
+            try:
+                outline_part = self._generate_chunk_outline(
+                    story,
+                    chunk,
+                    idx,
+                    total_chunks,
+                )
+            except Exception as exc:
+                logger.debug("Chunk outline generation failed for chunk %s/%s: %s", idx, total_chunks, exc)
+                return []
+            if not outline_part:
+                return []
+            positive_outline.extend(outline_part)
+
+        positive_outline.sort(key=lambda entry: entry.get("step", 0))
+        outline_json = json.dumps(positive_outline, ensure_ascii=False)
+        flow_steps_json = self._flow_steps_prompt_json(flow_steps)
+        return self._single_pass_generate(
+            story,
+            context_text,
+            flow_steps,
+            context_sources,
+            max_attempts=max_attempts,
+            llm_only=llm_only,
+            flow_steps_json_override=flow_steps_json,
+            positive_outline_json=outline_json,
+        )
+
+    def _single_pass_generate(
+        self,
+        story: str,
+        context_text: str,
+        flow_steps: List[dict],
+        context_sources: List[str],
+        max_attempts: int = 2,
+        llm_only: bool = False,
+        flow_steps_json_override: Optional[str] = None,
+        positive_outline_json: Optional[str] = None,
+    ) -> List[dict]:
+        flow_steps_prompt_json = flow_steps_json_override or self._flow_steps_prompt_json(flow_steps)
         for attempt in range(1, max_attempts + 1):
             prompt = self._build_generation_prompt(
                 story,
                 context_text,
                 flow_steps_prompt_json,
+                positive_outline_json=positive_outline_json,
             )
             if attempt > 1:
                 strict_suffix = (
-                    "\n\nIMPORTANT: Your previous output failed validation. Return ONLY a valid JSON array with objects containing keys "
-                    f"{', '.join(self.default_fields)} and 'step_details'. No prose, no code fences, no trailing commas, no comments."
+                    "\n\nIMPORTANT: Your previous output failed validation. Return ONLY a valid JSON array with objects "
+                    f"containing keys {', '.join(self.default_fields)} and 'step_details'. No prose, no code fences, no trailing commas, no comments."
                 )
                 prompt = prompt + strict_suffix
 
@@ -136,17 +525,7 @@ class TestCaseGenerator:
                     f"Regex failure while invoking LLM (pattern={pattern!r}): {exc}"
                 ) from exc
 
-            output = resp.content if hasattr(resp, "content") else str(resp)
-            # Strip fences
-            try:
-                output = re.sub(r"^```(?:json)?\s*", "", output, flags=re.DOTALL)
-                output = re.sub(r"\s*```$", "", output, flags=re.DOTALL).strip()
-            except re.error as exc:
-                pattern = getattr(exc, "pattern", None)
-                raise ValueError(
-                    f"Regex failure while sanitising LLM output (pattern={pattern!r}): {exc}"
-                ) from exc
-            output = output.strip()
+            output = self._sanitize_llm_response(resp)
 
             try:
                 normalized_output = self._normalize_llm_json(output)
@@ -159,26 +538,173 @@ class TestCaseGenerator:
             parsed_cases = None
             try:
                 parsed_cases = json.loads(normalized_output)
-            except json.JSONDecodeError as je:
-                last_error = f"json decode: {je}"
+            except json.JSONDecodeError:
                 repaired = self._repair_llm_output_to_json_array(normalized_output)
                 if isinstance(repaired, list):
                     parsed_cases = repaired
 
             if isinstance(parsed_cases, list):
                 cleaned = self._enforce_schema(parsed_cases)
-                # Optionally bypass deterministic injection to rely solely on LLM output
                 if not llm_only:
                     cleaned = self._inject_flow_details(cleaned, flow_steps, context_sources)
                 if cleaned:
                     return cleaned
-                last_error = "parsed but no valid cases after schema enforcement"
 
-        # All attempts failed; choose fallback strategy
         if flow_steps and not llm_only:
             return self._fallback_from_flow(story, flow_steps)
-        # Synthesize from vector context
         return self._synthesize_from_context(story, context_text, context_sources)
+
+    def _humanize_cases(self, cases: List[dict]) -> List[dict]:
+        if not cases:
+            return cases
+
+        payload: List[dict] = []
+        original_steps_map: Dict[str, List[str]] = {}
+        step_detail_lengths: Dict[str, int] = {}
+
+        for case in cases:
+            steps_field = case.get("steps")
+            if isinstance(steps_field, list):
+                step_lines = [str(item).strip() for item in steps_field if str(item).strip()]
+            elif isinstance(steps_field, str):
+                step_lines = [line.strip() for line in steps_field.split("\n") if line.strip()]
+            else:
+                step_lines = []
+
+            detail_context = case.get("step_details")
+            if not isinstance(detail_context, list):
+                detail_context = []
+
+            case_id = str(case.get("id") or "")
+            if case_id:
+                original_steps_map[case_id] = step_lines or []
+                step_detail_lengths[case_id] = len(detail_context)
+
+            payload.append(
+                {
+                    "id": case_id,
+                    "type": str(case.get("type") or ""),
+                    "steps": step_lines,
+                    "step_details": detail_context,
+                }
+            )
+
+        prompt = self._build_humanize_prompt(payload)
+        if not prompt:
+            return cases
+
+        try:
+            response = self._invoke_llm_json(prompt)
+        except Exception as exc:
+            logger.debug("Humanization prompt failed: %s", exc)
+            return cases
+
+        if not isinstance(response, list):
+            return cases
+
+        replacements: Dict[str, List[str]] = {}
+        for item in response:
+            if not isinstance(item, dict):
+                continue
+            case_id = str(item.get("id") or "").strip()
+            steps_value = item.get("steps")
+            if case_id and isinstance(steps_value, list):
+                cleaned_steps = [str(step).strip() for step in steps_value if str(step).strip()]
+                if cleaned_steps:
+                    replacements[case_id] = cleaned_steps
+
+        for case in cases:
+            case_id = str(case.get("id") or "").strip()
+            if not case_id:
+                continue
+            target_length = step_detail_lengths.get(case_id) or len(original_steps_map.get(case_id, []))
+            candidate_steps = replacements.get(case_id)
+            if candidate_steps and target_length and len(candidate_steps) == target_length:
+                case["steps"] = replacements[case_id]
+            elif candidate_steps and not target_length:
+                case["steps"] = candidate_steps
+            elif case_id in original_steps_map and original_steps_map[case_id]:
+                case["steps"] = original_steps_map[case_id]
+
+        return cases
+
+    def _ensure_steps_alignment(self, cases: List[dict]) -> List[dict]:
+        if not cases:
+            return cases
+
+        def _render_step(detail: dict) -> str:
+            if not isinstance(detail, dict):
+                return str(detail)
+            action = str(detail.get("action") or "").strip()
+            navigation = str(detail.get("navigation") or "").strip()
+            data = str(detail.get("data") or "").strip()
+            expected = str(detail.get("expected") or "").strip()
+            parts = [p for p in [action, navigation] if p]
+            if data:
+                parts.append(f"Data: {data}")
+            if expected:
+                parts.append(f"Expected: {expected}")
+            return " - ".join(parts) if parts else navigation or action or ""
+
+        for case in cases:
+            details = case.get("step_details")
+            if not isinstance(details, list) or not details:
+                continue
+            expected_len = len(details)
+            steps_field = case.get("steps")
+            if isinstance(steps_field, list):
+                current_steps = [str(step).strip() for step in steps_field if str(step).strip()]
+            elif isinstance(steps_field, str):
+                current_steps = [line.strip() for line in steps_field.split("\n") if line.strip()]
+            else:
+                current_steps = []
+            if len(current_steps) != expected_len:
+                case["steps"] = [_render_step(detail) for detail in details]
+        return cases
+
+    def _build_humanize_prompt(self, payload: List[dict]) -> str:
+        if not payload:
+            return ""
+        payload_json = json.dumps(payload, ensure_ascii=False)
+        return (
+            "Refine manual QA step text so each instruction is a concise single sentence using imperative voice.\n"
+            "Rules:\n"
+            "- Preserve the number of steps and their order per case.\n"
+            "- Include the UI control type when obvious (e.g., \"button\", \"link\", \"field\").\n"
+            "- Mention example data values from 'step_details.data' inline (e.g., \"Enter 'TESTSR1' in Supplier\").\n"
+            "- If a 'steps' array is empty, derive the wording from the provided 'step_details'.\n"
+            "- Keep terminology aligned with Oracle Fusion UI labels, quoting the exact label text.\n"
+            "- Do not introduce new steps or contradict the structured data.\n"
+            "- Return ONLY a JSON array; each object must include 'id' and 'steps' (list of strings).\n\n"
+            "Input JSON:\n"
+            f"{payload_json}"
+        )
+
+
+    def _agentic_generate(self, story: str, context_text: str, flow_steps: List[dict], context_sources: List[str], max_attempts: int = 2, llm_only: bool = False) -> List[dict]:
+        if flow_steps:
+            try:
+                chunked = self._map_reduce_generate(
+                    story,
+                    context_text,
+                    flow_steps,
+                    context_sources,
+                    max_attempts=max_attempts,
+                    llm_only=llm_only,
+                )
+                if chunked:
+                    return chunked
+            except Exception as exc:
+                logger.debug("Chunked generation fallback triggered: %s", exc)
+
+        return self._single_pass_generate(
+            story,
+            context_text,
+            flow_steps,
+            context_sources,
+            max_attempts=max_attempts,
+            llm_only=llm_only,
+        )
 
     def _fallback_from_flow(self, story: str, flow_steps: List[dict]) -> List[dict]:
         step_details = [
@@ -580,99 +1106,303 @@ class TestCaseGenerator:
         return chunks, matched_flow_steps, context_sources
 
     def _load_vector_flow(self, story: str, top_k: int = 256) -> Tuple[List[str], List[dict]]:
-        flow_slug = slugify(story)
-        candidates = [
-            {"query": story, "where": {"type": "recorder_refined", "flow_slug": flow_slug}},
-            {"query": flow_slug, "where": {"type": "recorder_refined", "flow_slug": flow_slug}},
-            {"query": story, "where": {"type": "recorder_refined", "flow_name": story}},
-        ]
+        normalized_story = self._normalize_story_title(story)
+        flow_slug = slugify(normalized_story or story)
         steps_map: dict[int, dict] = {}
         element_map: dict[int, dict] = {}
-        for spec in candidates:
-            try:
-                results = self.db.query_where(spec["query"], spec["where"], top_k=top_k)
-            except Exception as exc:
-                logger.debug("Vector query failed (%s): %s", spec["where"], exc)
-                continue
-            for entry in results or []:
-                meta = entry.get("metadata") or {}
-                content = self._decode_vector_content(entry.get("content"))
-                record_kind = meta.get("record_kind") or content.get("record_kind")
-                if record_kind == "element":
-                    elem_index = content.get("element_index") or meta.get("element_index")
-                    try:
-                        elem_index = int(elem_index)
-                    except (TypeError, ValueError):
-                        elem_index = len(element_map) + 1
-                    label = (content.get("label") or meta.get("label") or "").strip()
-                    if not label:
-                        continue
-                    role = (content.get("role") or meta.get("role") or "").strip()
-                    tag = (content.get("tag") or meta.get("tag") or "").strip()
-                    locator_block = content.get("locators") or {}
-                    locators = locator_block if isinstance(locator_block, dict) else {}
-                    if not locators or "playwright" not in locators:
-                        if role and label:
-                            locators = {"playwright": {"byRole": {"role": role, "name": label}}}
-                        else:
-                            locators = {"playwright": {"byText": label}}
-                    element_map[elem_index] = {
-                        "step": elem_index,
-                        "action": label,
-                        "navigation": "",
-                        "data": "",
-                        "expected": "",
-                        "locators": {
-                            **locators,
-                            "labels": label,
-                            "role": role,
-                            "tag": tag,
-                            "name": label,
-                        },
-                    }
-                    continue
+        flow_hashes: set[str] = set()
 
-                step_index = content.get("step_index") or meta.get("step_index")
+        candidate_slugs_lower = set()
+        metadata_slug_filters = set()
+        candidate_names = set()
+        original_story = str(story or "").strip()
+        if flow_slug:
+            candidate_slugs_lower.add(flow_slug.lower())
+            metadata_slug_filters.add(flow_slug)
+            if "-" in flow_slug:
+                alt = flow_slug.replace("-", "_")
+                candidate_slugs_lower.add(alt.lower())
+                metadata_slug_filters.add(alt)
+            if "_" in flow_slug:
+                alt = flow_slug.replace("_", "-")
+                candidate_slugs_lower.add(alt.lower())
+                metadata_slug_filters.add(alt)
+        story_clean = self._normalize_story_title(original_story) or original_story
+        if story_clean:
+            candidate_names.add(story_clean.lower())
+        if original_story and original_story.lower() != story_clean.lower():
+            candidate_names.add(original_story.lower())
+
+        def _infer_navigation_from_element(label: str, role: str, tag: str) -> tuple[str, str]:
+            label_clean = (label or "").strip()
+            role_lower = (role or "").strip().lower()
+            tag_lower = (tag or "").strip().lower()
+
+            if role_lower in {"textbox", "input", "searchbox", "textarea", "password"} or tag_lower in {"input"}:
+                pretty = label_clean or "Field"
+                return (f"Enter {pretty}", f"{pretty}: <value>")
+            if role_lower in {"combobox", "listbox", "select"} or tag_lower in {"select"}:
+                pretty = label_clean or "Value"
+                return (f"Select {pretty}", f"{pretty}: <value>")
+            if role_lower in {"option", "radio", "menuitemradio"} or tag_lower in {"option"}:
+                pretty = label_clean or "Option"
+                return (f"Select the '{pretty}' option", "")
+            if role_lower in {"checkbox", "switch", "menuitemcheckbox"} or tag_lower in {"input"} and "checkbox" in (label_clean.lower() if label_clean else ""):
+                pretty = label_clean or "Option"
+                noun = "checkbox" if role_lower == "checkbox" else "switch"
+                return (f"Toggle the '{pretty}' {noun}", "")
+            if role_lower == "button" or tag_lower in {"button"}:
+                target = label_clean or "button"
+                return (f"Click the '{target}' button", "")
+            if role_lower == "link" or tag_lower == "a":
+                target = label_clean or "link"
+                return (f"Click the '{target}' link", "")
+            if role_lower == "img" or tag_lower == "img":
+                target = label_clean or "icon"
+                return (f"Click on '{target}' icon", "")
+            if role_lower == "cell" or tag_lower in {"td", "th"}:
+                target = label_clean or "cell"
+                return (f"Select the '{target}' cell", "")
+            if role_lower == "tab":
+                target = label_clean or "Tab"
+                return (f"Open the '{target}' tab", "")
+            if label_clean:
+                return (f"Interact with '{label_clean}'", "")
+            if role_lower:
+                return (f"Interact with {role_lower}", "")
+            if tag_lower:
+                return (f"Interact with {tag_lower}", "")
+            return ("Interact with element", "")
+
+        def process_entry(entry: dict):
+            if not entry:
+                return
+            meta = entry.get("metadata") or {}
+            content = self._decode_vector_content(entry.get("content"))
+            step_slug = str(
+                meta.get("flow_slug")
+                or content.get("flow_slug")
+                or ""
+            ).strip()
+            step_name = str(
+                meta.get("flow_name")
+                or content.get("flow_name")
+                or content.get("flow")
+                or ""
+            ).strip()
+            step_slug_lower = step_slug.lower() if step_slug else ""
+            step_name_lower = step_name.lower() if step_name else ""
+
+            if candidate_slugs_lower and step_slug_lower and step_slug_lower not in candidate_slugs_lower:
+                return
+            if candidate_names and step_name_lower and step_name_lower not in candidate_names:
+                return
+
+            flow_hash = str(
+                meta.get("flow_hash")
+                or content.get("flow_hash")
+                or ""
+            ).strip()
+            if flow_hash:
+                flow_hashes.add(flow_hash)
+
+            record_kind = (meta.get("record_kind") or content.get("record_kind") or "").strip().lower() or "step"
+            if record_kind == "element":
+                elem_index = content.get("element_index") or meta.get("element_index")
                 try:
-                    step_index = int(step_index)
+                    elem_index = int(elem_index)
                 except (TypeError, ValueError):
-                    step_index = len(steps_map) + 1
-                action = content.get("action") or meta.get("action") or ""
-                navigation = content.get("navigation") or meta.get("navigation") or ""
-                data_val = content.get("data") or meta.get("data") or ""
-                expected = content.get("expected") or meta.get("expected") or ""
-                locators = content.get("locators") or {}
-                existing = steps_map.get(step_index)
-                if existing and existing.get("locators") and not locators:
-                    continue
-                steps_map[step_index] = {
-                    "step": step_index,
-                    "action": action,
-                    "navigation": navigation,
-                    "data": data_val,
-                    "expected": expected,
-                    "locators": locators,
+                    elem_index = len(element_map) + 1
+                label = (content.get("label") or meta.get("label") or "").strip()
+                if not label:
+                    return
+                role = (content.get("role") or meta.get("role") or "").strip()
+                tag = (content.get("tag") or meta.get("tag") or "").strip()
+                locator_block = content.get("locators") or {}
+                locators = locator_block if isinstance(locator_block, dict) else {}
+                if not locators or "playwright" not in locators:
+                    if role and label:
+                        locators = {"playwright": {"byRole": {"role": role, "name": label}}}
+                    else:
+                        locators = {"playwright": {"byText": label}}
+                navigation_text, data_text = _infer_navigation_from_element(label, role, tag)
+                element_entry = {
+                    "step": elem_index,
+                    "action": label,
+                    "navigation": navigation_text,
+                    "data": data_text,
+                    "expected": "",
+                    "locators": {
+                        **locators,
+                        "labels": label,
+                        "role": role,
+                        "tag": tag,
+                        "name": label,
+                    },
+                    "label": label,
+                    "role": role,
+                    "tag": tag,
+                    "record_kind": "element",
                 }
-            if element_map or steps_map:
-                break
+                element_map[elem_index] = element_entry
+                # If we do not already have a richer step entry, synthesise one from the element.
+                existing_step = steps_map.get(elem_index)
+                if not existing_step or not any(existing_step.get(key) for key in ("navigation", "label", "locators")):
+                    synthetic_navigation = navigation_text or label or role or tag or f"Element {elem_index}"
+                    steps_map[elem_index] = {
+                        "step": elem_index,
+                        "action": label or synthetic_navigation,
+                        "navigation": synthetic_navigation,
+                        "data": data_text,
+                        "expected": "",
+                        "locators": element_entry.get("locators", {}),
+                        "label": label,
+                        "role": role,
+                        "record_kind": "element",
+                    }
+                return
 
-        if element_map:
+            step_index = content.get("step_index") or meta.get("step_index")
+            try:
+                step_index = int(step_index)
+            except (TypeError, ValueError):
+                step_index = len(steps_map) + 1
+            action = content.get("action") or meta.get("action") or ""
+            navigation = content.get("navigation") or meta.get("navigation") or ""
+            data_val = content.get("data") or meta.get("data") or ""
+            expected = content.get("expected") or meta.get("expected") or ""
+            locators = content.get("locators") or {}
+            label = (
+                content.get("label")
+                or meta.get("label")
+                or (locators.get("labels") if isinstance(locators, dict) else "")
+                or ""
+            )
+            existing = steps_map.get(step_index)
+            if existing and existing.get("locators") and not locators:
+                return
+            steps_map[step_index] = {
+                "step": step_index,
+                "action": action,
+                "navigation": navigation,
+                "data": data_val,
+                "expected": expected,
+                "locators": locators,
+                "label": label,
+                "record_kind": record_kind or "step",
+            }
+
+        # Fetch all recorder entries for the flow via metadata filters (no similarity ranking).
+        where_candidates: List[dict] = []
+        if metadata_slug_filters:
+            for slug_value in metadata_slug_filters:
+                where_candidates.append({"type": "recorder_refined", "flow_slug": slug_value})
+        if story_clean:
+            where_candidates.append({"type": "recorder_refined", "flow_name": story_clean})
+        if original_story and original_story.lower() != story_clean.lower():
+            where_candidates.append({"type": "recorder_refined", "flow_name": original_story})
+
+        metadata_limit = max(top_k, 256) * 4
+        metadata_limit = max(metadata_limit, 1024)
+
+        for where in where_candidates:
+            try:
+                records = self.db.list_where(where, limit=metadata_limit)
+            except Exception as exc:
+                logger.debug("Vector metadata fetch failed (%s): %s", where, exc)
+                continue
+            for entry in records or []:
+                process_entry(entry)
+
+        # If any flow hashes surfaced, hydrate the entire sequence for each hash.
+        if flow_hashes:
+            processed_hashes: set[str] = set()
+            queue = [fh for fh in flow_hashes if fh]
+            while queue:
+                flow_hash = queue.pop(0)
+                if flow_hash in processed_hashes:
+                    continue
+                processed_hashes.add(flow_hash)
+                where = {"type": "recorder_refined", "flow_hash": flow_hash}
+                try:
+                    records = self.db.list_where(where, limit=metadata_limit)
+                except Exception as exc:
+                    logger.debug("Vector metadata fetch failed (%s): %s", where, exc)
+                    continue
+                for entry in records or []:
+                    process_entry(entry)
+
+        # As a final fallback (still no ranking), scan all recorder_refined entries and pick those matching the slug/name.
+        if not steps_map and not element_map:
+            try:
+                all_records = self.db.list_where({"type": "recorder_refined"}, limit=metadata_limit)
+            except Exception as exc:
+                logger.debug("Vector metadata catch-all failed: %s", exc)
+                all_records = []
+            for entry in all_records or []:
+                process_entry(entry)
+
+        # Merge strategy: prefer chronological steps; append elements that don't duplicate them.
+        if not steps_map and element_map:
             ordered_steps = [element_map[idx] for idx in sorted(element_map)]
             snippet_lines = [f"Element {item.get('step')}: {item.get('action')}" for item in ordered_steps[:12]]
             summary = f"Vector flow (elements): {story}\n" + "\n".join(snippet_lines)
             return [summary], ordered_steps
 
-        if not steps_map:
+        if not steps_map and not element_map:
             return [], []
 
-        ordered_steps = [steps_map[idx] for idx in sorted(steps_map)]
+        # Start with steps in order
+        ordered_steps = [element_map[idx] for idx in sorted(element_map)] if element_map else [steps_map[idx] for idx in sorted(steps_map)]
+        combined = list(ordered_steps)
+
+        # Helper to compute a dedupe signature similar to refined extractor
+        def _sig(item: dict) -> tuple:
+            loc = item.get("locators") or {}
+            role = str(loc.get("role") or "").strip().lower()
+            label = str((loc.get("labels") or loc.get("label") or loc.get("name") or item.get("action") or "")).strip().lower()
+            tag = str(loc.get("tag") or "").strip().lower()
+            pw = loc.get("playwright")
+            if isinstance(pw, str):
+                locator_sig = pw.strip()[:120]
+            elif isinstance(pw, dict):
+                by_role = pw.get("byRole") or {}
+                locator_sig = f"{by_role.get('role','')}|{by_role.get('name','')}".strip().lower()
+            else:
+                locator_sig = ""
+            step_id = str(item.get("step") or "")
+            return (role, label, tag, locator_sig, step_id)
+
+        seen = {_sig(s) for s in combined}
+
+        # Append steps when no element map available (fallback to recorder steps)
+        if not element_map and steps_map:
+            for idx in sorted(steps_map):
+                step_entry = steps_map[idx]
+                signature = _sig(step_entry)
+                if signature in seen:
+                    continue
+                combined.append(step_entry)
+                seen.add(signature)
+
+        # Append any remaining element entries not already included (for completeness)
+        if element_map:
+            for idx in sorted(element_map):
+                elem = element_map[idx]
+                signature = _sig(elem)
+                if signature in seen:
+                    continue
+                combined.append(elem)
+                seen.add(signature)
+
+        # Build summary from first 12 entries
         snippet_lines = []
-        for item in ordered_steps[:12]:
+        for item in combined[:12]:
             descriptor = item.get("action") or item.get("navigation") or ""
             snippet_lines.append(f"Step {item.get('step')}: {descriptor}")
 
         summary = f"Vector flow: {story}\n" + "\n".join(snippet_lines)
-        return [summary], ordered_steps
+        return [summary], combined
 
     def _decode_vector_content(self, raw_document) -> dict:
         if raw_document is None:
@@ -857,7 +1587,17 @@ class TestCaseGenerator:
                 or item.get("name")
             )
             navigation = str(item.get("navigation") or "").strip().lower()
-            dedupe_key = (role, label.lower(), tag, navigation)
+            # Include locator signature and step id to avoid collapsing distinct steps with same label
+            pw = (loc or {}).get("playwright")
+            if isinstance(pw, str):
+                locator_sig = pw.strip()[:120].lower()
+            elif isinstance(pw, dict):
+                br = pw.get("byRole") or {}
+                locator_sig = f"{str(br.get('role') or '').lower()}|{str(br.get('name') or '').lower()}"
+            else:
+                locator_sig = ""
+            step_id = str(item.get("step") or "")
+            dedupe_key = (role, label.lower(), tag, navigation, locator_sig, step_id)
             if dedupe_key in seen_keys:
                 continue
             seen_keys.add(dedupe_key)
@@ -873,7 +1613,17 @@ class TestCaseGenerator:
                 continue
             if not (label or role):
                 continue
-            dedupe_key = (role, label.lower(), tag, "")
+            # Use full label and locator signature for elements as well
+            pw = element.get("playwright")
+            if isinstance(pw, str):
+                el_sig = pw.strip()[:120].lower()
+            elif isinstance(pw, dict):
+                br = pw.get("byRole") or {}
+                el_sig = f"{str(br.get('role') or '').lower()}|{str(br.get('name') or '').lower()}"
+            else:
+                el_sig = ""
+            el_step_id = str(element.get("element_index") or element.get("step") or "")
+            dedupe_key = (role, label.lower(), tag, "", el_sig, el_step_id)
             if dedupe_key in seen_keys:
                 continue
             locators = {
@@ -1215,35 +1965,20 @@ class TestCaseGenerator:
 
     def _flow_steps_prompt_json(self, flow_steps: List[dict]) -> str:
         summary: List[dict] = []
-        for idx, step in enumerate(flow_steps, start=1):
-            locators = step.get("locators") if isinstance(step, dict) else {}
-            label_value: str = ""
-            role_value: str = ""
-            locator_hint: str = ""
-            if isinstance(locators, dict):
-                labels_field = locators.get("labels")
-                if isinstance(labels_field, (list, tuple, set)):
-                    label_value = ", ".join(str(part).strip() for part in labels_field if part)
-                elif labels_field:
-                    label_value = str(labels_field).strip()
-                if not label_value and locators.get("playwright"):
-                    label_value = str(locators.get("playwright")).strip()
-                role_value = str(locators.get("role") or "").strip()
-                locator_hint = str(locators.get("playwright") or "").strip()
-                if not role_value and locator_hint:
-                    match = re.search(r"getByRole\(\s*['\"]([^'\"]+)['\"]", locator_hint)
-                    if match:
-                        role_value = match.group(1)
-            if not label_value:
-                label_value = str(step.get("navigation") or step.get("action") or "").strip()
-
+        for step in flow_steps:
+            if not isinstance(step, dict):
+                continue
             summary.append(
                 {
-                    "step": idx,
+                    "step": step.get("step"),
                     "action": step.get("action"),
-                    "label": label_value,
-                    "role": role_value,
-                    "locator": locator_hint,
+                    "navigation": step.get("navigation"),
+                    "data": step.get("data"),
+                    "expected": step.get("expected"),
+                    "label": step.get("label"),
+                    "role": step.get("role"),
+                    "locator": step.get("locator"),
+                    "record_kind": step.get("record_kind"),
                 }
             )
         return json.dumps(summary, ensure_ascii=False)
@@ -1290,16 +2025,23 @@ class TestCaseGenerator:
             return [], sources
         return ["Recorder refined element cues:\n" + "\n".join(lines)], sources
 
-    def _build_generation_prompt(self, story: str, context: str, flow_steps_json: str) -> str:
+    def _build_generation_prompt(self, story: str, context: str, flow_steps_json: str, positive_outline_json: Optional[str] = None) -> str:
         fields = ", ".join(self.default_fields)
+        outline_section = ""
+        if positive_outline_json:
+            outline_section = (
+                "Positive flow outline (assembled from chunked step rewrites; maintain this order and ensure every step id is represented once):\n"
+                f"{positive_outline_json}\n\n"
+            )
         return (
             "You are an expert QA engineer for Oracle Fusion / enterprise web flows.\n"
             "Using ONLY the retrieved context, derive comprehensive, professional manual test cases covering positive, negative, and edge scenarios.\n"
             f"The user supplied keywords or artifact name: '{story}'.\n"
             "Context snippets (prioritise Playwright flows, repo scaffolds, Jira docs):\n"
             f"{context}\n\n"
-            "You are also provided recorder element cues per step. Each item contains: the recorder step index, the intended action verb, the captured UI label(s), the ARIA role (if available), and the original Playwright locator snippet.\n"
+            "You are also provided sanitized recorder element cues per step. Each item contains: the recorder step index, the intended action verb, the captured UI label(s), the ARIA role (if available), and a concise locator hint (no XPath data).\n"
             "For the primary positive scenario, mirror these steps in order, deriving navigation wording directly from the element labels and role context (do not invent new UI names). Expand the labels into detailed actions with explicit navigation, data entry, and observable expected outcomes.\n"
+            f"{outline_section}"
             f"Recorder element cues JSON:\n{flow_steps_json}\n\n"
             "Additionally, for EACH core step in the positive flow (up to 6-8 main steps), generate at least one negative and one edge case focusing on that step's validation (e.g., required field empty, invalid format, unauthorized action, boundary values). Keep these as separate cases with precise 'type' values and step-by-step actions.\n\n"
             "Output strictly as a JSON array. Respond with ONLY the JSON array - no prose, no explanations, no code fences. Each element must contain the fields: "
@@ -1323,6 +2065,7 @@ class TestCaseGenerator:
             "- Ensure each case covers an end-to-end workflow, not just authentication, and ties outcomes to business results.\n"
             "- Keep language precise, imperative, and free of AI hedging (no 'maybe', 'could').\n"
             "- All values must be valid JSON strings (no expressions like \"a\".repeat(3)).\n"
+            "- Double-check that the positive scenario covers every recorder step index supplied. If anything cannot be covered, list the missing indices under 'assumptions'.\n"
             "- If context is limited, propose the most probable flow and document assumptions explicitly.\n"
         )
 
@@ -1367,13 +2110,35 @@ class TestCaseGenerator:
         payload += "\n\nContext (refined steps, compact):\n" + compact + "\n"
         return payload
 
-    def generate_manual_table(self, story: str, db_query: Optional[str] = None, scope: Optional[str] = None) -> str:
-        """Generate a markdown table using the dedicated manual-table prompt. Returns raw markdown text."""
+    def generate_manual_table(
+        self,
+        story: str,
+        db_query: Optional[str] = None,
+        scope: Optional[str] = None,
+        coverage: str = "grouped",
+        include_unlabeled: bool = False,
+        include_login: bool = False,
+    ) -> str:
+        """Generate a markdown table.
+
+        Args:
+            story: Flow name used to locate refined steps.
+            db_query: Optional vector DB query override.
+            scope: Optional textual hint.
+            coverage: "grouped" (default) groups steps into friendly sections;
+                      "full" returns ALL extracted micro-steps without grouping.
+            include_unlabeled: When True, include unlabeled icon/anchor elements
+                               with generic phrasing (helps capture Navigator/Task icons, etc.).
+
+        Returns:
+            Markdown table text.
+        """
         context_chunks, flow_steps, _ = self._collect_context(story)
         manual_steps: List[dict] = []
         if flow_steps:
             if any(isinstance(step, dict) and (step.get("locators") or {}).get("playwright") for step in flow_steps):
-                manual_steps = self._build_manual_steps_from_refined(flow_steps)
+                # Build directly from refined recorder cues
+                manual_steps = self._build_manual_steps_from_refined(flow_steps, include_unlabeled=include_unlabeled)
             else:
                 manual_steps = [
                     {
@@ -1387,8 +2152,14 @@ class TestCaseGenerator:
                 ]
 
         if manual_steps:
-            manual_steps = self._refine_manual_steps_phrasing(manual_steps)
-            return self._manual_steps_to_markdown(manual_steps)
+            if include_login:
+                manual_steps = self._maybe_prepend_login_steps(manual_steps)
+            if str(coverage).lower() == "full":
+                # Return raw extracted micro-steps without grouping or rewriting
+                return self._manual_steps_to_markdown(manual_steps)
+            # Otherwise, keep the current phrasing/grouping behavior
+            refined = self._refine_manual_steps_phrasing(manual_steps)
+            return self._manual_steps_to_markdown(refined)
 
         prompt = self._build_manual_table_prompt(
             flow_name=story,
@@ -1731,13 +2502,14 @@ class TestCaseGenerator:
         return cases
 
     # ----------------- Refined Playwright cues -> manual steps -----------------
-    def _build_manual_steps_from_refined(self, refined_steps: List[dict]) -> List[dict]:
+    def _build_manual_steps_from_refined(self, refined_steps: List[dict], include_unlabeled: bool = False) -> List[dict]:
         """Build manual steps from refined Playwright cues in a generic, data-driven way.
         Rules:
         - Use only Playwright getByRole/getByText/getByLabel cues; ignore raw CSS/XPath.
         - Do not hardcode domain values or flow-specific text; derive labels from the cues.
         - Generate generic navigation/data/expected phrasing based on the role and label text.
-        - Skip anonymous svg/img/path/a elements with no label.
+        - By default skip anonymous svg/img/path/a elements with no label. Set include_unlabeled=True
+          to include them with generic phrasing (helps capture icon clicks and anchors).
         """
         def parse_playwright(locators: dict) -> tuple[str, str]:
             pw = (locators or {}).get("playwright")
@@ -1841,7 +2613,8 @@ class TestCaseGenerator:
                     break
 
             if not label and tag in {"svg", "img", "path", "a"}:
-                continue
+                if not include_unlabeled:
+                    continue
 
             nav_text = ""
             data_text = ""
@@ -1870,15 +2643,35 @@ class TestCaseGenerator:
             elif role in click_phrases and label:
                 nav_text = click_phrases[role].format(label=quoted)
 
-            if not nav_text and label:
-                nav_text = f"Click on {quoted}"
+            if not nav_text:
+                if label:
+                    nav_text = f"Click on {quoted}"
+                elif include_unlabeled:
+                    # Use any available hint for a generic phrase
+                    title_hint = str((step.get("locators") or {}).get("title") or "").strip()
+                    hint = title_hint or role or tag or "element"
+                    verb = "Click"
+                    if role in {"checkbox", "switch"}:
+                        verb = "Toggle"
+                    nav_text = f"{verb} the {hint}"
+                else:
+                    continue
 
             if not nav_text:
                 continue
 
+            # Make de-duplication resilient for unlabeled elements by including a locator signature
+            locator_sig = ""
+            pw = (loc or {}).get("playwright")
+            if isinstance(pw, str):
+                locator_sig = pw.strip()[:120]
+            elif isinstance(pw, dict):
+                by_role = pw.get("byRole") or {}
+                locator_sig = f"{by_role.get('role','')}|{by_role.get('name','')}".strip()
+            step_id = str(step.get("step") or "")
             dedupe_key = (
                 (role or "").lower(),
-                label.lower() if label else "",
+                (label.lower() if label else locator_sig or step_id),
                 nav_text.lower(),
                 data_text.lower() if data_text else "",
             )
@@ -1911,6 +2704,35 @@ class TestCaseGenerator:
                 last_action = act
             normalized.append(d)
         return normalized
+
+    def _maybe_prepend_login_steps(self, steps: List[dict]) -> List[dict]:
+        """Prepend a generic Oracle login step if one is not already present.
+
+        Detection: If any existing step mentions login/sign in or contains username/password fields, we assume
+        login is already covered and do nothing. Otherwise, we add a consolidated first step capturing the
+        homepage, login click, credentials, and success expectation.
+        """
+        try:
+            joined = "\n".join([
+                f"{s.get('action','')}\n{s.get('navigation','')}\n{s.get('data','')}\n{s.get('expected','')}"
+                for s in (steps or [])
+            ]).lower()
+        except Exception:
+            joined = ""
+
+        tokens = [
+            "login", "log in", "sign in", "signin", "user name", "username", "password",
+        ]
+        if any(t in joined for t in tokens):
+            return steps
+
+        login_step = {
+            "action": "Log into Oracle",
+            "navigation": "Login to Oracle Cloud Applications Homepage\nClick Login",
+            "data": "Enter User Name\nEnter Password",
+            "expected": "Login Successful",
+        }
+        return [login_step] + (steps or [])
 
     def _manual_steps_to_markdown(self, manual_steps: List[dict]) -> str:
         """Render manual step dictionaries as a markdown table."""
@@ -2359,7 +3181,58 @@ def _map_to_detailed_flow_template(llm_output, template_df, columns, normalized_
     if not rows:
         return template_df.copy()
 
-    return pd.DataFrame(rows, columns=df_columns)
+    def _append_field(accumulator: dict, column: str, new_value: str):
+        if not column:
+            return
+        value = str(new_value or "").strip()
+        if not value:
+            return
+        existing = str(accumulator.get(column) or "").strip()
+        if existing:
+            accumulator[column] = f"{existing}\n{value}"
+        else:
+            accumulator[column] = value
+
+    merged_rows: List[dict] = []
+    for row in rows:
+        action_value = str(row.get(action_col) or "").strip()
+        if action_value:
+            merged_rows.append(row)
+            continue
+        if not merged_rows:
+            merged_rows.append(row)
+            continue
+        target = merged_rows[-1]
+        prefix = str(row.get(sl_col) or "").strip()
+        nav_text = str(row.get(nav_col) or "").strip()
+        data_text = str(row.get(data_col) or "").strip()
+        expected_text = str(row.get(expected_col) or "").strip()
+
+        def _with_prefix(text: str) -> str:
+            stripped = text.strip()
+            if not stripped:
+                return stripped
+            return f"{prefix}. {stripped}" if prefix else stripped
+
+        if nav_text:
+            _append_field(target, nav_col, _with_prefix(nav_text))
+        if data_text:
+            _append_field(target, data_col, _with_prefix(data_text))
+        if expected_text:
+            _append_field(target, expected_col, _with_prefix(expected_text))
+
+    # Normalize SL column to keep sequential numbering after merges
+    current_sl = 0
+    for row in merged_rows:
+        if isinstance(row.get(sl_col), int):
+            current_sl = row[sl_col]
+        elif str(row.get(sl_col) or "").isdigit():
+            current_sl = int(row[sl_col])
+        else:
+            current_sl += 1
+            row[sl_col] = current_sl
+
+    return pd.DataFrame(merged_rows, columns=df_columns)
 
 
 def export_to_excel(mapped_df, output_path="generated_test_cases.xlsx"):

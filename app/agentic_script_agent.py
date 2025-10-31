@@ -9,7 +9,7 @@ import posixpath
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Set
 import ast
 
 from langchain.prompts import PromptTemplate
@@ -80,6 +80,95 @@ def _extract_data_value(step: Dict[str, Any]) -> str:
     return ""
 
 
+def _extract_data_key(step: Dict[str, Any]) -> str:
+    data = step.get("data")
+    if isinstance(data, str) and ":" in data:
+        key, _ = data.split(":", 1)
+        return key.strip()
+    navigation = step.get("navigation")
+    if isinstance(navigation, str):
+        text = navigation.strip()
+        match = re.search(r"enter\s+([a-z0-9 _-]+)", text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    return ""
+
+
+def _step_signature(step: Dict[str, Any]) -> str:
+    action = (step.get("action") or "").strip().lower()
+    navigation = (step.get("navigation") or "").strip().lower()
+    data = (step.get("data") or "").strip().lower()
+    return f"{action}|{navigation}|{data}"
+
+
+def _extract_preview_signatures(preview: str) -> Optional[Set[str]]:
+    if not preview:
+        return None
+    signatures: Set[str] = set()
+    parsed_count = 0
+    for raw_line in preview.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line[0].isdigit():
+            parts = line.split(" ", 1)
+            if len(parts) == 2:
+                line = parts[1].strip()
+        if '|' not in line:
+            continue
+        segments = [segment.strip().lower() for segment in line.split("|")]
+        if not segments:
+            continue
+        action = segments[0]
+        navigation = segments[1] if len(segments) > 1 else ""
+        data_value = ""
+        for segment in segments[2:]:
+            if segment.startswith("data:"):
+                data_value = segment.split(":", 1)[1].strip()
+        signature = f"{action}|{navigation}|{data_value}"
+        signatures.add(signature)
+        parsed_count += 1
+    if parsed_count < 2:
+        return None
+    return signatures
+
+
+def _normalize_for_match(text: str) -> str:
+    cleaned = re.sub(r"\s+", " ", (text or "").strip().lower())
+    cleaned = cleaned.replace("'", "").replace('"', "")
+    return cleaned
+
+
+def _extract_preview_phrases(preview: str) -> Set[str]:
+    """Collect normalized action/navigation phrases from the preview list.
+
+    The preview format is expected to be pipe-separated columns like:
+      Action | Navigation | Data: ... | Expected: ...
+    We capture the first two segments (action, navigation) when present; otherwise, we use the whole line.
+    """
+    phrases: Set[str] = set()
+    if not preview:
+        return phrases
+    for raw_line in preview.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        # Strip leading numbering like "19. "
+        if line and line[0].isdigit():
+            parts = line.split(" ", 1)
+            if len(parts) == 2 and parts[0][:-1].isdigit() if parts[0].endswith('.') else parts[0].isdigit():
+                line = parts[1].strip()
+        if "|" in line:
+            segments = [seg.strip() for seg in line.split("|")]
+            if segments:
+                phrases.add(_normalize_for_match(segments[0]))
+            if len(segments) > 1:
+                phrases.add(_normalize_for_match(segments[1]))
+        else:
+            phrases.add(_normalize_for_match(line))
+    return {p for p in phrases if p}
+
+
 def _relative_import(from_path: Path, to_path: Path) -> str:
     rel = os.path.relpath(to_path, start=from_path.parent)
     rel_posix = posixpath.normpath(rel.replace("\\", "/"))
@@ -114,7 +203,7 @@ class FrameworkProfile:
         tests = find_dir(["tests", "specs", "test", "e2e", "src/tests"])
 
         additional = {}
-        for name in ["fixtures", "data", "utils", "support"]:
+        for name in ["fixtures", "data", "util", "utils", "support"]:
             candidate = root / name
             if candidate.exists() and candidate.is_dir():
                 additional[name] = candidate
@@ -918,78 +1007,159 @@ class AgenticScriptAgent:
                 "No refined recorder steps available for this scenario. "
                 "Please ingest the refined flow or record the scenario again."
             )
-        return self._build_deterministic_payload(scenario, framework, vector_steps)
+        keep_signatures = _extract_preview_signatures(accepted_preview)
+        # Also extract navigation/action phrases for fuzzy alignment
+        preview_phrases = _extract_preview_phrases(accepted_preview)
+
+        # If signatures are too few, disable strict filtering
+        final_signatures = None if (keep_signatures is not None and len(keep_signatures) < 2) else keep_signatures
+
+        # If signatures exist but don't align well with vector steps, try phrase-based filtering
+        if final_signatures:
+            matched = [step for step in vector_steps if _step_signature(step) in final_signatures]
+            # Heuristic: if signature matching keeps <50% of preview lines or 0, try phrase filter
+            if not matched or (preview_phrases and len(matched) < max(2, len(preview_phrases) // 2)):
+                def _matches_phrase(step: Dict[str, Any]) -> bool:
+                    nav = _normalize_for_match(step.get("navigation") or step.get("action") or "")
+                    if not nav:
+                        return False
+                    for phrase in preview_phrases:
+                        if not phrase:
+                            continue
+                        # Accept substring either way to cope with small wording drift
+                        if phrase in nav or nav in phrase:
+                            return True
+                    return False
+                fuzzy = [s for s in vector_steps if _matches_phrase(s)]
+                if fuzzy:
+                    return self._build_deterministic_payload(scenario, framework, fuzzy, keep_signatures=None)
+
+        return self._build_deterministic_payload(scenario, framework, vector_steps, keep_signatures=final_signatures)
 
     def _build_deterministic_payload(
         self,
         scenario: str,
         framework: FrameworkProfile,
         vector_steps: List[Dict[str, Any]],
+        keep_signatures: Optional[Set[str]] = None,
     ) -> Dict[str, List[Dict[str, str]]]:
         slug = _slugify(scenario)
         root = framework.root
 
         def resolve_relative(target: Path) -> str:
-            return str(target.relative_to(root)).replace("\\", "/")
+            return str(target.relative_to(root)).replace('\\', '/')
 
         if framework.locators_dir:
             locators_path = framework.locators_dir / f"{slug}.ts"
         else:
-            locators_path = root / "locators" / f"{slug}.ts"
+            locators_path = root / 'locators' / f"{slug}.ts"
         if framework.pages_dir:
             page_filename = f"{_to_camel_case(slug).capitalize() or 'Generated'}Page.ts"
             page_path = framework.pages_dir / page_filename
         else:
-            page_path = root / "pages" / f"{_to_camel_case(slug).capitalize() or 'Generated'}Page.ts"
+            page_path = root / 'pages' / f"{_to_camel_case(slug).capitalize() or 'Generated'}Page.ts"
         if framework.tests_dir:
             test_path = framework.tests_dir / f"{slug}.spec.ts"
         else:
-            test_path = root / "tests" / f"{slug}.spec.ts"
+            test_path = root / 'tests' / f"{slug}.spec.ts"
+
+        search_dirs: List[Path] = []
+        if framework.pages_dir and framework.pages_dir.exists():
+            search_dirs.append(framework.pages_dir)
+        else:
+            fallback_pages_dir = root / 'pages'
+            if fallback_pages_dir.exists():
+                search_dirs.append(fallback_pages_dir)
+
+        login_page_file: Optional[Path] = None
+        home_page_file: Optional[Path] = None
+
+        for directory in search_dirs:
+            matches = list(directory.glob('**/login.page.ts'))
+            if matches:
+                login_page_file = matches[0]
+                break
+
+        for directory in search_dirs:
+            matches = list(directory.glob('**/home.page.ts'))
+            if matches:
+                home_page_file = matches[0]
+                break
+
+        login_key_candidates = {
+            "username",
+            "userid",
+            "user",
+            "signin",
+            "sign_in",
+            "password",
+            "enterpasscode",
+            "passcode",
+            "verify",
+        }
 
         selector_to_key: Dict[str, str] = {}
         used_keys: set[str] = set()
         entries: List[Tuple[str, str]] = []
+        entry_keys: set[str] = set()
         step_refs: List[Dict[str, Any]] = []
+        data_bindings: List[Dict[str, Any]] = []
+        method_names: set[str] = set()
 
-        for index, step in enumerate(vector_steps):
-            locators = step.get("locators") or {}
+        if keep_signatures is not None and len(keep_signatures) < 2:
+            keep_signatures = None
+
+        effective_steps: List[Dict[str, Any]]
+        if keep_signatures:
+            filtered_steps = [
+                step for step in vector_steps if _step_signature(step) in keep_signatures
+            ]
+            effective_steps = filtered_steps or vector_steps
+        else:
+            effective_steps = vector_steps
+
+        for index, step in enumerate(effective_steps):
+            locators = step.get('locators') or {}
+            signature = _step_signature(step)
+            if keep_signatures is not None and signature not in keep_signatures:
+                continue
             selector = _normalize_selector(
-                locators.get("css")
-                or locators.get("playwright")
-                or locators.get("stable")
-                or locators.get("xpath")
-                or locators.get("raw_xpath")
-                or locators.get("selector")
-                or ""
+                locators.get('css')
+                or locators.get('playwright')
+                or locators.get('stable')
+                or locators.get('xpath')
+                or locators.get('raw_xpath')
+                or locators.get('selector')
+                or ''
             )
             if not selector:
-                element = step.get("element") or {}
+                element = step.get('element') or {}
                 selector = _normalize_selector(
-                    element.get("css")
-                    or element.get("playwright")
-                    or element.get("stable")
-                    or element.get("xpath")
-                    or element.get("raw_xpath")
+                    element.get('css')
+                    or element.get('playwright')
+                    or element.get('stable')
+                    or element.get('xpath')
+                    or element.get('raw_xpath')
                 )
             if not selector:
                 raise ValueError(
                     f"No selector resolved for step {index + 1} "
                     f"(action={step.get('action')!r}, navigation={step.get('navigation')!r}). "
-                    "Ensure the refined recorder flow includes CSS or stable selectors."
+                    'Ensure the refined recorder flow includes CSS or stable selectors.'
                 )
 
             if selector in selector_to_key:
                 key = selector_to_key[selector]
             else:
                 base_name = (
-                    locators.get("name")
-                    or locators.get("title")
-                    or locators.get("labels")
-                    or step.get("navigation")
-                    or step.get("action")
-                    or f"step{index + 1}"
+                    locators.get('name')
+                    or locators.get('title')
+                    or locators.get('labels')
+                    or step.get('navigation')
+                    or step.get('action')
+                    or f'step{index + 1}'
                 )
-                base_key = _to_camel_case(base_name) or f"step{index + 1}"
+                base_key = _to_camel_case(base_name) or f'step{index + 1}'
                 key = base_key
                 suffix = 2
                 while key in used_keys:
@@ -997,116 +1167,397 @@ class AgenticScriptAgent:
                     suffix += 1
                 selector_to_key[selector] = key
                 used_keys.add(key)
+
+            navigation = step.get('navigation') or ''
+            nav_lower = navigation.lower()
+            handled_by: Optional[str] = None
+            key_lower = key.lower()
+
+            if login_page_file:
+                login_keywords = [
+                    'user name',
+                    'username',
+                    'password',
+                    'sign in',
+                    'signin',
+                    'passcode',
+                    'verify',
+                    'login page',
+                ]
+                if any(term in nav_lower for term in login_keywords) or any(candidate in key_lower for candidate in login_key_candidates):
+                    handled_by = 'login'
+
+            if not handled_by and key not in entry_keys:
                 entries.append((key, selector))
+                entry_keys.add(key)
 
-            step_refs.append(
-                {
-                    "key": key,
-                    "action": (step.get("action") or "").lower(),
-                    "data": _extract_data_value(step),
-                    "raw": step,
-                }
-            )
+            step_ref: Dict[str, Any] = {
+                'key': key,
+                'action': (step.get('action') or '').lower(),
+                'data': _extract_data_value(step),
+                'raw': step,
+            }
+            if handled_by:
+                step_ref['handled_by'] = handled_by
+            step_refs.append(step_ref)
 
-        locators_lines = ["const locators = {"] + [
+            data_key = _extract_data_key(step)
+            if data_key and not handled_by:
+                action_lower = (step.get('action') or '').lower()
+                action_category = 'fill'
+                if 'select' in action_lower or 'dropdown' in nav_lower or 'choose' in nav_lower:
+                    action_category = 'select'
+                method_suffix = _to_camel_case(data_key) or _to_camel_case(navigation) or key
+                if method_suffix:
+                    method_suffix = method_suffix[:1].upper() + method_suffix[1:]
+                else:
+                    method_suffix = key.title()
+                prefix = 'set' if action_category != 'select' else 'select'
+                candidate_name = prefix + (method_suffix[:1].upper() + method_suffix[1:])
+                if candidate_name in method_names:
+                    counter = 2
+                    base_candidate = candidate_name
+                    while candidate_name in method_names:
+                        candidate_name = f"{base_candidate}{counter}"
+                        counter += 1
+                method_names.add(candidate_name)
+                normalised_key = re.sub(r'[^a-z0-9]+', '', data_key.lower())
+                data_bindings.append(
+                    {
+                        'locator_key': key,
+                        'data_key': data_key,
+                        'normalised': normalised_key,
+                        'method_name': candidate_name,
+                        'fallback': _extract_data_value(step),
+                        'action_category': action_category,
+                    }
+                )
+                step_ref['data_key'] = data_key
+                step_ref['method_name'] = candidate_name
+                step_ref['action_category'] = action_category
+
+        locators_lines = ['const locators = {'] + [
             f"  {key}: {json.dumps(selector)}," for key, selector in entries
-        ] + ["};", "", "export default locators;"]
+        ] + ['};', '', 'export default locators;']
         locators_content = "\n".join(locators_lines) + os.linesep
 
-        page_class = _to_camel_case(Path(page_path).stem).capitalize() or "GeneratedPage"
-        page_lines = [
+        page_class = _to_camel_case(Path(page_path).stem).capitalize() or 'GeneratedPage'
+        page_var = page_class[:1].lower() + page_class[1:] if page_class else 'pageObject'
+        page_lines: List[str] = [
             "import { Page, Locator } from '@playwright/test';",
             f'import locators from "{_relative_import(page_path, locators_path)}";',
-            "",
-            f"class {page_class} {{",
-            "  page: Page;",
         ]
+
+        helper_candidates = [
+            root / 'util' / 'methods.utility.ts',
+            root / 'util' / 'methods.utility',
+            root / 'utils' / 'methods.utility.ts',
+            root / 'utils' / 'methods.utility',
+        ]
+        helper_path = next((candidate for candidate in helper_candidates if candidate.exists()), None)
+        helper_available = helper_path is not None
+        if helper_available:
+            page_lines.insert(
+                1,
+                f'import HelperClass from "{_relative_import(page_path, helper_path)}";',
+            )
+        for binding in data_bindings:
+            binding['use_helper'] = helper_available and binding['action_category'] == 'select'
+
+        page_lines.append('')
+        page_lines.append(f'class {page_class} {{')
+        page_lines.append('  page: Page;')
+        if helper_available:
+            page_lines.append('  helper: HelperClass;')
         for key, _ in entries:
-            page_lines.append(f"  {key}: Locator;")
-        page_lines.append("")
-        page_lines.append("  constructor(page: Page) {")
-        page_lines.append("    this.page = page;")
+            page_lines.append(f'  {key}: Locator;')
+        page_lines.append('')
+        page_lines.append('  constructor(page: Page) {')
+        page_lines.append('    this.page = page;')
+        if helper_available:
+            page_lines.append('    this.helper = new HelperClass(page);')
         for key, _ in entries:
-            page_lines.append(f"    this.{key} = page.locator(locators.{key});")
-        page_lines.append("  }")
-        page_lines.append("}")
-        page_lines.append("")
-        page_lines.append(f"export default {page_class};")
+            page_lines.append(f'    this.{key} = page.locator(locators.{key});')
+        page_lines.append('  }')
+
+        if data_bindings:
+            page_lines.append('')
+            page_lines.append("  private coerceValue(value: unknown): string {")
+            page_lines.append("    if (value === undefined || value === null) {")
+            page_lines.append("      return '';")
+            page_lines.append('    }')
+            page_lines.append("    if (typeof value === 'number') {")
+            page_lines.append("      return `${value}`;")
+            page_lines.append('    }')
+            page_lines.append("    if (typeof value === 'string') {")
+            page_lines.append('      return value;')
+            page_lines.append('    }')
+            page_lines.append("    return `${value ?? ''}`;")
+            page_lines.append('  }')
+            page_lines.append('')
+            page_lines.append("  private normaliseDataKey(value: string): string {")
+            page_lines.append("    return (value || '').replace(/[^a-z0-9]+/gi, '').toLowerCase();")
+            page_lines.append('  }')
+            page_lines.append('')
+            page_lines.append("  private resolveDataValue(formData: Record<string, any> | null | undefined, key: string, fallback: string = ''): string {")
+            page_lines.append('    const target = this.normaliseDataKey(key);')
+            page_lines.append('    if (formData) {')
+            page_lines.append('      for (const entryKey of Object.keys(formData)) {')
+            page_lines.append('        if (this.normaliseDataKey(entryKey) === target) {')
+            page_lines.append('          const candidate = this.coerceValue(formData[entryKey]);')
+            page_lines.append("          if (candidate.trim() !== '') {")
+            page_lines.append('            return candidate;')
+            page_lines.append('          }')
+            page_lines.append('        }')
+            page_lines.append('      }')
+            page_lines.append('    }')
+            page_lines.append('    return this.coerceValue(fallback);')
+            page_lines.append('  }')
+
+        fallback_map: Dict[str, str] = {}
+        for binding in data_bindings:
+            fallback_map[binding['data_key']] = ""
+
+        for binding in data_bindings:
+            method_name = binding['method_name']
+            locator_key = binding['locator_key']
+            action_category = binding['action_category']
+            use_helper = binding['use_helper']
+            page_lines.append('')
+            page_lines.append(f'  async {method_name}(value: unknown): Promise<void> {{')
+            page_lines.append('    const finalValue = this.coerceValue(value);')
+            if action_category == 'select' and use_helper:
+                page_lines.append(f'    await this.helper.compoundElementSelection(this.{locator_key}, finalValue);')
+            elif action_category == 'select':
+                page_lines.append(f'    await this.{locator_key}.selectOption(finalValue);')
+            else:
+                page_lines.append(f'    await this.{locator_key}.fill(finalValue);')
+            page_lines.append('  }')
+
+        if data_bindings:
+            page_lines.append('')
+            page_lines.append('  async applyData(formData: Record<string, any> | null | undefined, keys?: string[]): Promise<void> {')
+            page_lines.append('    const fallbackValues: Record<string, string> = {')
+            for data_key, fallback in fallback_map.items():
+                page_lines.append(f"      {json.dumps(data_key)}: {json.dumps(fallback or '')},")
+            page_lines.append('    };')
+            page_lines.append('    const targetKeys = Array.isArray(keys) && keys.length ? keys.map((key) => this.normaliseDataKey(key)) : null;')
+            page_lines.append('    const shouldHandle = (key: string) => {')
+            page_lines.append('      if (!targetKeys) {')
+            page_lines.append('        return true;')
+            page_lines.append('      }')
+            page_lines.append('      return targetKeys.includes(this.normaliseDataKey(key));')
+            page_lines.append('    };')
+            for binding in data_bindings:
+                data_key = binding['data_key']
+                method_name = binding['method_name']
+                page_lines.append(f"    if (shouldHandle({json.dumps(data_key)})) {{")
+                page_lines.append(f"      await this.{method_name}(this.resolveDataValue(formData, {json.dumps(data_key)}, fallbackValues[{json.dumps(data_key)}] ?? ''));")
+                page_lines.append('    }')
+            page_lines.append('  }')
+
+        page_lines.append('}')
+        page_lines.append('')
+        page_lines.append(f'export default {page_class};')
         page_content = "\n".join(page_lines) + os.linesep
 
         scenario_literal = json.dumps(scenario)
         spec_lines = [
             'import { test } from "./testSetup.ts";',
             f'import PageObject from "{_relative_import(test_path, page_path)}";',
-            'import { getTestToRun, shouldRun } from "../util/csvFileManipulation.ts";',
-            'import { namedStep } from "../util/screenshot.ts";',
-            "import * as dotenv from 'dotenv';",
-            "",
-            "const path = require('path');",
-            "",
-            "dotenv.config();",
-            "let executionList: any[];",
-            "",
-            "test.beforeAll(() => {",
-            "  executionList = getTestToRun(path.join(__dirname, '../testmanager.xlsx'));",
-            "});",
-            "",
-            f"test.describe({scenario_literal}, () => {{",
-            "  let flow: PageObject;",
-            "",
-            "  const run = (name: string, fn: ({ page }, testinfo: any) => Promise<void>) =>",
-            "    (shouldRun(name) ? test : test.skip)(name, fn);",
-            "",
-            f"  run({scenario_literal}, async ({{ page }}, testinfo) => {{",
-            "    flow = new PageObject(page);",
-            "    const testCaseId = testinfo.title;",
-            "    const testRow: any = executionList?.find((row: any) => row['TestCaseID'] === testCaseId) ?? {};",
-            "    void testRow;",
-            "",
         ]
+        if login_page_file:
+            spec_lines.append(f'import LoginPage from "{_relative_import(test_path, login_page_file)}";')
+        if home_page_file:
+            spec_lines.append(f'import HomePage from "{_relative_import(test_path, home_page_file)}";')
+
+        spec_lines.extend([
+            'import { getTestToRun, shouldRun, readExcelData } from "../util/csvFileManipulation.ts";',
+            'import { attachScreenshot, namedStep } from "../util/screenshot.ts";',
+            "import * as dotenv from 'dotenv';",
+            '',
+            "const path = require('path');",
+            "const fs = require('fs');",
+            '',
+            'dotenv.config();',
+            'let executionList: any[];',
+            '',
+            'test.beforeAll(() => {',
+            "  executionList = getTestToRun(path.join(__dirname, '../testmanager.xlsx'));",
+            '});',
+            '',
+            f'test.describe({scenario_literal}, () => {{',
+            f'  let {page_var}: PageObject;',
+        ])
+
+        if login_page_file:
+            spec_lines.append('  let loginPage: LoginPage;')
+        if home_page_file:
+            spec_lines.append('  let homePage: HomePage;')
+        spec_lines.append('')
+        spec_lines.append('  const run = (name: string, fn: ({ page }, testinfo: any) => Promise<void>) =>')
+        spec_lines.append('    (shouldRun(name) ? test : test.skip)(name, fn);')
+        spec_lines.append('')
+        spec_lines.append(f'  run({scenario_literal}, async ({{ page }}, testinfo) => {{')
+        spec_lines.append(f'    {page_var} = new PageObject(page);')
+        if login_page_file:
+            spec_lines.append('    loginPage = new LoginPage(page);')
+        if home_page_file:
+            spec_lines.append('    homePage = new HomePage(page);')
+        spec_lines.extend([
+            '    const testCaseId = testinfo.title;',
+            "    const testRow: Record<string, any> = executionList?.find((row: any) => row['TestCaseID'] === testCaseId) ?? {};",
+            '    const defaultDataStem = (() => {',
+            "      const core = testCaseId.replace(/[^a-z0-9]+/gi, ' ').trim();",
+            "      if (!core) {",
+            "        return 'TestData';",
+            '      }',
+            r"      return core.split(/\s+/).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');",
+            '    })();',
+            "    const defaultDatasheetName = `${defaultDataStem}Data.xlsx`;",
+            "    const defaultIdColumn = `${defaultDataStem}ID`;",
+            "    const defaultReferenceId = `${defaultDataStem}001`;",
+            "    const dataSheetName = String(testRow?.['DatasheetName'] ?? '').trim() || defaultDatasheetName;",
+            "    const dataReferenceId = String(testRow?.['ReferenceID'] ?? '').trim() || defaultReferenceId;",
+            "    const dataIdColumn = String(testRow?.['IDName'] ?? '').trim() || defaultIdColumn;",
+            "    const dataSheetTab = String(testRow?.['SheetName'] ?? testRow?.['Sheet'] ?? '').trim();",
+            "    const dataDir = path.join(__dirname, '../data');",
+            '    fs.mkdirSync(dataDir, { recursive: true });',
+            '    let dataRow: Record<string, any> = {};',
+            '    const ensureDataFile = (): string | null => {',
+            '      if (!dataSheetName) {',
+            "        console.warn(`[DATA] DatasheetName missing for ${testCaseId}; using generated defaults.`);",
+            '        return null;',
+            '      }',
+            '      const expectedPath = path.join(dataDir, dataSheetName);',
+            '      if (!fs.existsSync(expectedPath)) {',
+            '        const caseInsensitiveMatch = (() => {',
+            '          try {',
+            '            const entries = fs.readdirSync(dataDir, { withFileTypes: false });',
+            '            const target = dataSheetName.toLowerCase();',
+            '            const found = entries.find((entry) => entry.toLowerCase() === target);',
+            '            return found ? path.join(dataDir, found) : null;',
+            '          } catch (err) {',
+            "            console.warn(`[DATA] Unable to scan data directory for ${dataSheetName}:`, err);",
+            '            return null;',
+            '          }',
+            '        })();',
+            '        if (caseInsensitiveMatch) {',
+            '          return caseInsensitiveMatch;',
+            '        }',
+            "        const message = `Test data file '${dataSheetName}' not found in data/. Upload the file before running '${testCaseId}'.`;",
+            "        console.warn(`[DATA] ${message}`);",
+            '        throw new Error(message);',
+            '      }',
+            '      return expectedPath;',
+            '    };',
+            "    const normaliseKey = (value: string) => value.replace(/[^a-z0-9]/gi, '').toLowerCase();",
+            '    const findMatchingDataKey = (sourceKey: string) => {',
+            '      if (!sourceKey || !dataRow) {',
+            '        return undefined;',
+            '      }',
+            '      const normalisedSource = normaliseKey(sourceKey);',
+            '      return Object.keys(dataRow || {}).find((candidate) => normaliseKey(String(candidate)) === normalisedSource);',
+            '    };',
+            '    const getDataValue = (sourceKey: string, fallback: string) => {',
+            '      if (!sourceKey) {',
+            '        return fallback;',
+            '      }',
+            "      const directKey = findMatchingDataKey(sourceKey) || findMatchingDataKey(sourceKey.replace(/([A-Z])/g, '_$1'));",
+            '      if (directKey) {',
+            '        const candidate = dataRow?.[directKey];',
+            "        if (candidate !== undefined && candidate !== null && `${candidate}`.trim() !== '') {",
+            '          return `${candidate}`;',
+            '        }',
+            '      }',
+            '      return fallback;',
+            '    };',
+            '    const dataPath = ensureDataFile();',
+            '    if (dataPath && dataReferenceId && dataIdColumn) {',
+            "      dataRow = readExcelData(dataPath, dataSheetTab || '', dataReferenceId, dataIdColumn) ?? {};",
+            '      if (!dataRow || Object.keys(dataRow).length === 0) {',
+            "        console.warn(`[DATA] Row not found in ${dataSheetName} for ${dataIdColumn}='${dataReferenceId}'.`);",
+            '      }',
+            '    } else if (dataSheetName) {',
+            "      console.warn(`[DATA] DatasheetName provided but ReferenceID/IDName missing for ${testCaseId}. Generated defaults will be used.`);",
+            '    }',
+            '',
+        ])
+
+        login_step_emitted = False
+        has_data_bindings = bool(data_bindings)
+
         for idx, ref in enumerate(step_refs, start=1):
-            raw = ref.get("raw") or {}
-            note = raw.get("navigation") or raw.get("action") or raw.get("expected") or f"Step {idx}"
-            step_title = json.dumps(f"Step {idx} - {note}")
-            comment = raw.get("navigation") or raw.get("action") or ""
-            key = ref.get("key")
-            action = ref.get("action") or ""
-            data_value = ref.get("data") or ""
-            locator_expr = f"flow.{key}" if key else ""
-            spec_lines.append(f"    await namedStep({step_title}, page, testinfo, async () => {{")
+            raw = ref.get('raw') or {}
+            note = raw.get('navigation') or raw.get('action') or raw.get('expected') or f'Step {idx}'
+            step_title = json.dumps(f'Step {idx} - {note}')
+            comment = raw.get('navigation') or raw.get('action') or ''
+            key = ref.get('key')
+            action = ref.get('action') or ''
+            data_value = ref.get('data') or ''
+            locator_expr = f"{page_var}.{key}" if key else ''
+            handled_by = ref.get('handled_by')
+            home_method = ref.get('home_method')
+
+            if handled_by == 'login' and login_page_file:
+                if not login_step_emitted:
+                    spec_lines.append(f'    await namedStep({step_title}, page, testinfo, async () => {{')
+                    if comment:
+                        spec_lines.append(f'      // {comment}')
+                    spec_lines.append('      await loginPage.goto();')
+                    spec_lines.append("      await loginPage.login(process.env.USERID ?? '', process.env.PASSWORD ?? '');")
+                    spec_lines.append('      const screenshot = await page.screenshot();')
+                    spec_lines.append(f'      attachScreenshot({step_title}, testinfo, screenshot);')
+                    if raw.get('expected'):
+                        spec_lines.append(f"      // Expected: {raw['expected']}")
+                    spec_lines.append('    });')
+                    spec_lines.append('')
+                    login_step_emitted = True
+                continue
+
+            spec_lines.append(f'    await namedStep({step_title}, page, testinfo, async () => {{')
             if comment:
-                spec_lines.append(f"      // {comment}")
+                spec_lines.append(f'      // {comment}')
+            fallback_literal = json.dumps(data_value or '')
+            data_expr = fallback_literal
             if key:
-                if any(token in action for token in ["fill", "type", "enter"]):
-                    spec_lines.append(f"      await {locator_expr}.fill({json.dumps(data_value)});")
-                elif "select" in action:
-                    spec_lines.append(f"      await {locator_expr}.selectOption({json.dumps(data_value)});")
-                elif "press" in action:
-                    press_value = json.dumps(data_value or "Enter")
-                    spec_lines.append(f"      await {locator_expr}.press({press_value});")
-                elif "goto" in action or "navigate" in action:
-                    spec_lines.append(f"      await page.goto({json.dumps(data_value)});")
-                else:
-                    spec_lines.append(f"      await {locator_expr}.click();")
+                data_expr = f"getDataValue({json.dumps(key)}, {fallback_literal})"
+
+            if has_data_bindings and ref.get('data_key'):
+                keys_literal = json.dumps([ref['data_key']])
+                spec_lines.append(f'      await {page_var}.applyData(dataRow, {keys_literal});')
+            elif key and any(token in action for token in ['fill', 'type', 'enter']):
+                spec_lines.append(f'      await {locator_expr}.fill({data_expr});')
+            elif key and 'select' in action:
+                spec_lines.append(f'      await {locator_expr}.selectOption({data_expr});')
+            elif key and 'press' in action:
+                press_value = json.dumps(data_value or 'Enter')
+                spec_lines.append(f'      await {locator_expr}.press({press_value});')
+            elif 'goto' in action or 'navigate' in action:
+                spec_lines.append(f'      await page.goto({data_expr});')
+            elif key:
+                spec_lines.append(f'      await {locator_expr}.click();')
             else:
-                spec_lines.append("      // TODO: No selector provided by refined flow.")
-            if raw.get("expected"):
+                spec_lines.append('      // TODO: No selector provided by refined flow.')
+            if raw.get('expected'):
                 spec_lines.append(f"      // Expected: {raw['expected']}")
-            spec_lines.append("    });")
-            spec_lines.append("")
-        spec_lines.append("  });")
-        spec_lines.append("});")
+            spec_lines.append('      const screenshot = await page.screenshot();')
+            spec_lines.append(f'      attachScreenshot({step_title}, testinfo, screenshot);')
+            spec_lines.append('    });')
+            spec_lines.append('')
+        spec_lines.append('  });')
+        spec_lines.append('});')
         spec_content = "\n".join(spec_lines).rstrip() + os.linesep
 
         return {
-            "locators": [
-                {"path": resolve_relative(locators_path), "content": locators_content}
+            'locators': [
+                {'path': resolve_relative(locators_path), 'content': locators_content}
             ],
-            "pages": [
-                {"path": resolve_relative(page_path), "content": page_content}
+            'pages': [
+                {'path': resolve_relative(page_path), 'content': page_content}
             ],
-            "tests": [
-                {"path": resolve_relative(test_path), "content": spec_content}
+            'tests': [
+                {'path': resolve_relative(test_path), 'content': spec_content}
             ],
         }
 
@@ -1140,6 +1591,10 @@ def initialise_agentic_state() -> Dict[str, Any]:
         "context": {},
         "payload": {},
         "written_files": [],
+        "pending_test_ids": [],
+        "pending_datasheet_defaults": None,
+        "datasheet_values": None,
+        "awaiting_datasheet": False,
     }
 
 
