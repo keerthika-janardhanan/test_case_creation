@@ -6,7 +6,7 @@ try:
     from .vector_db import VectorDBClient  # type: ignore
     from .hashstore import compute_hash, is_changed  # type: ignore
 except ImportError:  # pragma: no cover - fallback for direct script usage
-    from vector_db import VectorDBClient
+    from app.vector_db import VectorDBClient
     from hashstore import compute_hash, is_changed
 
 db = VectorDBClient()

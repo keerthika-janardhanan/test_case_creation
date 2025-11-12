@@ -7,17 +7,41 @@ import os
 import re
 import posixpath
 from collections import Counter
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Set
 import ast
 
-from langchain.prompts import PromptTemplate
-from langchain_openai import AzureChatOpenAI
+# Defensive optional imports: keyword-inspect and other non-LLM endpoints should not 500
+# just because langchain or langchain-openai isn't installed in a minimal environment.
+try:  # pragma: no cover - import guards
+    from langchain.prompts import PromptTemplate  # type: ignore
+except ImportError:  # Lightweight fallback with compatible .format()
+    class PromptTemplate:  # type: ignore
+        def __init__(self, input_variables, template: str):
+            self.input_variables = input_variables
+            self.template = template
 
-from orchestrator import TestScriptOrchestrator
-from git_utils import push_to_git
-from vector_db import VectorDBClient
+        def format(self, **kwargs) -> str:
+            return self.template.format(**kwargs)
+
+try:  # pragma: no cover - import guards
+    from langchain_openai import AzureChatOpenAI  # type: ignore
+except ImportError:
+    AzureChatOpenAI = None  # type: ignore
+
+"""Agent responsible for generating previews and deterministic script payloads.
+
+Key reliability adjustments (Oct/Nov 2025):
+ - Use package-relative imports so FastAPI app import context doesn't break.
+ - Gracefully degrade when Azure OpenAI env vars are missing instead of raising 500.
+ - Wrap LLM invocations; return explicit sentinel messages when unavailable.
+"""
+
+from .orchestrator import TestScriptOrchestrator
+from .git_utils import push_to_git
+from .vector_db import VectorDBClient
 
 
 def _strip_code_fences(text: str) -> str:
@@ -240,18 +264,16 @@ class FrameworkProfile:
         return " | ".join(parts)
 
 
+logger = logging.getLogger(__name__)
+
+
 class AgenticScriptAgent:
     def __init__(self):
-        self.llm = AzureChatOpenAI(
-            openai_api_version=os.getenv("OPENAI_API_VERSION"),
-            azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "GPT-4o"),
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-            api_key=os.getenv("AZURE_OPENAI_KEY"),
-            temperature=0.2,
-        )
+        # Lazy-initialize LLM to avoid failures in endpoints that don't require it (e.g., keyword-inspect)
+        self.llm = None  # type: ignore[assignment]
         self.orchestrator = TestScriptOrchestrator()
         self.vector_db = VectorDBClient()
-
+        # Initialize prompt templates eagerly so attributes are always present
         self.preview_prompt = PromptTemplate(
             input_variables=[
                 "scenario",
@@ -323,11 +345,44 @@ class AgenticScriptAgent:
                 "Test examples:\n{tests_snippet}"
             ),
         )
+    def _ensure_llm(self):
+        """Instantiate the Azure LLM only when needed (preview/refine).
+        Defers environment validation until first use so other endpoints don't 500.
+        """
+        if self.llm is None:
+            if AzureChatOpenAI is None:
+                raise RuntimeError("AzureChatOpenAI dependency not available; install langchain-openai")
+            missing = [
+                var for var in [
+                    "OPENAI_API_VERSION",
+                    "AZURE_OPENAI_DEPLOYMENT",
+                    "AZURE_OPENAI_ENDPOINT",
+                    "AZURE_OPENAI_KEY",
+                ]
+                if not os.getenv(var)
+            ]
+            if missing:
+                raise RuntimeError(f"Missing Azure OpenAI env vars: {', '.join(missing)}")
+            self.llm = AzureChatOpenAI(
+                openai_api_version=os.getenv("OPENAI_API_VERSION"),
+                azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "GPT-4o"),
+                azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+                api_key=os.getenv("AZURE_OPENAI_KEY"),
+                temperature=0.2,
+            )
+        return self.llm
 
     def gather_context(self, scenario: str) -> Dict[str, Any]:
-        existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps = (
-            self.orchestrator.generate_script(scenario)
-        )
+        try:
+            existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps = (
+                self.orchestrator.generate_script(scenario)
+            )
+        except Exception as exc:
+            # Don't let context gathering break endpoints that can work with vector/FS only
+            logger.warning("orchestrator.generate_script failed for scenario '%s': %s", scenario, exc)
+            existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps = (
+                None, None, None, None, None, None
+            )
 
         enriched_text = json.dumps(enriched_steps, indent=2) if enriched_steps else ""
         existing_excerpt = ""
@@ -377,7 +432,21 @@ class AgenticScriptAgent:
             scaffold_snippet=context.get("scaffold_snippet", ""),
             framework_summary=framework.summary(),
         )
-        response = self.llm.invoke(prompt)
+        try:
+            llm = self._ensure_llm()
+        except Exception as exc:  # Environment/config issues
+            logger.warning("LLM initialisation failed: %s", exc)
+            # Fallback: emit grounded contextual steps directly so the UI can proceed
+            if vector_steps:
+                return self._format_steps_for_prompt(vector_steps)
+            return enriched or f"LLM_NOT_AVAILABLE: {exc}"
+        try:
+            response = llm.invoke(prompt)
+        except Exception as exc:
+            logger.warning("LLM invoke failed for preview: %s", exc)
+            if vector_steps:
+                return self._format_steps_for_prompt(vector_steps)
+            return enriched or f"LLM_NOT_AVAILABLE: {exc}"
         return _strip_code_fences(getattr(response, "content", str(response)))
 
     def refine_preview(
@@ -396,7 +465,25 @@ class AgenticScriptAgent:
             scaffold_snippet=context.get("scaffold_snippet", ""),
             framework_summary=framework.summary(),
         )
-        response = self.llm.invoke(prompt)
+        try:
+            llm = self._ensure_llm()
+        except Exception as exc:
+            logger.warning("LLM initialisation failed (refine): %s", exc)
+            # Fallback: return previous preview if available, otherwise grounded steps
+            if previous_preview.strip():
+                return previous_preview
+            steps = context.get("vector_steps") or []
+            enriched = context.get("enriched_steps", "")
+            return (self._format_steps_for_prompt(steps) if steps else enriched) or f"LLM_NOT_AVAILABLE: {exc}"
+        try:
+            response = llm.invoke(prompt)
+        except Exception as exc:
+            logger.warning("LLM invoke failed for refine: %s", exc)
+            if previous_preview.strip():
+                return previous_preview
+            steps = context.get("vector_steps") or []
+            enriched = context.get("enriched_steps", "")
+            return (self._format_steps_for_prompt(steps) if steps else enriched) or f"LLM_NOT_AVAILABLE: {exc}"
         return _strip_code_fences(getattr(response, "content", str(response)))
 
     @staticmethod
@@ -848,7 +935,11 @@ class AgenticScriptAgent:
     def find_existing_framework_assets(
         self, scenario: str, framework: FrameworkProfile, top_k: int = 8
     ) -> List[Dict[str, Any]]:
-        results = self.vector_db.query(scenario, top_k=top_k)
+        try:
+            results = self.vector_db.query(scenario, top_k=top_k)
+        except Exception as exc:
+            logger.warning("vector_db.query failed for scenario '%s': %s", scenario, exc)
+            results = []
         assets: List[Dict[str, Any]] = []
         min_score = 6  # threshold to avoid unrelated matches
         scenario_tokens = self._tokenize(scenario)

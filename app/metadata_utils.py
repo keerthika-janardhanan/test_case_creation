@@ -5,7 +5,7 @@ import time
 import uuid
 from typing import Any, Dict, Tuple, List, Set
 
-DEFAULT_SENSITIVE_SELECTORS = {"password", "token", "secret", "card", "ssn"}
+DEFAULT_SENSITIVE_SELECTORS = {"password", "pass", "token", "secret", "card", "ssn", "email"}
 
 def _is_sensitive_selector(selector: str, custom_sensitive: Set[str] = None) -> bool:
     selector = (selector or "").lower()

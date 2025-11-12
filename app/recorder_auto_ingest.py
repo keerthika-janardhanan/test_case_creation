@@ -280,7 +280,7 @@ def auto_refine_and_ingest(
             from .ingest_refined_flow import ingest_refined_file  # type: ignore
         except ImportError:  # pragma: no cover - fallback for direct execution
             from ingest_refined_flow import ingest_refined_file  # type: ignore
-        ingest_stats = ingest_refined_file(str(output_path), resolved_flow_name)
+    ingest_stats = ingest_refined_file(str(output_path), resolved_flow_name)
 
     return {
         "refined_path": str(output_path),

@@ -35,6 +35,7 @@ from playwright.sync_api import (
 )
 
 from app.browser_utils import SUPPORTED_BROWSERS, normalize_browser_name
+from app.event_client import publish_recorder_event
 
 DEFAULT_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -835,6 +836,13 @@ def main() -> None:
         print(f"[recorder] Auto-stop after {args.timeout} seconds or Ctrl+C.")
     else:
         print("[recorder] Press Ctrl+C to stop recording.")
+    publish_recorder_event(
+        session_name,
+        "Recorder launcher initialised",
+        url=args.url,
+        browser=args.browser,
+        timeout=args.timeout,
+    )
 
     playwright = _ensure_playwright()
     context: Optional[BrowserContext] = None
@@ -1405,8 +1413,21 @@ def main() -> None:
                     print(f"[recorder] DOM snapshots stored in {session.dom_dir}")
                 if args.capture_screenshots:
                     print(f"[recorder] Screenshots stored in {session.screenshot_dir}")
+                publish_recorder_event(
+                    session_name,
+                    "Recorder session artefacts saved",
+                    actions=len(session.actions),
+                    metadata_path=str(meta_path),
+                )
             except Exception:
+                publish_recorder_event(
+                    session_name,
+                    "Recorder finalization failed",
+                    level="error",
+                )
                 pass
+        else:
+            publish_recorder_event(session_name, "Recorder session aborted", level="warning")
 
 
 if __name__ == "__main__":

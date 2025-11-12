@@ -1,0 +1,4078 @@
+{
+  "metadataVersion": "2025.10",
+  "flowId": "9337cc20e3434b50a049c50d680df639",
+  "flowName": "me flow",
+  "runTimestamp": "2025-11-06T17:40:21.857371+00:00",
+  "environment": {
+    "browser": "chromium",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "pages": [
+    {
+      "pageId": "page-1",
+      "pageRef": "url:about:blank",
+      "pageUrl": "about:blank",
+      "pageTitle": "",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "artifacts": {
+        "domSnapshots": [],
+        "screenshots": []
+      },
+      "actions": []
+    },
+    {
+      "pageId": "page-2",
+      "pageRef": "url:https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "pageTitle": "",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "artifacts": {
+        "domSnapshots": [],
+        "screenshots": []
+      },
+      "actions": []
+    },
+    {
+      "pageId": "page-3",
+      "pageRef": "url:https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "pageTitle": "",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "artifacts": {
+        "domSnapshots": [
+          "dom\\P-004.html",
+          "dom\\P-005.html"
+        ],
+        "screenshots": [
+          "screenshots\\P-004.png",
+          "screenshots\\P-005.png"
+        ]
+      },
+      "actions": []
+    },
+    {
+      "pageId": "page-4",
+      "pageRef": "url:https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "artifacts": {
+        "domSnapshots": [],
+        "screenshots": []
+      },
+      "actions": [
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "html",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.000658+00:00",
+          "actionId": "A-001",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.000658+00:00",
+          "type": "click",
+          "pageTitle": "",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Identity Cloud Service",
+          "timestamp": "2025-11-06T17:40:34.199000+00:00",
+          "element": {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "role": "",
+            "name": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',\n          ",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "",
+            "text": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',",
+            "labels": [],
+            "attributes": {},
+            "dataset": {},
+            "xpath": "/html[1]",
+            "cssPath": "html:nth-child(1)",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              }
+            ],
+            "relations": {
+              "parent": null,
+              "parentAttributes": {},
+              "previousSibling": null,
+              "nextSibling": null,
+              "siblingIndex": 1,
+              "siblings": []
+            },
+            "styles": {
+              "display": "block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgb(0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "start"
+            },
+            "cssProperties": {
+              "display": "block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgb(0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "start"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1280,
+              "height": 0
+            },
+            "stableSelector": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+            "playwright": {
+              "byRole": null,
+              "byLabel": null,
+              "byText": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo"
+            }
+          },
+          "extra": {
+            "button": 0,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.005182+00:00",
+          "actionId": "A-002",
+          "timestampEpochMs": 1762450834199,
+          "type": "click",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+            "css": "html:nth-child(1)",
+            "xpath": "/html[1]",
+            "text": "getByText('Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo')"
+          },
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.034671+00:00",
+          "actionId": "A-003",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.034671+00:00",
+          "type": "click",
+          "pageTitle": "Identity Cloud Service",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:36.171000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "role": "textbox",
+            "name": "User Name",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "User name or email",
+            "text": "",
+            "labels": [
+              "User Name"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-username",
+              "type": "text",
+              "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+              "placeholder": "User name or email"
+            },
+            "dataset": {
+              "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+              "bind": "value: username",
+              "idcsEnableRightClick": "true"
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-username",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12",
+                "index": 1
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-username",
+                "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+                "index": 2
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12"
+              },
+              "parentAttributes": {
+                "class": "oj-flex-item oj-sm-12"
+              },
+              "previousSibling": {
+                "tag": "oj-label",
+                "text": "User Name"
+              },
+              "nextSibling": null,
+              "siblingIndex": 2,
+              "siblings": [
+                {
+                  "tag": "oj-label",
+                  "text": "User Name",
+                  "id": "ui-id-2",
+                  "className": "oj-label oj-component oj-complete"
+                }
+              ]
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 349.875,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-username",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "User Name"
+              },
+              "byLabel": "User Name",
+              "byText": null
+            }
+          },
+          "extra": {
+            "button": 0,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.038790+00:00",
+          "actionId": "A-004",
+          "timestampEpochMs": 1762450836171,
+          "type": "click",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-username",
+            "css": "input#idcs-signin-basic-signin-form-username",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'User Name' })"
+          },
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "input",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.050669+00:00",
+          "actionId": "A-005",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.050669+00:00",
+          "type": "input",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "input",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:36.325000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "role": "textbox",
+            "name": "User Name",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "User name or email",
+            "text": "",
+            "labels": [
+              "User Name"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-username",
+              "type": "text",
+              "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+              "placeholder": "User name or email"
+            },
+            "dataset": {
+              "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+              "bind": "value: username",
+              "idcsEnableRightClick": "true"
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-username",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12",
+                "index": 1
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-username",
+                "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+                "index": 2
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12"
+              },
+              "parentAttributes": {
+                "class": "oj-flex-item oj-sm-12"
+              },
+              "previousSibling": {
+                "tag": "oj-label",
+                "text": "User Name"
+              },
+              "nextSibling": null,
+              "siblingIndex": 2,
+              "siblings": [
+                {
+                  "tag": "oj-label",
+                  "text": "User Name",
+                  "id": "ui-id-2",
+                  "className": "oj-label oj-component oj-complete"
+                }
+              ]
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 349.875,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-username",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "User Name"
+              },
+              "byLabel": "User Name",
+              "byText": null
+            },
+            "value": "arjun.gurunathan@cognizant.com",
+            "valueMasked": "<email>"
+          },
+          "extra": {
+            "value": "arjun.gurunathan@cognizant.com",
+            "valueMasked": "<email>",
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.057339+00:00",
+          "actionId": "A-006",
+          "timestampEpochMs": 1762450836325,
+          "type": "input",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-username",
+            "css": "input#idcs-signin-basic-signin-form-username",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'User Name' })"
+          },
+          "inputSummary": "Value: <email>",
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "change",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.072109+00:00",
+          "actionId": "A-007",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.072109+00:00",
+          "type": "change",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "change",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:43.280000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "role": "textbox",
+            "name": "User Name",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "User name or email",
+            "text": "",
+            "labels": [
+              "User Name"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-username",
+              "type": "text",
+              "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+              "placeholder": "User name or email"
+            },
+            "dataset": {
+              "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+              "bind": "value: username",
+              "idcsEnableRightClick": "true"
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-username",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12",
+                "index": 1
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-username",
+                "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+                "index": 2
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12"
+              },
+              "parentAttributes": {
+                "class": "oj-flex-item oj-sm-12"
+              },
+              "previousSibling": {
+                "tag": "oj-label",
+                "text": "User Name"
+              },
+              "nextSibling": null,
+              "siblingIndex": 2,
+              "siblings": [
+                {
+                  "tag": "oj-label",
+                  "text": "User Name",
+                  "id": "ui-id-2",
+                  "className": "oj-label oj-component oj-complete"
+                }
+              ]
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 359.6750183105469,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-username",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "User Name"
+              },
+              "byLabel": "User Name",
+              "byText": null
+            },
+            "value": "arjun.gurunathan@cognizant.com",
+            "valueMasked": "<email>"
+          },
+          "extra": {
+            "value": "arjun.gurunathan@cognizant.com",
+            "valueMasked": "<email>",
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.078009+00:00",
+          "actionId": "A-008",
+          "timestampEpochMs": 1762450843280,
+          "type": "change",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-username",
+            "css": "input#idcs-signin-basic-signin-form-username",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'User Name' })"
+          },
+          "inputSummary": "Value: <email>",
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.093275+00:00",
+          "actionId": "A-009",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.093275+00:00",
+          "type": "click",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:43.447000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "role": "textbox",
+            "name": "Password",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "Password",
+            "text": "",
+            "labels": [
+              "Password"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-password|input",
+              "type": "password",
+              "class": "oj-inputpassword-input oj-component-initnode",
+              "placeholder": "Password"
+            },
+            "dataset": {
+              "ojInternal": ""
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+                "index": 2
+              },
+              {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "index": 2
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-password|input",
+                "className": "oj-inputpassword-input oj-component-initnode",
+                "index": 1
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+              },
+              "parentAttributes": {
+                "id": "idcs-signin-basic-signin-form-password",
+                "value": "{{password}}",
+                "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "placeholder": "[[bundle('signin.password')]]"
+              },
+              "previousSibling": null,
+              "nextSibling": null,
+              "siblingIndex": 1,
+              "siblings": []
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 449.0375061035156,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "Password"
+              },
+              "byLabel": "Password",
+              "byText": null
+            }
+          },
+          "extra": {
+            "button": 0,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.101503+00:00",
+          "actionId": "A-010",
+          "timestampEpochMs": 1762450843447,
+          "type": "click",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+            "css": "input#idcs-signin-basic-signin-form-password|input",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'Password' })"
+          },
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "input",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.118243+00:00",
+          "actionId": "A-011",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.118243+00:00",
+          "type": "input",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "input",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:43.507000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "role": "textbox",
+            "name": "Password",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "Password",
+            "text": "",
+            "labels": [
+              "Password"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-password|input",
+              "type": "password",
+              "class": "oj-inputpassword-input oj-component-initnode",
+              "placeholder": "Password"
+            },
+            "dataset": {
+              "ojInternal": ""
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+                "index": 2
+              },
+              {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "index": 2
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-password|input",
+                "className": "oj-inputpassword-input oj-component-initnode",
+                "index": 1
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+              },
+              "parentAttributes": {
+                "id": "idcs-signin-basic-signin-form-password",
+                "value": "{{password}}",
+                "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "placeholder": "[[bundle('signin.password')]]"
+              },
+              "previousSibling": null,
+              "nextSibling": null,
+              "siblingIndex": 1,
+              "siblings": []
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 449.0375061035156,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "Password"
+              },
+              "byLabel": "Password",
+              "byText": null
+            },
+            "value": "<masked>",
+            "valueMasked": true
+          },
+          "extra": {
+            "value": "<masked>",
+            "valueMasked": true,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.128653+00:00",
+          "actionId": "A-012",
+          "timestampEpochMs": 1762450843507,
+          "type": "input",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+            "css": "input#idcs-signin-basic-signin-form-password|input",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'Password' })"
+          },
+          "inputSummary": "Value: <masked>",
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "change",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "input",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.148793+00:00",
+          "actionId": "A-013",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.148793+00:00",
+          "type": "change",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "change",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:44.344000+00:00",
+          "element": {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "role": "textbox",
+            "name": "Password",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "Password",
+            "text": "",
+            "labels": [
+              "Password"
+            ],
+            "attributes": {
+              "id": "idcs-signin-basic-signin-form-password|input",
+              "type": "password",
+              "class": "oj-inputpassword-input oj-component-initnode",
+              "placeholder": "Password"
+            },
+            "dataset": {
+              "ojInternal": ""
+            },
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+                "index": 2
+              },
+              {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "index": 2
+              },
+              {
+                "tag": "input",
+                "id": "idcs-signin-basic-signin-form-password|input",
+                "className": "oj-inputpassword-input oj-component-initnode",
+                "index": 1
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "oj-input-password",
+                "id": "idcs-signin-basic-signin-form-password",
+                "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+              },
+              "parentAttributes": {
+                "id": "idcs-signin-basic-signin-form-password",
+                "value": "{{password}}",
+                "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+                "placeholder": "[[bundle('signin.password')]]"
+              },
+              "previousSibling": null,
+              "nextSibling": null,
+              "siblingIndex": 1,
+              "siblings": []
+            },
+            "styles": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "cssProperties": {
+              "display": "inline-block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgba(0, 0, 0, 0.8)",
+              "backgroundColor": "rgb(252, 252, 253)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "left"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 391.20001220703125,
+              "y": 449.0375061035156,
+              "width": 482.3999938964844,
+              "height": 36.5625
+            },
+            "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+            "playwright": {
+              "byRole": {
+                "role": "textbox",
+                "name": "Password"
+              },
+              "byLabel": "Password",
+              "byText": null
+            },
+            "value": "<masked>",
+            "valueMasked": true
+          },
+          "extra": {
+            "value": "<masked>",
+            "valueMasked": true,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.164152+00:00",
+          "actionId": "A-014",
+          "timestampEpochMs": 1762450844344,
+          "type": "change",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+            "css": "input#idcs-signin-basic-signin-form-password|input",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+            "aria": "getByRole('textbox', { name: 'Password' })"
+          },
+          "inputSummary": "Value: <masked>",
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "element": {
+            "tag": "span",
+            "labels": []
+          },
+          "extra": {
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.185733+00:00",
+          "actionId": "A-015",
+          "timestampEpochMs": null,
+          "timestamp": "2025-11-06T17:41:27.185733+00:00",
+          "type": "click",
+          "pageTitle": "Cloud Sign In",
+          "pageId": "page-4",
+          "selectorStrategies": {},
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        },
+        {
+          "action": "click",
+          "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+          "pageTitle": "Cloud Sign In",
+          "timestamp": "2025-11-06T17:40:44.557000+00:00",
+          "element": {
+            "tag": "span",
+            "id": "ui-id-4",
+            "className": "oj-button-text",
+            "role": "",
+            "name": "Sign In",
+            "ariaLabel": "",
+            "title": "",
+            "placeholder": "",
+            "text": "Sign In",
+            "labels": [],
+            "attributes": {
+              "id": "ui-id-4",
+              "class": "oj-button-text"
+            },
+            "dataset": {},
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+            "cssPath": "span#ui-id-4",
+            "ancestors": [
+              {
+                "tag": "html",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "body",
+                "id": "",
+                "className": "",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-container",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-idaas-signin-app-shell-rw",
+                "id": "idcs-app-shell",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-sm-flex-direction-column",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "idcs-app-shell-signin-background",
+                "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "oj-module",
+                "id": "",
+                "className": "oj-complete",
+                "index": 2
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-flex-item idcs-signin-section-content-top-margin",
+                "index": 4
+              },
+              {
+                "tag": "oj-button",
+                "id": "idcs-signin-basic-signin-form-submit",
+                "className": "oj-button-primary oj-sm-6 idcs-signin-buttons oj-button oj-component oj-enabled oj-button-full-chrome oj-button-text-only oj-complete oj-hover oj-focus",
+                "index": 1
+              },
+              {
+                "tag": "button",
+                "id": "",
+                "className": "oj-button-button oj-component-initnode",
+                "index": 1
+              },
+              {
+                "tag": "div",
+                "id": "",
+                "className": "oj-button-label",
+                "index": 1
+              },
+              {
+                "tag": "span",
+                "id": "ui-id-4",
+                "className": "oj-button-text",
+                "index": 1
+              }
+            ],
+            "relations": {
+              "parent": {
+                "tag": "div",
+                "id": "",
+                "className": "oj-button-label"
+              },
+              "parentAttributes": {
+                "class": "oj-button-label"
+              },
+              "previousSibling": null,
+              "nextSibling": null,
+              "siblingIndex": 1,
+              "siblings": []
+            },
+            "styles": {
+              "display": "block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgb(255, 255, 255)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "center"
+            },
+            "cssProperties": {
+              "display": "block",
+              "visibility": "visible",
+              "opacity": "1",
+              "color": "rgb(255, 255, 255)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "textTransform": "none",
+              "textAlign": "center"
+            },
+            "nearestHeading": null,
+            "rect": {
+              "x": 472.20001220703125,
+              "y": 550.2750244140625,
+              "width": 79.20000457763672,
+              "height": 20.80000114440918
+            },
+            "stableSelector": "#ui-id-4",
+            "playwright": {
+              "byRole": null,
+              "byLabel": null,
+              "byText": "Sign In"
+            }
+          },
+          "extra": {
+            "button": 0,
+            "fromConsole": true
+          },
+          "receivedAt": "2025-11-06T17:41:27.198926+00:00",
+          "actionId": "A-016",
+          "timestampEpochMs": 1762450844557,
+          "type": "click",
+          "pageId": "page-4",
+          "selectorStrategies": {
+            "playwright": "#ui-id-4",
+            "css": "span#ui-id-4",
+            "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+            "text": "getByText('Sign In')"
+          },
+          "inputSummary": null,
+          "artifacts": {
+            "screenshot": null,
+            "domSnapshot": null
+          },
+          "degraded": true,
+          "notes": [
+            "Recorded via console debug fallback; selectors may be incomplete."
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "page-5",
+      "pageRef": "runtime:1834698545680",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": null,
+      "headings": [],
+      "mainHeading": null,
+      "viewport": {},
+      "artifacts": {
+        "domSnapshots": [
+          "dom\\P-007.html"
+        ],
+        "screenshots": [
+          "screenshots\\P-007.png"
+        ]
+      },
+      "actions": []
+    }
+  ],
+  "warnings": [
+    "Using degraded console fallback for action due to missing binding context."
+  ],
+  "artifacts": {
+    "har": null,
+    "trace": "trace.zip"
+  },
+  "session": {
+    "id": "9337cc20e3434b50a049c50d680df639",
+    "startedAt": "2025-11-06T17:40:21.857371+00:00",
+    "endedAt": "2025-11-06T17:41:28.873266+00:00"
+  },
+  "options": {
+    "browser": "chromium",
+    "headless": false,
+    "slowMo": null,
+    "captureDom": true,
+    "captureScreenshots": true,
+    "recordHar": true,
+    "recordTrace": true,
+    "url": "https://ecqg-test.fa.us2.oraclecloud.com/",
+    "ignoreHttpsErrors": false,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "proxy": null,
+    "disableGpu": false,
+    "bypassCsp": false,
+    "flowName": "me flow"
+  },
+  "pageContextEvents": [
+    {
+      "pageUrl": "about:blank",
+      "title": "",
+      "timestamp": 1762450822264,
+      "trigger": "init",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "receivedAt": "2025-11-06T17:40:26.824758+00:00"
+    },
+    {
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "title": "",
+      "timestamp": 1762450823882,
+      "trigger": "init",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "receivedAt": "2025-11-06T17:40:26.826808+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "title": "",
+      "timestamp": 1762450826640,
+      "trigger": "init",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "receivedAt": "2025-11-06T17:40:26.828327+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "title": "",
+      "timestamp": 1762450826775,
+      "trigger": "domcontentloaded",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "domSnapshotPath": "dom\\P-004.html",
+      "screenshotPath": "screenshots\\P-004.png",
+      "receivedAt": "2025-11-06T17:40:28.898941+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "title": "",
+      "timestamp": 1762450826777,
+      "trigger": "load",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "domSnapshotPath": "dom\\P-005.html",
+      "screenshotPath": "screenshots\\P-005.png",
+      "receivedAt": "2025-11-06T17:40:29.226370+00:00"
+    },
+    {
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "title": "",
+      "timestamp": 1762450827074,
+      "trigger": "init",
+      "headings": [],
+      "mainHeading": "",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "receivedAt": "2025-11-06T17:40:29.228873+00:00"
+    },
+    {
+      "trigger": "finalize",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "receivedAt": "2025-11-06T17:41:27.978291+00:00",
+      "domSnapshotPath": "dom\\P-007.html",
+      "screenshotPath": "screenshots\\P-007.png"
+    }
+  ],
+  "actions": [
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "html",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.000658+00:00",
+      "actionId": "A-001",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.000658+00:00",
+      "type": "click",
+      "pageTitle": "",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Identity Cloud Service",
+      "timestamp": "2025-11-06T17:40:34.199000+00:00",
+      "element": {
+        "tag": "html",
+        "id": "",
+        "className": "",
+        "role": "",
+        "name": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',\n          ",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "",
+        "text": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',",
+        "labels": [],
+        "attributes": {},
+        "dataset": {},
+        "xpath": "/html[1]",
+        "cssPath": "html:nth-child(1)",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          }
+        ],
+        "relations": {
+          "parent": null,
+          "parentAttributes": {},
+          "previousSibling": null,
+          "nextSibling": null,
+          "siblingIndex": 1,
+          "siblings": []
+        },
+        "styles": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "start"
+        },
+        "cssProperties": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "start"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 0
+        },
+        "stableSelector": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+        "playwright": {
+          "byRole": null,
+          "byLabel": null,
+          "byText": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo"
+        }
+      },
+      "extra": {
+        "button": 0,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.005182+00:00",
+      "actionId": "A-002",
+      "timestampEpochMs": 1762450834199,
+      "type": "click",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+        "css": "html:nth-child(1)",
+        "xpath": "/html[1]",
+        "text": "getByText('Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo')"
+      },
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.034671+00:00",
+      "actionId": "A-003",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.034671+00:00",
+      "type": "click",
+      "pageTitle": "Identity Cloud Service",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:36.171000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "role": "textbox",
+        "name": "User Name",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "User name or email",
+        "text": "",
+        "labels": [
+          "User Name"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-username",
+          "type": "text",
+          "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+          "placeholder": "User name or email"
+        },
+        "dataset": {
+          "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+          "bind": "value: username",
+          "idcsEnableRightClick": "true"
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12",
+            "index": 1
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "index": 2
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12"
+          },
+          "parentAttributes": {
+            "class": "oj-flex-item oj-sm-12"
+          },
+          "previousSibling": {
+            "tag": "oj-label",
+            "text": "User Name"
+          },
+          "nextSibling": null,
+          "siblingIndex": 2,
+          "siblings": [
+            {
+              "tag": "oj-label",
+              "text": "User Name",
+              "id": "ui-id-2",
+              "className": "oj-label oj-component oj-complete"
+            }
+          ]
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 349.875,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-username",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "User Name"
+          },
+          "byLabel": "User Name",
+          "byText": null
+        }
+      },
+      "extra": {
+        "button": 0,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.038790+00:00",
+      "actionId": "A-004",
+      "timestampEpochMs": 1762450836171,
+      "type": "click",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-username",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'User Name' })"
+      },
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "input",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.050669+00:00",
+      "actionId": "A-005",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.050669+00:00",
+      "type": "input",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "input",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:36.325000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "role": "textbox",
+        "name": "User Name",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "User name or email",
+        "text": "",
+        "labels": [
+          "User Name"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-username",
+          "type": "text",
+          "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+          "placeholder": "User name or email"
+        },
+        "dataset": {
+          "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+          "bind": "value: username",
+          "idcsEnableRightClick": "true"
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12",
+            "index": 1
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "index": 2
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12"
+          },
+          "parentAttributes": {
+            "class": "oj-flex-item oj-sm-12"
+          },
+          "previousSibling": {
+            "tag": "oj-label",
+            "text": "User Name"
+          },
+          "nextSibling": null,
+          "siblingIndex": 2,
+          "siblings": [
+            {
+              "tag": "oj-label",
+              "text": "User Name",
+              "id": "ui-id-2",
+              "className": "oj-label oj-component oj-complete"
+            }
+          ]
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 349.875,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-username",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "User Name"
+          },
+          "byLabel": "User Name",
+          "byText": null
+        },
+        "value": "arjun.gurunathan@cognizant.com",
+        "valueMasked": "<email>"
+      },
+      "extra": {
+        "value": "arjun.gurunathan@cognizant.com",
+        "valueMasked": "<email>",
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.057339+00:00",
+      "actionId": "A-006",
+      "timestampEpochMs": 1762450836325,
+      "type": "input",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-username",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'User Name' })"
+      },
+      "inputSummary": "Value: <email>",
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "change",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.072109+00:00",
+      "actionId": "A-007",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.072109+00:00",
+      "type": "change",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "change",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:43.280000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-username",
+        "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+        "role": "textbox",
+        "name": "User Name",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "User name or email",
+        "text": "",
+        "labels": [
+          "User Name"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-username",
+          "type": "text",
+          "class": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+          "placeholder": "User name or email"
+        },
+        "dataset": {
+          "idcsPlaceholderTranslationId": "idcs-username-placeholder",
+          "bind": "value: username",
+          "idcsEnableRightClick": "true"
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-username",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12",
+            "index": 1
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-username",
+            "className": "oj-sm-12 oj-form-control oj-inputtext-nocomp",
+            "index": 2
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12"
+          },
+          "parentAttributes": {
+            "class": "oj-flex-item oj-sm-12"
+          },
+          "previousSibling": {
+            "tag": "oj-label",
+            "text": "User Name"
+          },
+          "nextSibling": null,
+          "siblingIndex": 2,
+          "siblings": [
+            {
+              "tag": "oj-label",
+              "text": "User Name",
+              "id": "ui-id-2",
+              "className": "oj-label oj-component oj-complete"
+            }
+          ]
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 359.6750183105469,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-username",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "User Name"
+          },
+          "byLabel": "User Name",
+          "byText": null
+        },
+        "value": "arjun.gurunathan@cognizant.com",
+        "valueMasked": "<email>"
+      },
+      "extra": {
+        "value": "arjun.gurunathan@cognizant.com",
+        "valueMasked": "<email>",
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.078009+00:00",
+      "actionId": "A-008",
+      "timestampEpochMs": 1762450843280,
+      "type": "change",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-username",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'User Name' })"
+      },
+      "inputSummary": "Value: <email>",
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.093275+00:00",
+      "actionId": "A-009",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.093275+00:00",
+      "type": "click",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:43.447000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-password|input",
+        "className": "oj-inputpassword-input oj-component-initnode",
+        "role": "textbox",
+        "name": "Password",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "Password",
+        "text": "",
+        "labels": [
+          "Password"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-password|input",
+          "type": "password",
+          "class": "oj-inputpassword-input oj-component-initnode",
+          "placeholder": "Password"
+        },
+        "dataset": {
+          "ojInternal": ""
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+            "index": 2
+          },
+          {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "index": 2
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "index": 1
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+          },
+          "parentAttributes": {
+            "id": "idcs-signin-basic-signin-form-password",
+            "value": "{{password}}",
+            "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "placeholder": "[[bundle('signin.password')]]"
+          },
+          "previousSibling": null,
+          "nextSibling": null,
+          "siblingIndex": 1,
+          "siblings": []
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 449.0375061035156,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "Password"
+          },
+          "byLabel": "Password",
+          "byText": null
+        }
+      },
+      "extra": {
+        "button": 0,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.101503+00:00",
+      "actionId": "A-010",
+      "timestampEpochMs": 1762450843447,
+      "type": "click",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'Password' })"
+      },
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "input",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.118243+00:00",
+      "actionId": "A-011",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.118243+00:00",
+      "type": "input",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "input",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:43.507000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-password|input",
+        "className": "oj-inputpassword-input oj-component-initnode",
+        "role": "textbox",
+        "name": "Password",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "Password",
+        "text": "",
+        "labels": [
+          "Password"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-password|input",
+          "type": "password",
+          "class": "oj-inputpassword-input oj-component-initnode",
+          "placeholder": "Password"
+        },
+        "dataset": {
+          "ojInternal": ""
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+            "index": 2
+          },
+          {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "index": 2
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "index": 1
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+          },
+          "parentAttributes": {
+            "id": "idcs-signin-basic-signin-form-password",
+            "value": "{{password}}",
+            "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "placeholder": "[[bundle('signin.password')]]"
+          },
+          "previousSibling": null,
+          "nextSibling": null,
+          "siblingIndex": 1,
+          "siblings": []
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 449.0375061035156,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "Password"
+          },
+          "byLabel": "Password",
+          "byText": null
+        },
+        "value": "<masked>",
+        "valueMasked": true
+      },
+      "extra": {
+        "value": "<masked>",
+        "valueMasked": true,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.128653+00:00",
+      "actionId": "A-012",
+      "timestampEpochMs": 1762450843507,
+      "type": "input",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'Password' })"
+      },
+      "inputSummary": "Value: <masked>",
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "change",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "input",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.148793+00:00",
+      "actionId": "A-013",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.148793+00:00",
+      "type": "change",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "change",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:44.344000+00:00",
+      "element": {
+        "tag": "input",
+        "id": "idcs-signin-basic-signin-form-password|input",
+        "className": "oj-inputpassword-input oj-component-initnode",
+        "role": "textbox",
+        "name": "Password",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "Password",
+        "text": "",
+        "labels": [
+          "Password"
+        ],
+        "attributes": {
+          "id": "idcs-signin-basic-signin-form-password|input",
+          "type": "password",
+          "class": "oj-inputpassword-input oj-component-initnode",
+          "placeholder": "Password"
+        },
+        "dataset": {
+          "ojInternal": ""
+        },
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "cssPath": "input#idcs-signin-basic-signin-form-password|input",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 idcs-signin-field-label-top-margin",
+            "index": 2
+          },
+          {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "index": 2
+          },
+          {
+            "tag": "input",
+            "id": "idcs-signin-basic-signin-form-password|input",
+            "className": "oj-inputpassword-input oj-component-initnode",
+            "index": 1
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "oj-input-password",
+            "id": "idcs-signin-basic-signin-form-password",
+            "className": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus"
+          },
+          "parentAttributes": {
+            "id": "idcs-signin-basic-signin-form-password",
+            "value": "{{password}}",
+            "class": "oj-sm-12 oj-inputpassword oj-form-control oj-component oj-complete oj-focus",
+            "placeholder": "[[bundle('signin.password')]]"
+          },
+          "previousSibling": null,
+          "nextSibling": null,
+          "siblingIndex": 1,
+          "siblings": []
+        },
+        "styles": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "cssProperties": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgba(0, 0, 0, 0.8)",
+          "backgroundColor": "rgb(252, 252, 253)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "left"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 391.20001220703125,
+          "y": 449.0375061035156,
+          "width": 482.3999938964844,
+          "height": 36.5625
+        },
+        "stableSelector": "#idcs-signin-basic-signin-form-password\\|input",
+        "playwright": {
+          "byRole": {
+            "role": "textbox",
+            "name": "Password"
+          },
+          "byLabel": "Password",
+          "byText": null
+        },
+        "value": "<masked>",
+        "valueMasked": true
+      },
+      "extra": {
+        "value": "<masked>",
+        "valueMasked": true,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.164152+00:00",
+      "actionId": "A-014",
+      "timestampEpochMs": 1762450844344,
+      "type": "change",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#idcs-signin-basic-signin-form-password\\|input",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "aria": "getByRole('textbox', { name: 'Password' })"
+      },
+      "inputSummary": "Value: <masked>",
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "element": {
+        "tag": "span",
+        "labels": []
+      },
+      "extra": {
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.185733+00:00",
+      "actionId": "A-015",
+      "timestampEpochMs": null,
+      "timestamp": "2025-11-06T17:41:27.185733+00:00",
+      "type": "click",
+      "pageTitle": "Cloud Sign In",
+      "pageId": "page-4",
+      "selectorStrategies": {},
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    },
+    {
+      "action": "click",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "timestamp": "2025-11-06T17:40:44.557000+00:00",
+      "element": {
+        "tag": "span",
+        "id": "ui-id-4",
+        "className": "oj-button-text",
+        "role": "",
+        "name": "Sign In",
+        "ariaLabel": "",
+        "title": "",
+        "placeholder": "",
+        "text": "Sign In",
+        "labels": [],
+        "attributes": {
+          "id": "ui-id-4",
+          "class": "oj-button-text"
+        },
+        "dataset": {},
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "cssPath": "span#ui-id-4",
+        "ancestors": [
+          {
+            "tag": "html",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "body",
+            "id": "",
+            "className": "",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-container",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-idaas-signin-app-shell-rw",
+            "id": "idcs-app-shell",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-sm-flex-direction-column",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "idcs-app-shell-signin-background",
+            "className": "oj-idaas-signin-app-shell-rw oj-idaas-signin-app-shell-background-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex oj-idaas-signin-app-shell-wrapper-rw oj-idaas-signin-app-shell-wrapper-background-rw oj-idaas-signin-app-shell-wrapper-default-branding-rw",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item oj-sm-12 oj-idaas-signin-app-shell-content-wrapper-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-idaas-signin-app-shell-padding-left-rw oj-idaas-signin-app-shell-padding-right-rw",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "oj-module",
+            "id": "",
+            "className": "oj-complete",
+            "index": 2
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-flex-item idcs-signin-section-content-top-margin",
+            "index": 4
+          },
+          {
+            "tag": "oj-button",
+            "id": "idcs-signin-basic-signin-form-submit",
+            "className": "oj-button-primary oj-sm-6 idcs-signin-buttons oj-button oj-component oj-enabled oj-button-full-chrome oj-button-text-only oj-complete oj-hover oj-focus",
+            "index": 1
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "className": "oj-button-button oj-component-initnode",
+            "index": 1
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "className": "oj-button-label",
+            "index": 1
+          },
+          {
+            "tag": "span",
+            "id": "ui-id-4",
+            "className": "oj-button-text",
+            "index": 1
+          }
+        ],
+        "relations": {
+          "parent": {
+            "tag": "div",
+            "id": "",
+            "className": "oj-button-label"
+          },
+          "parentAttributes": {
+            "class": "oj-button-label"
+          },
+          "previousSibling": null,
+          "nextSibling": null,
+          "siblingIndex": 1,
+          "siblings": []
+        },
+        "styles": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 255, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "center"
+        },
+        "cssProperties": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 255, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "textTransform": "none",
+          "textAlign": "center"
+        },
+        "nearestHeading": null,
+        "rect": {
+          "x": 472.20001220703125,
+          "y": 550.2750244140625,
+          "width": 79.20000457763672,
+          "height": 20.80000114440918
+        },
+        "stableSelector": "#ui-id-4",
+        "playwright": {
+          "byRole": null,
+          "byLabel": null,
+          "byText": "Sign In"
+        }
+      },
+      "extra": {
+        "button": 0,
+        "fromConsole": true
+      },
+      "receivedAt": "2025-11-06T17:41:27.198926+00:00",
+      "actionId": "A-016",
+      "timestampEpochMs": 1762450844557,
+      "type": "click",
+      "pageId": "page-4",
+      "selectorStrategies": {
+        "playwright": "#ui-id-4",
+        "css": "span#ui-id-4",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "text": "getByText('Sign In')"
+      },
+      "inputSummary": null,
+      "artifacts": {
+        "screenshot": null,
+        "domSnapshot": null
+      },
+      "degraded": true,
+      "notes": [
+        "Recorded via console debug fallback; selectors may be incomplete."
+      ]
+    }
+  ]
+}

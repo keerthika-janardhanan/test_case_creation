@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
 import pandas as pd
-from vector_db import VectorDBClient
+from app.vector_db import VectorDBClient
 from langchain_openai import AzureChatOpenAI
-from recorder_enricher import slugify, GENERATED_DIR
+from app.recorder_enricher import slugify, GENERATED_DIR
 try:
     from .ingest_refined_flow import ingest_refined_file  # type: ignore
 except ImportError:
@@ -2925,29 +2925,29 @@ class TestCaseGenerator:
 
         return refined
 
-    def _generate_from_template(self, story: str):
-        """Fill test cases using the selected template."""
-        lines = [line.strip() for line in story.splitlines() if line.strip()]
-        test_cases = []
+    # def _generate_from_template(self, story: str):
+    #     """Fill test cases using the selected template."""
+    #     lines = [line.strip() for line in story.splitlines() if line.strip()]
+    #     test_cases = []
 
-        if "rows" in self.template:
-            # Excel/CSV style template
-            for idx, row in enumerate(self.template["rows"], 1):
-                test_cases.append({"id": idx, **row})
-        else:
-            # Format string style (JSON/YAML/TXT)
-            for idx, line in enumerate(lines, 1):
-                format_str = self.template.get("format", "{title}")
-                fields = self.template.get("fields", ["title"])
+    #     if "rows" in self.template:
+    #         # Excel/CSV style template
+    #         for idx, row in enumerate(self.template["rows"], 1):
+    #             test_cases.append({"id": idx, **row})
+    #     else:
+    #         # Format string style (JSON/YAML/TXT)
+    #         for idx, line in enumerate(lines, 1):
+    #             format_str = self.template.get("format", "{title}")
+    #             fields = self.template.get("fields", ["title"])
 
-                filled = format_str
-                for field in fields:
-                    value = line if field == "title" else f"<{field}_value>"
-                    filled = filled.replace(f"{{{field}}}", value)
+    #             filled = format_str
+    #             for field in fields:
+    #                 value = line if field == "title" else f"<{field}_value>"
+    #                 filled = filled.replace(f"{{{field}}}", value)
 
-                test_cases.append({"id": idx, "test_case": filled})
+    #             test_cases.append({"id": idx, "test_case": filled})
 
-        return test_cases
+    #     return test_cases
     
 def map_llm_to_template(llm_output, template_df):
     """Map LLM output into the structure of the uploaded Excel template.

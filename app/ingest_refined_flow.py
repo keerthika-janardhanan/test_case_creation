@@ -24,7 +24,7 @@ try:
     from .ingest_utils import ingest_artifact  # type: ignore
     from .hashstore import compute_hash  # type: ignore
 except ImportError:
-    from vector_db import VectorDBClient
+    from app.vector_db import VectorDBClient
     from ingest_utils import ingest_artifact
     from hashstore import compute_hash
 

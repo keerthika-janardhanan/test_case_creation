@@ -1,5 +1,5 @@
 # app/test.py
-from vector_db import VectorDBClient
+from app.vector_db import VectorDBClient
 
 def check_vector_db_by_source_or_type(limit: int = 5):
     db = VectorDBClient()

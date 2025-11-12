@@ -3,11 +3,37 @@ import json
 import re
 from pathlib import Path
 
-from vector_db import VectorDBClient
-from parser_utils import extract_structure, merge_recorder_flow, apply_ui_crawl_locators, insert_test_variations
-from codegen_utils import generate_final_script
-from executor import run_trial
-from llm_client import ask_llm_for_script, ask_llm_to_self_heal, update_locator_cache
+from app.vector_db import VectorDBClient
+
+try:
+    from .parser_utils import (
+        extract_structure,
+        merge_recorder_flow,
+        apply_ui_crawl_locators,
+        insert_test_variations,
+    )
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from parser_utils import (  # type: ignore
+        extract_structure,
+        merge_recorder_flow,
+        apply_ui_crawl_locators,
+        insert_test_variations,
+    )
+
+try:
+    from .codegen_utils import generate_final_script
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from codegen_utils import generate_final_script  # type: ignore
+
+try:
+    from .executor import run_trial
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from executor import run_trial  # type: ignore
+
+try:
+    from .llm_client import ask_llm_for_script, ask_llm_to_self_heal
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from llm_client import ask_llm_for_script, ask_llm_to_self_heal  # type: ignore
 
 
 def safe_content(artifact):
@@ -148,28 +174,25 @@ class TestScriptOrchestrator:
 
         return existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps
 
-    def generate_and_run(self, test_case_id: str):
-        existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps = \
-            self.generate_script(test_case_id)
-
-        # Call LLM to generate new script
-        new_script = ask_llm_for_script(
-            structure=structure,
-            existing_script=safe_content(existing_script),
-            test_case=safe_content(test_case),
-            enriched_steps=enriched_steps,
-            ui_crawl=safe_content(ui_crawl),
-        )
-
-        # Trial run
-        success, logs = run_trial(new_script)
-
-        # Self-healing if locator fails
-        if not success and "locator" in logs.lower():
-            healed_script = ask_llm_to_self_heal(new_script, logs, safe_content(ui_crawl))
-            success, logs = run_trial(healed_script)
-
-            if success:
-                new_script = healed_script
-
-        return new_script, success, logs
+    # NOTE: A previous draft of a generate_and_run() helper leaked top-level code here,
+    # which executed on import and caused 500 errors when importing this module.
+    # That experimental block has been removed. If needed in the future, implement
+    # a proper instance method like the sketch below and call it explicitly:
+    #
+    # def generate_and_run(self, test_case_id: str):
+    #     existing_script, recorder_flow, ui_crawl, test_case, structure, enriched_steps = \
+    #         self.generate_script(test_case_id)
+    #     new_script = ask_llm_for_script(
+    #         structure=structure,
+    #         existing_script=safe_content(existing_script),
+    #         test_case=safe_content(test_case),
+    #         enriched_steps=enriched_steps,
+    #         ui_crawl=safe_content(ui_crawl),
+    #     )
+    #     success, logs = run_trial(new_script)
+    #     if not success and "locator" in logs.lower():
+    #         healed_script = ask_llm_to_self_heal(new_script, logs, safe_content(ui_crawl))
+    #         success, logs = run_trial(healed_script)
+    #         if success:
+    #             new_script = healed_script
+    #     return new_script, success, logs

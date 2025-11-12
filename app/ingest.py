@@ -1,14 +1,14 @@
 import json
 import os
-from sources.jira import fetch_jira_issues
-from sources.documents import load_documents
-from sources.ui_crawl import load_ui_crawl
-from vector_db import VectorDBClient
-from ingest_utils import ingest_artifact
-from utils import clean_metadata
-from metadata_utils import prepare_artifact_and_metadata_for_ingest
+from app.sources.jira import fetch_jira_issues
+from app.sources.documents import load_documents
+from app.sources.ui_crawl import load_ui_crawl
+from app.vector_db import VectorDBClient
+from app.ingest_utils import ingest_artifact
+from app.utils import clean_metadata
+from app.metadata_utils import prepare_artifact_and_metadata_for_ingest
 from fastapi import FastAPI, Request
-from parse_playwright import parse_playwright_code
+from app.parse_playwright import parse_playwright_code
 
 
 db = VectorDBClient()

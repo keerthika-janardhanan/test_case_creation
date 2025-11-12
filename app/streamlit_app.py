@@ -876,8 +876,8 @@ def _build_playwright_command(spec_path: Path | str, headed: bool = False) -> Li
 def run_spec_file(spec_path: Path, repo_root: Path, headed: bool = False) -> Tuple[bool, str]:
     absolute_spec = spec_path if spec_path.is_absolute() else (repo_root / spec_path).resolve()
     prepared_path, cleanup = prepare_trial_spec_path(absolute_spec, repo_root)
-
     try:
+        # Resolve path for CLI argument
         try:
             relative_prepared = prepared_path.relative_to(repo_root)
             spec_arg: Path | str = relative_prepared
@@ -886,9 +886,10 @@ def run_spec_file(spec_path: Path, repo_root: Path, headed: bool = False) -> Tup
 
         cmd = _build_playwright_command(spec_arg, headed=headed)
         env_vars = os.environ.copy()
-        try_env = trial_env_overrides(repo_root)
+        try_env = trial_env_overrides(repo_root, spec_path=prepared_path)
         if try_env:
             env_vars.update(try_env)
+
         try:
             result = subprocess.run(
                 cmd,

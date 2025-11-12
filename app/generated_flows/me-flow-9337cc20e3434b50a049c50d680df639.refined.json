@@ -1,0 +1,230 @@
+{
+  "refinedVersion": "2025.10",
+  "flow_name": "me flow",
+  "flow_id": "9337cc20e3434b50a049c50d680df639",
+  "generated_at": "2025-11-06T17:41:33.078810+00:00",
+  "pages": [
+    {
+      "pageId": "page-1",
+      "pageUrl": "about:blank",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-2",
+      "pageUrl": "https://ecqg-test.fa.us2.oraclecloud.com/fscmUI/faces/AtkHomePageWelcome",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-3",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/oauth2/v1/authorize?response_mode=form_post&response_type=id_token&scope=openid&IDCS_CG_ENC_VER=v2&state=bTxSwjCAvYS3bl5e0fHvopsps9ECOMRKB3OsqowuUUA&nonce=34y6ljpZBP9q2IgI12eVVYo6vXchQbx3uk4YUGAYuPo&IDCS_IS_CLOUDGATE=true&X-HOST-IDENTIFIER-NAME=ecqg-test.fa.us2.oraclecloud.com%3A443&idcs_app_name=FAAppResource_11-13-25-07-0-08000_APPID&idcs_app_resource_url=https%3A%2F%2Fecqg-test.fa.us2.oraclecloud.com%3A443%2FfscmUI%2FadfAuthentication%3Flevel%3DFORM%26success_url%3D%252FfscmUI%252Ffaces%252FAtkHomePageWelcome%253F_afrLoop%253D47870259703113849%2526_afrWindowMode%253D0%2526_afrWindowId%253Dnull%2526_adf.ctrl-state%253D119lefcxc5_1%2526_afrFS%253D16%2526_afrMT%253Dscreen%2526_afrMFW%253D1280%2526_afrMFH%253D720%2526_afrMFDW%253D1280%2526_afrMFDH%253D720%2526_afrMFC%253D8%2526_afrMFCI%253D0%2526_afrMFM%253D0%2526_afrMFR%253D96%2526_afrMFG%253D0%2526_afrMFS%253D0%2526_afrMFO%253D0%2526_adf.no-new-window-redirect%253Dtrue&client_id=44e4228134b44ae4937a140a33ee8093_APPID&IDCS_CG_ENC=true&enc=Vj8dEnG_8Zf6AwAAwAMAABAgwAMAAKYDAAAQADM_545UMBN6mJl88OIce5sorNmcXy_Ojhi4NgJKIne4OTS35j8ga7MLoC6iWrky23iL95g5aMa8x7xkyyIvPE_dvdNP8mt7Pq0iQL2c2MvVtn1gBABG0ciTII3bhdIO6qyZKAYM-YnbM-_ODiIsy9Er1VoWpeh-fIl_GcjBV7Za8IgrOwVvGlX5N4G29bYOCjnHH91TMz_cyAHgLHMKiL3_S6jnJdFA4pciTlWjQt24nPo-fCdopqPN8ugrbyO8g-Wd2R9sb8kEg7MtE8efPVDLuEj5xZGnXTFQkUawt7F6k5q0WpaD0LCk8LTqAG6WB31eyM5oPEeFpSwifBs1IlqAsybpYG0JyHOmKhQIxwWtYgS9h55FFxKDiElDkvZ-Tvh9GXesytHQiCjAL0_goB043i6jKpJ3FtKtlD49u6hCCraXQeyRFyuuLL1FQD3WRUfpzBEnBPeOqM5XXauOugETha7ZDUlaAnErS8Iphw2ukb_JN_uyDrI1Brw0ak--FkDFQDWJUiIMn2zEcaQySLZwZ9Qm_QqQ8Hi3vZoPN2hohFcl3nKgMZEqwDARfbesJevxwgkNveoaxL6u4THqKdDeU3cgN0dj9iM2w-pfwIIFgoncMpY-BJa22N0VqxzX7x-eNBsmBsuThmGJZzctTUu5t97h1nWPQo_Ko0dJXB7g4ndVclo9nnq6JVTG4VnPaQsYBY3xl-yTPrNss1V2mRtmvxuZkZ_NIMeSq06-Kxv2Oij0KiDmeJBIx4yt5EMpfml4CvSeTEgS8xYrHcuyl1Pk61_m8Pcr5JZOqn6wIUUVksYENs5Jp7QPc5YQan99rF5ljvhoEDYwXzC1GybnOS-paTEnbMKhOYn1lmKk1sUKknfwKfs8xqPhUU3tv03oLIgX3v9_NUpYODmx84ADPyomcJ5OgoZ9veNQWBbgXE3dycX36Z5Lfwi0i-zN98TtDisZXseHDjC-wWhSXScQJaBOosh7OtaHwXLQ3rwS3RWLW68XQH8Jrr9EPqgBVPlKJNroKE9YKgX5MHo09-uU19nvrNsKWvOrcuR_HdBn4e48fB53tKWLLI-I9TMqifZA-IxKmsKrpd1PrLerL4G86t_eSSaK7TZkb8RkOYaqw4JSYs0nN7Kp_-ANhSXx2Os1FRc1LizjrJCzPdxe7xCkqTV3_h3imG7Z16ToFzN4aUhN3NfQ8q3cUYePFq3OptfHfuAD0KpZ_GADTbDK8fSOR420ImhhGaEoUzrhGbeFNnLqWrb13AkW523ggGaRijNV532EOckvuFKyqHsqf0K3iwg89e_tAHTfsl3dke_TBnIcw-cTMkNi",
+      "pageTitle": "",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-4",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": "Cloud Sign In",
+      "mainHeading": ""
+    },
+    {
+      "pageId": "page-5",
+      "pageUrl": "https://idcs-03948457336f43a581f13551f128012c.identity.oraclecloud.com/ui/v1/signin",
+      "pageTitle": null,
+      "mainHeading": null
+    }
+  ],
+  "elements": [
+    {
+      "tag": "html",
+      "title": "",
+      "label": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',",
+      "role": "",
+      "name": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',",
+      "xpath": "/html[1]",
+      "css": "html:nth-child(1)",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "User Name",
+      "role": "textbox",
+      "name": "User Name",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+      "css": "input#idcs-signin-basic-signin-form-username",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "input",
+      "title": "",
+      "label": "Password",
+      "role": "textbox",
+      "name": "Password",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+      "css": "input#idcs-signin-basic-signin-form-password|input",
+      "heading": "",
+      "page_heading": ""
+    },
+    {
+      "tag": "span",
+      "title": "",
+      "label": "Sign In",
+      "role": "",
+      "name": "Sign In",
+      "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+      "css": "span#ui-id-4",
+      "heading": "",
+      "page_heading": ""
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "Click",
+      "navigation": "Click the Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+        "stable": "getByText(\"Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalCo\")",
+        "xpath": "/html[1]",
+        "xpath_candidates": [
+          "/html[1]"
+        ],
+        "raw_xpath": "/html[1]",
+        "css": "html:nth-child(1)",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Identity Cloud Service\n\n\n    \n    \n    \n\n    \n    \n    \n\n    \n      var GlobalConfig = {\n                  browserPreferredLocale: 'en-US',",
+        "tag": "html",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 2,
+      "action": "Click",
+      "navigation": "Click the User Name field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'User Name' })",
+        "stable": "#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "title": "",
+        "labels": "User Name",
+        "role": "textbox",
+        "name": "User Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 3,
+      "action": "Fill",
+      "navigation": "Enter User Name",
+      "data": "User Name: <email>",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'User Name' })",
+        "stable": "#idcs-signin-basic-signin-form-username",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-username",
+        "title": "",
+        "labels": "User Name",
+        "role": "textbox",
+        "name": "User Name",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 4,
+      "action": "Click",
+      "navigation": "Click the Password field",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Password' })",
+        "stable": "#idcs-signin-basic-signin-form-password\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "title": "",
+        "labels": "Password",
+        "role": "textbox",
+        "name": "Password",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 5,
+      "action": "Fill",
+      "navigation": "Enter Password",
+      "data": "Password: True",
+      "expected": "Field captures the entered data.",
+      "locators": {
+        "playwright": "getByRole('textbox', { name: 'Password' })",
+        "stable": "#idcs-signin-basic-signin-form-password\\|input",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[2]/oj-input-password[1]/input[1]",
+        "css": "input#idcs-signin-basic-signin-form-password|input",
+        "title": "",
+        "labels": "Password",
+        "role": "textbox",
+        "name": "Password",
+        "tag": "input",
+        "heading": "",
+        "page_heading": ""
+      }
+    },
+    {
+      "step": 6,
+      "action": "Click",
+      "navigation": "Click the element element",
+      "data": "",
+      "expected": "Element responds as expected.",
+      "locators": {
+        "playwright": "#ui-id-4",
+        "stable": "#ui-id-4",
+        "xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "xpath_candidates": [
+          "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]"
+        ],
+        "raw_xpath": "/html[1]/body[1]/div[1]/oj-idaas-signin-app-shell-rw[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/oj-module[1]/div[1]/oj-module[1]/div[1]/div[1]/div[4]/oj-button[1]/button[1]/div[1]/span[1]",
+        "css": "span#ui-id-4",
+        "title": "",
+        "labels": "",
+        "role": "",
+        "name": "Sign In",
+        "tag": "span",
+        "heading": "",
+        "page_heading": ""
+      }
+    }
+  ]
+}
