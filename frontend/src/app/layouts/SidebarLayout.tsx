@@ -41,17 +41,31 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
     <Flex minH="100vh" bg="gray.50">
       <Box
         as="nav"
-        w={{ base: "240px", xl: "260px" }}
-        bg="gray.900"
+        w={{ base: "260px", xl: "280px" }}
+        bg="linear-gradient(180deg, #1a202c 0%, #2d3748 100%)"
         color="white"
         px={6}
         py={8}
+        boxShadow="xl"
+        position="relative"
+        _after={{
+          content: '""',
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: "1px",
+          bg: "whiteAlpha.100",
+        }}
       >
-        <Heading size="md" mb={8}>
+        <Heading size="lg" mb={2} fontWeight="bold" letterSpacing="tight">
           Test Artifact Suite
         </Heading>
+        <Text fontSize="xs" color="whiteAlpha.700" mb={10}>
+          Automated Test Generation Platform
+        </Text>
         <Stack spacing={5}></Stack>
-        <VStack spacing={2} align="stretch" mt={10}>
+        <VStack spacing={2} align="stretch" mt={6}>
           {/* Vector Ingestion dropdown */}
           <Box>
             <HStack
@@ -59,18 +73,19 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
               onClick={() => setIngestOpen((o) => !o)}
               w="100%"
               justifyContent="space-between"
-              px={3}
-              py={2}
-              borderRadius="md"
-              bg={isIngestActive ? "blue.500" : "transparent"}
-              color={isIngestActive ? "white" : "gray.200"}
-              _hover={{ bg: isIngestActive ? "blue.600" : "gray.800" }}
+              px={4}
+              py={3}
+              borderRadius="lg"
+              bg={isIngestActive ? "whiteAlpha.200" : "transparent"}
+              color={isIngestActive ? "white" : "whiteAlpha.800"}
+              _hover={{ bg: isIngestActive ? "whiteAlpha.300" : "whiteAlpha.100" }}
+              transition="all 0.2s"
             >
-              <Text fontSize="sm" fontWeight="semibold">Vector Ingestion</Text>
-              <Text fontSize="sm">{ingestOpen ? "▼" : "▶"}</Text>
+              <Text fontSize="sm" fontWeight="600">Vector Ingestion</Text>
+              <Text fontSize="xs">{ingestOpen ? "▼" : "▶"}</Text>
             </HStack>
             <Collapse in={ingestOpen} animateOpacity>
-              <VStack spacing={1} align="stretch" mt={1} ml={2}>
+              <VStack spacing={1} align="stretch" mt={2} ml={3}>
                 {ingestLinks.map((link) => {
                   const isActive = location.pathname.startsWith(link.to);
                   return (
@@ -78,14 +93,20 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
                       as={RouterNavLink}
                       key={link.to}
                       to={link.to}
-                      px={3}
-                      py={2}
+                      px={4}
+                      py={2.5}
                       borderRadius="md"
                       fontSize="sm"
-                      fontWeight="medium"
-                      bg={isActive ? "blue.500" : "transparent"}
-                      color={isActive ? "white" : "gray.200"}
-                      _hover={{ bg: isActive ? "blue.600" : "gray.800" }}
+                      fontWeight="500"
+                      bg={isActive ? "brand.500" : "transparent"}
+                      color={isActive ? "white" : "whiteAlpha.800"}
+                      _hover={{ 
+                        bg: isActive ? "brand.600" : "whiteAlpha.100",
+                        transform: "translateX(4px)",
+                      }}
+                      transition="all 0.2s"
+                      borderLeftWidth="2px"
+                      borderLeftColor={isActive ? "brand.300" : "transparent"}
                     >
                       {link.label}
                     </Box>
@@ -103,14 +124,20 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
                 as={RouterNavLink}
                 key={link.to}
                 to={link.to}
-                px={3}
-                py={2}
-                borderRadius="md"
+                px={4}
+                py={3}
+                borderRadius="lg"
                 fontSize="sm"
-                fontWeight="medium"
-                bg={isActive ? "blue.500" : "transparent"}
-                color={isActive ? "white" : "gray.200"}
-                _hover={{ bg: isActive ? "blue.600" : "gray.800" }}
+                fontWeight="600"
+                bg={isActive ? "brand.500" : "transparent"}
+                color={isActive ? "white" : "whiteAlpha.800"}
+                _hover={{ 
+                  bg: isActive ? "brand.600" : "whiteAlpha.100",
+                  transform: "translateX(4px)",
+                }}
+                transition="all 0.2s"
+                borderLeftWidth="3px"
+                borderLeftColor={isActive ? "brand.300" : "transparent"}
               >
                 {link.label}
               </Box>
@@ -120,10 +147,29 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
       </Box>
       <Flex direction="column" flex="1">
         {/* Global header inputs removed: repo settings now live only on the Test Script Generator page */}
-        <Box as="header" borderBottomWidth="1px" borderColor="gray.200" bg="white" px={{ base: 6, md: 10 }} py={4}>
-          <Text fontSize="sm" color="gray.600">Test Artifact Suite</Text>
+        <Box 
+          as="header" 
+          borderBottomWidth="1px" 
+          borderColor="gray.200" 
+          bg="white" 
+          px={{ base: 6, md: 10 }} 
+          py={6}
+          boxShadow="sm"
+        >
+          <HStack spacing={4}>
+            <Box 
+              w="8px" 
+              h="8px" 
+              borderRadius="full" 
+              bg="green.400"
+              boxShadow="0 0 0 3px rgba(72, 187, 120, 0.2)"
+            />
+            <Text fontSize="lg" fontWeight="600" color="gray.700">
+              Test Artifact Suite
+            </Text>
+          </HStack>
         </Box>
-        <Box as="main" flex="1" px={{ base: 6, md: 10 }} py={10}>
+        <Box as="main" flex="1" px={{ base: 6, md: 10 }} py={8} bg="gray.50">
           {children}
         </Box>
       </Flex>
