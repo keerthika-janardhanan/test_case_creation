@@ -21,13 +21,55 @@ const config: ThemeConfig = {
 const theme = extendTheme({
   config,
   fonts: {
-    heading: "'Inter', sans-serif",
-    body: "'Inter', sans-serif",
+    heading: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    body: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  colors: {
+    brand: {
+      50: "#e6f2ff",
+      100: "#baddff",
+      200: "#8dc8ff",
+      300: "#5fb3ff",
+      400: "#319eff",
+      500: "#0084ff",
+      600: "#0070e0",
+      700: "#005ab8",
+      800: "#004590",
+      900: "#003068",
+    },
   },
   styles: {
     global: {
       body: {
         bg: "gray.50",
+        color: "gray.800",
+      },
+    },
+  },
+  components: {
+    Button: {
+      defaultProps: {
+        colorScheme: "brand",
+      },
+      variants: {
+        solid: {
+          _hover: {
+            transform: "translateY(-1px)",
+            boxShadow: "md",
+          },
+          transition: "all 0.2s",
+        },
+      },
+    },
+    Card: {
+      baseStyle: {
+        container: {
+          bg: "white",
+          boxShadow: "sm",
+          borderRadius: "lg",
+          borderWidth: "1px",
+          borderColor: "gray.200",
+        },
       },
     },
   },
