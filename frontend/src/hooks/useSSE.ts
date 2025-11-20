@@ -49,6 +49,12 @@ export async function readSSEStream(
 
 export async function fetchSSE(url: string, opts: SSEOptions = {}) {
   const { method = "GET", headers = {}, body, onEvent, onRawLine, signal } = opts;
+  
+  console.log('[FetchSSE] Starting SSE request');
+  console.log('[FetchSSE] URL:', url);
+  console.log('[FetchSSE] Method:', method);
+  console.log('[FetchSSE] Body:', body);
+  
   const init: RequestInit = {
     method,
     headers: {
@@ -58,7 +64,18 @@ export async function fetchSSE(url: string, opts: SSEOptions = {}) {
     body: method === "POST" ? (typeof body === "string" ? body : JSON.stringify(body)) : undefined,
     signal,
   };
+  
+  console.log('[FetchSSE] Sending request...');
   const res = await fetch(url, init);
-  if (!res.ok) throw new Error(`SSE request failed: ${res.status}`);
+  console.log('[FetchSSE] Response status:', res.status, res.statusText);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('[FetchSSE] Request failed:', res.status, errorText);
+    throw new Error(`SSE request failed: ${res.status} - ${errorText}`);
+  }
+  
+  console.log('[FetchSSE] Reading stream...');
   await readSSEStream(res, { onEvent, onRawLine, signal });
+  console.log('[FetchSSE] Stream finished');
 }

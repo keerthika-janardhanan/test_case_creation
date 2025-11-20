@@ -192,7 +192,18 @@ def build_refined_flow_from_metadata(
             converted.append(entry)
 
     if not converted:
-        raise ValueError("No recorder actions could be converted into refined steps.")
+        # Check if there were degraded actions that couldn't be converted
+        degraded_count = sum(1 for a in actions if a.get("degraded"))
+        if degraded_count > 0:
+            raise ValueError(
+                f"No valid recorder actions found. {degraded_count} action(s) were degraded with incomplete selectors. "
+                "Please perform meaningful interactions in the browser (fill forms, click buttons with proper selectors) and try again."
+            )
+        else:
+            raise ValueError(
+                "No recorder actions could be converted into refined steps. "
+                "Please perform some interactions in the browser before stopping the recording."
+            )
 
     elements_map: Dict[Tuple[str, str, str, str, str], Dict[str, Any]] = {}
     for entry in converted:
@@ -275,16 +286,23 @@ def auto_refine_and_ingest(
         json.dump(refined_flow, fh, indent=2, ensure_ascii=False)
 
     ingest_stats: Optional[Dict[str, Any]] = None
+    ingest_error: Optional[str] = None
     if ingest:
         try:
             from .ingest_refined_flow import ingest_refined_file  # type: ignore
         except ImportError:  # pragma: no cover - fallback for direct execution
             from ingest_refined_flow import ingest_refined_file  # type: ignore
-    ingest_stats = ingest_refined_file(str(output_path), resolved_flow_name)
+        
+        try:
+            ingest_stats = ingest_refined_file(str(output_path), resolved_flow_name)
+        except Exception as e:
+            ingest_error = f"Vector DB ingestion failed: {str(e)}"
+            print(f"[WARNING] {ingest_error}")
 
     return {
         "refined_path": str(output_path),
         "flow_name": resolved_flow_name,
         "ingested": bool(ingest_stats),
         "ingest_stats": ingest_stats,
+        "ingest_error": ingest_error,
     }

@@ -16,9 +16,11 @@ class VectorDBClient:
 
     # ---------------- Add ----------------
     def add_document(self, source: str, doc_id: str, content: str, metadata: dict):
+        # Ensure source is included in metadata
+        metadata_with_source = {**metadata, "source": source}
         self.collection.add(
             documents=[content],
-            metadatas=[metadata],
+            metadatas=[metadata_with_source],
             ids=[f"{source}-{doc_id}"]
         )
 

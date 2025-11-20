@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import os
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -209,6 +210,37 @@ async def finalize_recorder(req: FinalizeRecorderRequest) -> RecorderSessionResp
     return RecorderSessionResponse.from_result(result)
 
 
+@app.post("/recorder/finalize")
+async def finalize_recorder_by_session(req: dict) -> dict:
+    """Finalize recorder session by sessionId (used by recorder-sync flow)."""
+    session_id = req.get("sessionId")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="sessionId is required")
+    
+    session_dir = (RECORDINGS_DIR / session_id).resolve()
+    if not session_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
+    
+    # Run finalization in background daemon thread - will auto-terminate on server restart
+    def background_finalize():
+        try:
+            result = finalize_recorder_session(session_dir)
+            print(f"[Finalize] Session {session_id} finalized successfully")
+            print(f"[Finalize] Auto-ingest status: {result.auto_ingest_status}")
+        except Exception as e:
+            print(f"[Finalize] Error finalizing session {session_id}: {e}")
+    
+    thread = threading.Thread(target=background_finalize, daemon=True)
+    thread.start()
+    
+    # Return immediately - daemon thread will complete or die on restart
+    return {
+        "status": "processing",
+        "sessionId": session_id,
+        "message": "Finalization started in background (will complete or auto-cancel on restart)"
+    }
+
+
 @app.post("/api/recorder/sessions", response_model=RecorderSessionCreateResponse, status_code=202)
 async def create_recorder_session(req: RecorderSessionCreateRequest) -> RecorderSessionCreateResponse:
     job_id, session_id = enqueue_recorder_launch(req.model_dump())
@@ -332,16 +364,40 @@ async def ingest_documents_route(files: List[UploadFile] = File(...)) -> JobEnqu
     return JobEnqueueResponse(jobId=job_id)
 
 
-@app.delete("/api/vector/docs/{doc_id}", response_model=JobEnqueueResponse, status_code=202)
+@app.delete("/api/vector/docs/{doc_id:path}", response_model=JobEnqueueResponse, status_code=202)
 async def delete_vector_doc(doc_id: str) -> JobEnqueueResponse:
-    job_id = enqueue_vector_delete_by_id(doc_id)
+    from urllib.parse import unquote
+    # URL decode the doc_id to handle encoded characters
+    decoded_doc_id = unquote(doc_id)
+    job_id = enqueue_vector_delete_by_id(decoded_doc_id)
     return JobEnqueueResponse(jobId=job_id)
+
+
+@app.delete("/api/vector/docs/sync/{doc_id:path}", status_code=200)
+async def delete_vector_doc_sync(doc_id: str) -> dict:
+    """Synchronous delete - immediately deletes the document"""
+    from app.vector_db import VectorDBClient
+    from urllib.parse import unquote
+    client = VectorDBClient()
+    # URL decode the doc_id to handle encoded characters like %3A (colon) and %2F (slash)
+    decoded_doc_id = unquote(doc_id)
+    client.delete_document(decoded_doc_id)
+    return {"deleted": decoded_doc_id, "status": "success"}
 
 
 @app.delete("/api/vector/docs", response_model=JobEnqueueResponse, status_code=202)
 async def delete_vector_by_source(source: str) -> JobEnqueueResponse:
     job_id = enqueue_vector_delete_by_source(source)
     return JobEnqueueResponse(jobId=job_id)
+
+
+@app.delete("/api/vector/docs/sync", status_code=200)
+async def delete_vector_by_source_sync(source: str) -> dict:
+    """Synchronous delete by source - immediately deletes all documents from source"""
+    from app.vector_db import VectorDBClient
+    client = VectorDBClient()
+    client.delete_by_source(source)
+    return {"deletedSource": source, "status": "success"}
 
 
 @app.get("/api/jobs/{job_id}", response_model=JobDetailResponse)
@@ -352,12 +408,54 @@ async def get_job_detail(job_id: str) -> JobDetailResponse:
     return _job_dict_to_response(job)
 
 
+class GitPushRequest(BaseModel):
+    repoUrl: str
+    branch: str = "main"
+    commitMessage: str = "Add new test script"
+
+
+class GitPushResponse(BaseModel):
+    success: bool
+    message: str
+
+
+@app.post("/api/git/push", response_model=GitPushResponse)
+async def push_to_git_endpoint(request: GitPushRequest) -> GitPushResponse:
+    """Push changes to git repository"""
+    from app.git_utils import push_to_git
+    from app.api.framework_resolver import resolve_framework_root
+    
+    try:
+        # Resolve the repository path
+        repo_path = resolve_framework_root(request.repoUrl)
+        
+        # Push to git
+        success = push_to_git(repo_path, request.branch, request.commitMessage)
+        
+        if success:
+            return GitPushResponse(
+                success=True,
+                message=f"Successfully pushed to {request.branch}"
+            )
+        else:
+            return GitPushResponse(
+                success=False,
+                message="Failed to push changes. Check git configuration and credentials."
+            )
+    except Exception as e:
+        return GitPushResponse(
+            success=False,
+            message=f"Error: {str(e)}"
+        )
+
+
 # Contract-aligned routers (skeletons; some endpoints implemented in this file already)
 from .routers import health as r_health
 from .routers import manual as r_manual
 from .routers import cases as r_cases
 from .routers import agentic as r_agentic
 from .routers import recorder as r_recorder
+from .routers import recorder_sync as r_recorder_sync
 from .routers import trial as r_trial
 from .routers import files as r_files
 from .routers import config as r_config
@@ -368,6 +466,7 @@ app.include_router(r_manual.router)
 app.include_router(r_cases.router)
 app.include_router(r_agentic.router)
 app.include_router(r_recorder.router)
+app.include_router(r_recorder_sync.router)
 app.include_router(r_trial.router)
 app.include_router(r_files.router)
 app.include_router(r_config.router)

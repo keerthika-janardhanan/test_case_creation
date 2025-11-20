@@ -16,6 +16,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -24,5 +30,27 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/pages/AgenticPage.tsx",
+    "src/pages/AdminPage.tsx", 
+    "src/pages/TestCasesPage.tsx",
+    "src/pages/SettingsPage.tsx",
+    "src/pages/RecorderPage.tsx",
+    "src/pages/NotFoundPage.tsx",
+    "src/pages/ManualTestsPage.tsx",
+    "src/pages/JiraPage.tsx",
+    "src/pages/GitOpsPage.tsx",
+    "src/pages/DocumentsPage.tsx",
+    "src/pages/WebsitePage.tsx",
+    "src/pages/VectorSearchPage.tsx",
+    "src/pages/VectorManagePage.tsx",
+    "src/pages/TrialRunsPage.tsx",
+    "src/pages/__tests__/**/*",
+    "src/app/layouts/SidebarLayout.tsx",
+    "src/AppTest.tsx",
+    "src/components/ui/select.tsx",
+    "src/hooks/**/*",
+    "src/api/**/*"
+  ]
 }

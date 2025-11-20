@@ -67,3 +67,56 @@ async def query(req: VectorQueryRequest) -> VectorQueryResponse:
             )
         )
     return VectorQueryResponse(results=records)
+
+
+class FlowListItem(BaseModel):
+    flowName: str
+    flowSlug: str
+    timestamp: Optional[str] = None
+    stepCount: int = 0
+
+
+class FlowListResponse(BaseModel):
+    flows: List[FlowListItem]
+
+
+@router.get("/flows", response_model=FlowListResponse)
+async def list_flows() -> FlowListResponse:
+    """List all refined recorder flows from the vector database."""
+    try:
+        from ...vector_db import VectorDBClient
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Import failure: {exc}") from exc
+
+    client = VectorDBClient(path=os.getenv("VECTOR_DB_PATH", "./vector_store"))
+    
+    try:
+        # Query for all recorder_refined documents
+        raw = client.get_where(where={"type": "recorder_refined"}, limit=1000)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Vector query failed: {exc}") from exc
+
+    # Group by flow_slug to get unique flows
+    flows_map: Dict[str, Dict[str, Any]] = {}
+    for item in raw or []:
+        metadata = item.get("metadata") or {}
+        flow_slug = metadata.get("flow_slug")
+        if not flow_slug:
+            continue
+        
+        if flow_slug not in flows_map:
+            flows_map[flow_slug] = {
+                "flowName": metadata.get("flow_name") or flow_slug,
+                "flowSlug": flow_slug,
+                "timestamp": metadata.get("timestamp") or metadata.get("ingested_at"),
+                "stepCount": 0
+            }
+        
+        # Count steps
+        flows_map[flow_slug]["stepCount"] += 1
+
+    # Convert to list and sort by timestamp (newest first)
+    flows = list(flows_map.values())
+    flows.sort(key=lambda x: x.get("timestamp") or "", reverse=True)
+    
+    return FlowListResponse(flows=[FlowListItem(**f) for f in flows])

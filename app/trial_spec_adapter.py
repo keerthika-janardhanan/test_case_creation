@@ -46,108 +46,84 @@ def _is_id_like(value: str) -> bool:
 
 
 def load_trial_credentials(repo_root: Path, case_id: Optional[str] = None) -> Optional[TrialCredentials]:
-    workbook_path = repo_root / "testmanager.xlsx"
-    if not workbook_path.exists():
-        logger.debug("Trial adapter: testmanager.xlsx not found at %s", workbook_path)
+    """Load trial credentials from trial_run_config.json instead of testmanager.xlsx"""
+    trial_config_path = Path(__file__).resolve().parents[1] / "trial_run_config.json"
+    
+    if not trial_config_path.exists():
+        logger.debug("Trial adapter: trial_run_config.json not found at %s", trial_config_path)
         return None
+    
     try:
-        from openpyxl import load_workbook  # type: ignore
-    except ImportError as exc:  # pragma: no cover - optional dependency
-        logger.warning("Trial adapter: openpyxl is required to read %s (%s)", workbook_path, exc)
+        with open(trial_config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+    except Exception as exc:
+        logger.warning("Trial adapter: failed to read trial_run_config.json (%s)", exc)
         return None
-
-    try:
-        workbook = load_workbook(workbook_path, data_only=True, read_only=True)
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Trial adapter: failed to open %s (%s)", workbook_path, exc)
+    
+    base_url = config.get("base_url", "").strip()
+    username = config.get("username", "").strip()
+    password = config.get("password", "").strip()
+    
+    if not (username and password):
+        logger.warning("Trial adapter: trial_run_config.json missing username or password")
         return None
-
-    try:
-        sheet = workbook["TestConfiguration"]
-    except KeyError:
-        logger.warning("Trial adapter: sheet 'TestConfiguration' not found in %s", workbook_path)
-        workbook.close()
-        return None
-
-    headers = [str(cell.value).strip() if cell.value is not None else "" for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
-    header_index = {name: idx for idx, name in enumerate(headers)}
-
-    def _cell(row, name):
-        idx = header_index.get(name)
-        if idx is None or idx >= len(row):
-            return ""
-        value = row[idx]
-        if value is None:
-            return ""
-        return str(value).strip()
-
-    rows = list(sheet.iter_rows(min_row=2, values_only=True))
-    credentials: Optional[TrialCredentials] = None
-
-    # Simplified rule: pick the FIRST row that has both a non-empty USERNAME and PASSWORD.
-    # If none have both, fall back to first with any credential signal (USERNAME or PASSWORD or API_URL).
-    first_partial: Optional[TrialCredentials] = None
-    for row in rows:
-        if not row:
-            continue
-        base_url = _cell(row, "API_URL")
-        username = _cell(row, "USERNAME")
-        password = _cell(row, "PASSWORD")
-        if username and password:
-            credentials = TrialCredentials(base_url=base_url, username=username, password=password)
-            logger.info("Trial adapter: selected first full credential row (USERNAME+PASSWORD) from TestConfiguration")
-            break
-        if not first_partial and (username or password or base_url):
-            first_partial = TrialCredentials(base_url=base_url, username=username, password=password)
-    if not credentials and first_partial:
-        credentials = first_partial
-        logger.info("Trial adapter: fell back to first partial credential row from TestConfiguration")
-
-    workbook.close()
-    if not credentials:
-        logger.warning("Trial adapter: no usable credentials found in TestConfiguration (%s)", workbook_path)
-    return credentials
+    
+    msg = (
+        f"[TrialAdapter] Loaded credentials from trial_run_config.json:\n"
+        f"  base_url: {base_url}\n"
+        f"  username: {username}\n"
+        f"  password: {'*' * len(password)}"
+    )
+    print(msg)
+    logger.info(msg)
+    return TrialCredentials(base_url=base_url, username=username, password=password)
 
 
 def trial_env_overrides(repo_root: Path, case_id: Optional[str] = None, spec_path: Optional[Path] = None) -> Dict[str, str]:
     """
-    Build environment variable overrides for trial executions using credentials stored
-    in the TestConfiguration sheet. This enables specs that rely on process.env to use
-    consistent values without editing source files.
+    Build environment variable overrides for trial executions using credentials from trial_run_config.json.
+    This enables specs that rely on process.env to use consistent values without editing source files.
     """
-    # Infer case id from spec content if not provided
-    if not case_id and spec_path and spec_path.exists():
-        try:
-            source = spec_path.read_text(encoding="utf-8", errors="replace")
-            titles = _extract_titles_from_source(source)
-            # Pick the first ID-like title if present
-            for t in titles:
-                if _is_id_like(t):
-                    case_id = t
-                    break
-        except Exception:  # noqa: BLE001
-            pass
-
-    credentials = load_trial_credentials(repo_root, case_id)
-    if not credentials:
+    # Always read from trial_run_config.json at the project root
+    trial_config_path = Path(__file__).resolve().parents[1] / "trial_run_config.json"
+    
+    if not trial_config_path.exists():
+        logger.warning("Trial adapter: trial_run_config.json not found at %s", trial_config_path)
         return {}
-
+    
+    try:
+        with open(trial_config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+    except Exception as exc:
+        logger.warning("Trial adapter: failed to read trial_run_config.json (%s)", exc)
+        return {}
+    
+    base_url = config.get("base_url", "").strip()
+    username = config.get("username", "").strip()
+    password = config.get("password", "").strip()
+    
+    if not (username and password):
+        logger.warning("Trial adapter: trial_run_config.json missing username or password")
+        return {}
+    
     overrides: Dict[str, str] = {}
     # Always override a broad set of common env names so trial ignores .env creds
-    if credentials.username:
-        overrides["USERID"] = credentials.username
-        overrides["USERNAME"] = credentials.username  # alias for tests using USERNAME
-        overrides["TRIAL_USER"] = credentials.username
-        overrides["TRIAL_USERNAME"] = credentials.username
-        overrides["EMAIL"] = credentials.username  # some tests may treat username as email
-    if credentials.password:
-        overrides["PASSWORD"] = credentials.password
-        overrides["TRIAL_PASSWORD"] = credentials.password
-    if credentials.base_url:
-        overrides["BASE_URL"] = credentials.base_url
-        overrides["URL"] = credentials.base_url  # alias for tests using URL
-        overrides["TRIAL_BASE_URL"] = credentials.base_url
-        overrides["TRIAL_URL"] = credentials.base_url
+    if username:
+        overrides["USERID"] = username
+        overrides["USERNAME"] = username  # alias for tests using USERNAME
+        overrides["TRIAL_USER"] = username
+        overrides["TRIAL_USERNAME"] = username
+        overrides["EMAIL"] = username  # some tests may treat username as email
+    if password:
+        overrides["PASSWORD"] = password
+        overrides["TRIAL_PASSWORD"] = password
+    if base_url:
+        overrides["BASE_URL"] = base_url
+        overrides["URL"] = base_url  # alias for tests using URL
+        overrides["TRIAL_BASE_URL"] = base_url
+        overrides["TRIAL_URL"] = base_url
+    
+    logger.info("Trial adapter: loaded credentials from trial_run_config.json (username=%s, base_url=%s)", username, base_url)
     return overrides
 
 
@@ -161,7 +137,27 @@ def _replace_fill_call(source: str, pattern: str, replacement_value: str) -> Tup
         replaced = True
         prefix = match.group(1)
         suffix = match.group(2)
-        return f"{prefix}{json.dumps(replacement_value)}{suffix}"
+        original_value = match.group(0)
+        new_value_json = json.dumps(replacement_value)
+        result = f"{prefix}{new_value_json}{suffix}"
+        
+        # Add a 10-second wait after fill to see the value
+        result_with_wait = result + "\n      await page.waitForTimeout(10000); // Wait 10s to see filled value"
+        
+        # Log the replacement for debugging (both print and logger)
+        msg = (
+            f"[TrialAdapter] Replacing fill call:\n"
+            f"  Original: {original_value.strip()}\n"
+            f"  Pattern: {pattern}\n"
+            f"  Replacement value: {replacement_value}\n"
+            f"  JSON-encoded: {new_value_json}\n"
+            f"  Result: {result.strip()}\n"
+            f"  Added 10s wait after fill"
+        )
+        print(msg)
+        logger.info(msg)
+        
+        return result_with_wait
 
     updated = re.sub(pattern, _replacer, source, count=1)
     return updated, replaced
@@ -203,7 +199,7 @@ def _adjust_mfa_sequence(source: str) -> Tuple[str, bool]:
 def _inject_sign_in_pause(source: str) -> Tuple[str, bool]:
     import re
 
-    if "page.waitForTimeout(60000)" in source:
+    if "page.waitForTimeout(90000)" in source:
         return source, False
 
     pattern = r"(await\s+flow\.signIn\.click\(\);\s*\n)"
@@ -213,8 +209,8 @@ def _inject_sign_in_pause(source: str) -> Tuple[str, bool]:
         nonlocal injected
         injected = True
         return (
-            f"{match.group(1)}      // Trial adapter: wait to allow manual MFA passcode entry\n"
-            "      await page.waitForTimeout(60000);\n"
+            f"{match.group(1)}      // Trial adapter: wait 90s to allow manual MFA passcode entry\n"
+            "      await page.waitForTimeout(90000);\n"
         )
 
     updated = re.sub(pattern, _replacer, source, count=1)
@@ -232,25 +228,121 @@ def _ensure_navigation(source: str, base_url: str) -> Tuple[str, bool]:
     return updated, True
 
 
+def _add_login_page_wait(source: str) -> Tuple[str, bool]:
+    """Add a 20-second wait after navigation to login page to see what values are being filled."""
+    import re
+    
+    # Add wait after page.goto
+    if "page.goto(" in source and "await page.waitForTimeout(20000); // Wait to see login page" not in source:
+        pattern = r"(await\s+page\.goto\([^;]+;\s*\n)"
+        
+        def _replacer(match: "re.Match[str]") -> str:
+            return f"{match.group(1)}    await page.waitForTimeout(20000); // Wait 20s to see login page and filled values\n"
+        
+        updated = re.sub(pattern, _replacer, source, count=1)
+        if updated != source:
+            logger.info("[TrialAdapter] Added 20s wait after page.goto to inspect login page")
+            print("[TrialAdapter] Added 20s wait after page.goto to inspect login page")
+            return updated, True
+    
+    return source, False
+
+
 def adapt_spec_content_for_trial(source: str, repo_root: Path) -> Tuple[str, bool]:
     """Return transformed spec content for trial run; bool indicates change."""
+    logger.info("[TrialAdapter] ===== Starting spec adaptation for trial run =====")
+    print("\n[TrialAdapter] ===== Starting spec adaptation for trial run =====")
     credentials = load_trial_credentials(repo_root)
     if not credentials:
+        logger.info("[TrialAdapter] No credentials found, skipping adaptation")
+        print("[TrialAdapter] No credentials found, skipping adaptation")
         return source, False
 
     updated = source
     changed_any = False
 
+    # More flexible patterns that match any locator name with .fill()
+    # Pattern 1: Try specific flow.userName / flow.password first
+    logger.info("[TrialAdapter] Attempting to replace username fill call (flow.userName)...")
+    print("\n[TrialAdapter] Attempting to replace username fill call (flow.userName)...")
     updated, user_changed = _replace_fill_call(
         updated,
         r"(await\s+flow\.userName\.fill\()\s*(?:['\"].*?['\"])(\);)",
         credentials.username,
     )
+    logger.info(f"[TrialAdapter] Username replaced: {user_changed}")
+    print(f"[TrialAdapter] Username replaced: {user_changed}")
+    
+    logger.info("[TrialAdapter] Attempting to replace password fill call (flow.password)...")
+    print("\n[TrialAdapter] Attempting to replace password fill call (flow.password)...")
     updated, pass_changed = _replace_fill_call(
         updated,
         r"(await\s+flow\.password\.fill\()\s*(?:['\"].*?['\"])(\);)",
         credentials.password,
     )
+    logger.info(f"[TrialAdapter] Password replaced: {pass_changed}")
+    print(f"[TrialAdapter] Password replaced: {pass_changed}")
+
+    # Pattern 2: If not found, try generic patterns for username-like and password-like fields
+    if not user_changed:
+        logger.info("[TrialAdapter] Trying generic username patterns (user|username|userid|email)...")
+        print("\n[TrialAdapter] Trying generic username patterns...")
+        # Match any .fill() where the locator name contains user/username/userid/email
+        updated, user_changed = _replace_fill_call(
+            updated,
+            r"(await\s+(?:flow|page|locators)\.(?:user|username|userName|userid|userId|email)[^.]*\.fill\()\s*(?:['\"].*?['\"])(\);)",
+            credentials.username,
+        )
+        logger.info(f"[TrialAdapter] Generic username replaced: {user_changed}")
+        print(f"[TrialAdapter] Generic username replaced: {user_changed}")
+    
+    if not pass_changed:
+        logger.info("[TrialAdapter] Trying generic password patterns (password|pwd|pass)...")
+        print("\n[TrialAdapter] Trying generic password patterns...")
+        updated, pass_changed = _replace_fill_call(
+            updated,
+            r"(await\s+(?:flow|page|locators)\.(?:password|pwd|pass)[^.]*\.fill\()\s*(?:['\"].*?['\"])(\);)",
+            credentials.password,
+        )
+        logger.info(f"[TrialAdapter] Generic password replaced: {pass_changed}")
+        print(f"[TrialAdapter] Generic password replaced: {pass_changed}")
+
+    # Pattern 3: If still not found, try to find ANY .fill() calls and log them
+    if not (user_changed or pass_changed):
+        logger.warning("[TrialAdapter] No username/password fields found with standard patterns!")
+        print("\n[TrialAdapter] WARNING: No username/password fields found!")
+        print("[TrialAdapter] Searching for all .fill() calls in the script...")
+        
+        import re
+        # More comprehensive pattern to match various fill call formats
+        fill_patterns = [
+            r"await\s+([^\s]+)\.fill\([^)]*\);",  # await locator.fill()
+            r"await\s+page\.locator\([^)]+\)\.fill\([^)]*\);",  # await page.locator().fill()
+            r"await\s+page\.getBy[A-Z][a-z]+\([^)]+\)\.fill\([^)]*\);",  # await page.getByRole().fill()
+        ]
+        
+        all_fills = []
+        for pattern in fill_patterns:
+            fills = re.findall(pattern, source, re.IGNORECASE)
+            all_fills.extend(fills)
+        
+        if all_fills:
+            logger.info(f"[TrialAdapter] Found {len(all_fills)} .fill() calls:")
+            print(f"[TrialAdapter] Found {len(all_fills)} .fill() calls:")
+            for i, locator in enumerate(set(all_fills)[:10], 1):  # Show first 10 unique
+                logger.info(f"  {i}. {locator}.fill()")
+                print(f"  {i}. {locator}.fill()")
+        else:
+            # No .fill() calls found - show sample of the script to debug
+            logger.info("[TrialAdapter] No .fill() calls found in script")
+            print("[TrialAdapter] No .fill() calls found in script")
+            print("\n[TrialAdapter] Showing first 30 lines of script for debugging:")
+            lines = source.split('\n')[:30]
+            for i, line in enumerate(lines, 1):
+                print(f"  {i}: {line}")
+        
+        # Return without changes since we couldn't find login fields
+        return source, False
 
     if not (user_changed or pass_changed):
         # No login steps detected; nothing to adapt.
@@ -261,12 +353,43 @@ def adapt_spec_content_for_trial(source: str, repo_root: Path) -> Tuple[str, boo
     updated, nav_changed = _ensure_navigation(updated, credentials.base_url)
     changed_any |= nav_changed
 
+    updated, wait_changed = _add_login_page_wait(updated)
+    changed_any |= wait_changed
+
     updated, pause_changed = _inject_sign_in_pause(updated)
     changed_any |= pause_changed
 
     updated, strip_changed = _adjust_mfa_sequence(updated)
     changed_any |= strip_changed
 
+    summary = (
+        f"\n[TrialAdapter] ===== Adaptation complete =====\n"
+        f"[TrialAdapter] Total changes made: {changed_any}\n"
+        f"[TrialAdapter] Changes breakdown:\n"
+        f"  - Username replaced: {user_changed}\n"
+        f"  - Password replaced: {pass_changed}\n"
+        f"  - Navigation added: {nav_changed}\n"
+        f"  - Login page wait added: {wait_changed}\n"
+        f"  - Pause injected: {pause_changed}\n"
+        f"  - MFA adjusted: {strip_changed}"
+    )
+    print(summary)
+    logger.info(summary)
+    
+    if changed_any:
+        logger.info("[TrialAdapter] Preview of adapted login section:")
+        print("\n[TrialAdapter] Preview of adapted login section:")
+        # Find and print the login section
+        lines = updated.split('\n')
+        for i, line in enumerate(lines):
+            if 'userName.fill' in line or 'password.fill' in line:
+                start = max(0, i - 2)
+                end = min(len(lines), i + 3)
+                preview = "\n".join(lines[start:end])
+                print(preview)
+                logger.info(preview)
+                break
+    
     return updated, changed_any
 
 

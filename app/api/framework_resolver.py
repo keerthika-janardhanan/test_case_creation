@@ -7,6 +7,23 @@ import hashlib
 import subprocess
 import re
 
+# Track which repositories have already been pulled this session
+_PULLED_REPOS: set[str] = set()
+
+
+def reset_pull_cache(repo_path: Optional[str] = None) -> None:
+    """Reset the pull cache. If repo_path provided, reset only that repo; otherwise reset all.
+    
+    Call this when user explicitly updates repository details to force a fresh pull.
+    """
+    global _PULLED_REPOS
+    if repo_path:
+        _PULLED_REPOS.discard(str(Path(repo_path).resolve()))
+        print(f"[FrameworkResolver] Pull cache reset for {repo_path}")
+    else:
+        _PULLED_REPOS.clear()
+        print(f"[FrameworkResolver] Pull cache cleared for all repositories")
+
 
 def _normalize_remote_repo_input(raw: str) -> Tuple[str, Optional[str]]:
     cleaned = raw.replace("\\", "/").strip()
@@ -25,6 +42,119 @@ def _normalize_remote_repo_input(raw: str) -> Tuple[str, Optional[str]]:
     if cleaned.startswith("http") and not cleaned.endswith(".git"):
         cleaned = f"{cleaned}.git"
     return cleaned, branch_in_url
+
+
+def _create_default_framework_structure(base_path: Path) -> Path:
+    """Create a default Playwright TypeScript framework structure for fresh starts."""
+    default_framework = base_path / "default-playwright-framework"
+    
+    if default_framework.exists():
+        return default_framework
+    
+    # Create directory structure
+    default_framework.mkdir(parents=True, exist_ok=True)
+    (default_framework / "tests").mkdir(exist_ok=True)
+    (default_framework / "pages").mkdir(exist_ok=True)
+    (default_framework / "locators").mkdir(exist_ok=True)
+    
+    # Create package.json
+    package_json = default_framework / "package.json"
+    package_json.write_text('''{
+  "name": "default-playwright-framework",
+  "version": "1.0.0",
+  "description": "Auto-generated Playwright TypeScript test framework",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
+''')
+    
+    # Create playwright.config.ts
+    playwright_config = default_framework / "playwright.config.ts"
+    playwright_config.write_text('''import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
+''')
+    
+    # Create tsconfig.json
+    tsconfig = default_framework / "tsconfig.json"
+    tsconfig.write_text('''{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "types": ["node", "@playwright/test"]
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}
+''')
+    
+    # Create README
+    readme = default_framework / "README.md"
+    readme.write_text('''# Default Playwright Framework
+
+This is an auto-generated Playwright TypeScript test framework.
+
+## Setup
+
+```bash
+npm install
+npx playwright install
+```
+
+## Run Tests
+
+```bash
+npm test
+```
+
+## Structure
+
+- `tests/` - Test specification files
+- `pages/` - Page Object Model classes
+- `locators/` - Locator definitions and utilities
+''')
+    
+    # Create .gitignore
+    gitignore = default_framework / ".gitignore"
+    gitignore.write_text('''node_modules/
+test-results/
+playwright-report/
+playwright/.cache/
+.env
+''')
+    
+    return default_framework
 
 
 def resolve_framework_root(explicit: Optional[str] = None) -> Path:
@@ -74,9 +204,44 @@ def resolve_framework_root(explicit: Optional[str] = None) -> Path:
             if not target_dir.exists():
                 target_dir.parent.mkdir(parents=True, exist_ok=True)
                 try:
+                    print(f"[FrameworkResolver] Cloning repository from {clone_url}...")
                     subprocess.run(["git", "clone", clone_url, str(target_dir)], check=True)
+                    print(f"[FrameworkResolver] Successfully cloned repository to {target_dir}")
                 except (subprocess.CalledProcessError, FileNotFoundError) as exc:
                     raise FileNotFoundError(f"Git clone failed for '{clone_url}': {exc}") from exc
+            else:
+                # Repository already exists - only pull once per session when first accessed
+                # After that, work with local modifications under framework_repos/
+                print(f"[FrameworkResolver] Repository already exists at {target_dir}")
+                
+                repo_key = str(target_dir)
+                
+                if repo_key not in _PULLED_REPOS:
+                    # First time accessing this repo in current session - pull latest
+                    try:
+                        print(f"[FrameworkResolver] First access - pulling latest changes from remote...")
+                        subprocess.run(["git", "-C", str(target_dir), "fetch", "--all"], check=True, capture_output=True)
+                        # Try to pull, but don't fail if there are local changes
+                        result = subprocess.run(
+                            ["git", "-C", str(target_dir), "pull"],
+                            capture_output=True,
+                            text=True
+                        )
+                        if result.returncode == 0:
+                            print(f"[FrameworkResolver] Successfully pulled latest changes")
+                        else:
+                            print(f"[FrameworkResolver] Pull skipped or failed: {result.stderr.strip()}")
+                            print(f"[FrameworkResolver] Using existing local version (may include uncommitted changes)")
+                        
+                        # Mark this repo as pulled for this session
+                        _PULLED_REPOS.add(repo_key)
+                    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+                        print(f"[FrameworkResolver] Git operations unavailable: {exc}")
+                        print(f"[FrameworkResolver] Using existing local version")
+                        # Still mark as "pulled" to avoid repeated failures
+                        _PULLED_REPOS.add(repo_key)
+                else:
+                    print(f"[FrameworkResolver] Using local repository (already synced this session)")
             if branch_in_url:
                 try:
                     subprocess.run(["git", "-C", str(target_dir), "checkout", branch_in_url], check=True)
@@ -102,6 +267,6 @@ def resolve_framework_root(explicit: Optional[str] = None) -> Path:
     if subdirs:
         return subdirs[0]
 
-    raise FileNotFoundError(
-        "Framework repository root not found. Provide a local path, remote git URL, set FRAMEWORK_REPO_ROOT, or clone into ./framework_repos."
-    )
+    # 4) No framework found - create default structure
+    print("[FrameworkResolver] No framework repository found. Creating default Playwright framework...")
+    return _create_default_framework_structure(default_root)

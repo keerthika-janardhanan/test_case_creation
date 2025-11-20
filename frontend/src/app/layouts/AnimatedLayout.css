@@ -1,0 +1,375 @@
+.animated-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating Background Shapes */
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  animation: float 20s infinite linear;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+  animation-duration: 25s;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  right: 20%;
+  animation-delay: 5s;
+  animation-duration: 30s;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  top: 30%;
+  left: 70%;
+  animation-delay: 10s;
+  animation-duration: 22s;
+}
+
+.shape-4 {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 15s;
+  animation-duration: 28s;
+}
+
+.shape-5 {
+  width: 140px;
+  height: 140px;
+  top: 5%;
+  right: 5%;
+  animation-delay: 20s;
+  animation-duration: 35s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+    opacity: 1;
+  }
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+    opacity: 0.7;
+  }
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  min-height: 100vh;
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 100;
+}
+
+.sidebar.closed {
+  width: 80px;
+}
+
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.closed .sidebar-title {
+  opacity: 0;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Navigation Styles */
+.sidebar-nav {
+  padding: 24px 0;
+}
+
+.nav-section {
+  margin-bottom: 16px;
+}
+
+.nav-dropdown {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-dropdown:hover,
+.nav-dropdown.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nav-dropdown-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.closed .nav-label {
+  opacity: 0;
+}
+
+.dropdown-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.nav-submenu {
+  padding-left: 24px;
+  animation: slideDown 0.3s ease;
+}
+
+.sidebar.closed .nav-submenu {
+  padding-left: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(254, 202, 87, 0.2));
+  color: #fff;
+  border-left: 3px solid #ff6b6b;
+}
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(45deg, #ff6b6b, #feca57);
+}
+
+.nav-link.submenu {
+  padding-left: 48px;
+  font-size: 13px;
+}
+
+.sidebar.closed .nav-link {
+  padding: 12px;
+  justify-content: center;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.main-content.with-sidebar {
+  margin-left: 0;
+}
+
+.main-content.full-width {
+  margin-left: 0;
+}
+
+.main-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 32px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(46, 213, 115, 0.2);
+  border: 1px solid rgba(46, 213, 115, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #2ed573;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #2ed573;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(46, 213, 115, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(46, 213, 115, 0);
+  }
+}
+
+.content-area {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    z-index: 1000;
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .content-area {
+    padding: 20px;
+  }
+}

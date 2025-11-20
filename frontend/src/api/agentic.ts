@@ -122,6 +122,14 @@ export async function trialRunAgenticStream(
   options?: { scenario?: string; datasheet?: string; referenceId?: string; idName?: string; update?: boolean },
 ) {
   const url = `${API_BASE_URL}/agentic/trial-run/stream`;
+  
+  console.log('[TrialRunStream] Starting trial run stream');
+  console.log('[TrialRunStream] URL:', url);
+  console.log('[TrialRunStream] Headed:', headed);
+  console.log('[TrialRunStream] Framework root:', frameworkRoot);
+  console.log('[TrialRunStream] Options:', options);
+  console.log('[TrialRunStream] Test file length:', testFileContent?.length, 'chars');
+  
   await fetchSSE(url, {
     method: "POST",
     headers: {
@@ -138,9 +146,14 @@ export async function trialRunAgenticStream(
       referenceId: options?.referenceId,
       idName: options?.idName,
     },
-    onEvent,
+    onEvent: (evt) => {
+      console.log('[TrialRunStream] Event received:', evt);
+      onEvent(evt);
+    },
     signal,
   });
+  
+  console.log('[TrialRunStream] Stream completed');
 }
 
 export async function keywordInspect(keyword: string, repoPath: string, branch?: string, maxAssets = 5) {
@@ -182,4 +195,20 @@ export async function listDatasheets(frameworkRoot?: string) {
     { params: { frameworkRoot } },
   );
   return data.files || [];
+}
+
+export async function renameTestCaseId(
+  oldTestCaseId: string,
+  newTestCaseId: string,
+  frameworkRoot?: string
+): Promise<{ success: boolean; message: string }> {
+  const { data } = await apiClient.post<{ success: boolean; message: string }>(
+    "/config/rename_test_case_id",
+    {
+      oldTestCaseId,
+      newTestCaseId,
+      frameworkRoot,
+    }
+  );
+  return data;
 }

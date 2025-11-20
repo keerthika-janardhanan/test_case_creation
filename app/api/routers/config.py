@@ -113,6 +113,75 @@ async def list_test_manager(frameworkRoot: str | None = None) -> dict:
     return {"rows": rows}
 
 
+class RenameTestCaseIdRequest(BaseModel):
+    oldTestCaseId: str
+    newTestCaseId: str
+    frameworkRoot: str | None = Field(None, description="Root of the framework repo; resolves automatically if omitted")
+
+
+@router.post("/rename_test_case_id")
+async def rename_test_case_id(req: RenameTestCaseIdRequest) -> dict:
+    """Rename an existing TestCaseID in testmanager.xlsx"""
+    # Resolve framework root
+    repo_root: Path
+    explicit = (req.frameworkRoot or "").strip() if req.frameworkRoot else ""
+    if explicit:
+        try:
+            repo_root = resolve_framework_root(explicit)
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Unable to resolve frameworkRoot: {exc}") from exc
+    else:
+        repo_root = resolve_framework_root()
+    
+    from ...services.config_service import find_test_manager_path as _find
+    tm_path = _find(repo_root)
+    if not tm_path:
+        raise HTTPException(status_code=404, detail="testmanager.xlsx not found")
+    
+    try:
+        wb = load_workbook(tm_path)
+        ws = wb.active
+        
+        # Find TestCaseID column
+        header = [str(c.value or "").strip() for c in ws[1]] if ws.max_row >= 1 else []
+        id_col_idx = None
+        for i, h in enumerate(header):
+            if h.lower() in ["testcaseid", "test case id", "testcase id"]:
+                id_col_idx = i
+                break
+        
+        if id_col_idx is None:
+            raise HTTPException(status_code=400, detail="TestCaseID column not found in testmanager.xlsx")
+        
+        # Find and update the row
+        found = False
+        for row_idx in range(2, ws.max_row + 1):
+            cell = ws.cell(row=row_idx, column=id_col_idx + 1)
+            if str(cell.value or "").strip() == req.oldTestCaseId:
+                cell.value = req.newTestCaseId
+                found = True
+                break
+        
+        if not found:
+            raise HTTPException(status_code=404, detail=f"TestCaseID '{req.oldTestCaseId}' not found in testmanager.xlsx")
+        
+        # Save the workbook
+        wb.save(tm_path)
+        
+        return {
+            "success": True,
+            "message": f"Successfully renamed '{req.oldTestCaseId}' to '{req.newTestCaseId}'",
+            "oldTestCaseId": req.oldTestCaseId,
+            "newTestCaseId": req.newTestCaseId
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to rename TestCaseID: {exc}") from exc
+
+
 @router.post("/upload_datasheet")
 async def upload_datasheet(
     scenario: str = Form(...),

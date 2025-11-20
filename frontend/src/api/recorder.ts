@@ -58,12 +58,22 @@ export async function finalizeRecorderSession(
   return data;
 }
 
-export async function finalizeRecorderBySession(sessionId: string): Promise<RecorderSessionResponse> {
-  const { data } = await apiClient.post<RecorderSessionResponse>(
-    "/recorder/finalize",
-    { sessionId },
-  );
-  return data;
+export async function finalizeRecorderBySession(sessionId: string): Promise<any> {
+  console.log('[API] Calling /recorder/finalize with sessionId:', sessionId);
+  const startTime = Date.now();
+  try {
+    const { data } = await apiClient.post(
+      "/recorder/finalize",
+      { sessionId },
+    );
+    const duration = Date.now() - startTime;
+    console.log(`[API] /recorder/finalize completed in ${duration}ms:`, data);
+    return data;
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    console.error(`[API] /recorder/finalize failed after ${duration}ms:`, error);
+    throw error;
+  }
 }
 
 export async function publishRecorderEvent(
@@ -79,20 +89,20 @@ export async function publishRecorderEvent(
   });
 }
 
-// New modular endpoints
+// New modular endpoints (synchronous - no Celery needed)
 export async function startRecorder(payload: { url: string; sessionName?: string; options?: Record<string, unknown> }) {
-  const { data } = await apiClient.post<{ sessionId: string; status: string }>("/recorder/start", payload);
+  const { data } = await apiClient.post<{ sessionId: string; status: string }>("/recorder-sync/start", payload);
   return data;
 }
 
 export async function stopRecorder(sessionId: string) {
-  const { data } = await apiClient.post<{ status: string }>("/recorder/stop", { sessionId });
+  const { data } = await apiClient.post<{ status: string }>("/recorder-sync/stop", { sessionId });
   return data;
 }
 
 export async function getRecorderStatus(sessionId: string) {
-  const { data } = await apiClient.get<{ status: string; artifacts: Record<string, string>; files: string[] }>(
-    `/recorder/status/${encodeURIComponent(sessionId)}`,
+  const { data } = await apiClient.get<{ status: string; artifacts: Record<string, string>; files: string[]; isRunning: boolean }>(
+    `/recorder-sync/status/${encodeURIComponent(sessionId)}`,
   );
   return data;
 }

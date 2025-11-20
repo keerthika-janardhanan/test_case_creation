@@ -105,6 +105,7 @@ async def refine(req: RefineRequest) -> PreviewResponse:
         from ...agentic_script_agent import AgenticScriptAgent, FrameworkProfile
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=500, detail=f"Import failure: {exc}") from exc
+    
     framework_root = resolve_framework_root()
     framework = FrameworkProfile.from_root(framework_root)
     agent = AgenticScriptAgent()
@@ -124,6 +125,7 @@ async def payload(req: PayloadRequest) -> PayloadResponse:
         from ...agentic_script_agent import AgenticScriptAgent, FrameworkProfile
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=500, detail=f"Import failure: {exc}") from exc
+    
     framework_root = resolve_framework_root()
     framework = FrameworkProfile.from_root(framework_root)
     agent = AgenticScriptAgent()
@@ -408,6 +410,12 @@ async def trial_run_existing(req: TrialRunExistingRequest) -> TrialRunResponse:
 
     Reads the file content and delegates to run_trial (temp spec execution) so we don't mutate repo.
     """
+    logger.info(f"[TrialRunExisting] Request received:")
+    logger.info(f"[TrialRunExisting]   testFilePath={req.testFilePath}")
+    logger.info(f"[TrialRunExisting]   scenario={req.scenario}")
+    logger.info(f"[TrialRunExisting]   updateTestManager={req.updateTestManager}")
+    logger.info(f"[TrialRunExisting]   headed={req.headed}")
+    
     try:
         from ...executor import run_trial_in_framework
         from ..framework_resolver import resolve_framework_root
@@ -415,9 +423,11 @@ async def trial_run_existing(req: TrialRunExistingRequest) -> TrialRunResponse:
         raise HTTPException(status_code=500, detail=f"Import failure: {exc}") from exc
     # Resolve provided frameworkRoot via shared resolver (supports remote URLs)
     root = resolve_framework_root(req.frameworkRoot) if req.frameworkRoot else resolve_framework_root()
+    
     # Optionally update testmanager.xlsx prior to running the trial
     upd_info = None
     if req.updateTestManager and (req.scenario or "").strip():
+        logger.info(f"[TrialRunExisting] Updating testmanager.xlsx for scenario: '{req.scenario}'")
         try:
             from ...services.config_service import update_test_manager_entry as _upd
             upd_info = _upd(
@@ -429,9 +439,13 @@ async def trial_run_existing(req: TrialRunExistingRequest) -> TrialRunResponse:
                 reference_id=(req.referenceId or None),
                 id_name=(req.idName or None),
             )
-        except Exception:
+            logger.info(f"[TrialRunExisting] TestManager update result: {upd_info}")
+        except Exception as exc:
             # Non-fatal: proceed with trial even if update fails
+            logger.error(f"[TrialRunExisting] TestManager update failed: {exc}", exc_info=True)
             pass
+    else:
+        logger.info(f"[TrialRunExisting] Skipping testmanager update (updateTestManager={req.updateTestManager}, scenario='{req.scenario}')")
     target = (root / req.testFilePath).resolve()
     try:
         if target.is_dir():
@@ -447,26 +461,87 @@ async def trial_run_existing(req: TrialRunExistingRequest) -> TrialRunResponse:
         raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed reading file: {exc}") from exc
-    # Execute inside framework root so its Playwright config and node_modules apply.
-    # Temporarily unskip tests for trial runs only
-    content2, replaced = _unskip_tests_for_trial(content)
+    
     env_overrides = trial_env_overrides(root, case_id=(req.scenario or None), spec_path=target)
+    
     def _mask_pw(pw: str | None) -> str:
         if not pw:
             return ""
         if len(pw) <= 2:
             return "***"
         return ("*" * (len(pw) - 2)) + pw[-2:]
+    
     user = env_overrides.get("USERID") or env_overrides.get("USERNAME") or env_overrides.get("TRIAL_USERNAME") or env_overrides.get("EMAIL") or ""
     pw = env_overrides.get("PASSWORD") or env_overrides.get("TRIAL_PASSWORD") or ""
     base = env_overrides.get("BASE_URL") or env_overrides.get("URL") or env_overrides.get("TRIAL_BASE_URL") or env_overrides.get("TRIAL_URL") or ""
     banner = "[trial-creds] username=" + (user or "<empty>") + ", password=" + _mask_pw(pw) + (", base_url=" + base if base else "") + "\n"
-    success, logs = run_trial_in_framework(content2, root, headed=req.headed, env_overrides=env_overrides)
-    logger.info(banner.strip())
-    logs = banner + logs
-    if replaced:
-        logs = f"[trial-note] Unskipped {replaced} skipped/fixme declarations for this run.\n" + logs
-    return TrialRunResponse(success=bool(success), logs=logs, updateInfo=upd_info)
+    
+    # For trial runs, inject credentials via environment variables (not .env file)
+    # The test code will access them via process.env.USERID, process.env.PASSWORD, etc.
+    logger.info(f"[TrialRunExisting] Injecting trial credentials into environment")
+    logger.info(f"[TrialRunExisting] Credentials: USERID={user[:20] if user else '<empty>'}, PASSWORD={'***' if pw else '<empty>'}, BASE_URL={base[:30] if base else '<empty>'}")
+    
+    # Run the actual file directly using npx playwright test
+    import subprocess
+    import os
+    import platform
+    
+    relative_path = target.relative_to(root)
+    is_windows = platform.system() == "Windows"
+    
+    if is_windows:
+        # On Windows, convert backslashes to forward slashes for Playwright
+        # Playwright expects forward slashes even on Windows
+        path_for_cmd = str(relative_path).replace('\\', '/')
+        cmd_str = f'npx playwright test {path_for_cmd} --reporter=line'
+        if req.headed:
+            cmd_str += ' --headed'
+        cmd = cmd_str
+        use_shell = True
+    else:
+        # On Unix, use list format
+        cmd = ["npx", "playwright", "test", str(relative_path), "--reporter=line"]
+        if req.headed:
+            cmd.append("--headed")
+        use_shell = False
+    
+    logger.info(f"[TrialRunExisting] Running existing test file: {relative_path}")
+    logger.info(f"[TrialRunExisting] Command: {cmd if isinstance(cmd, str) else ' '.join(cmd)}")
+    logger.info(f"[TrialRunExisting] CWD: {root}")
+    logger.info(f"[TrialRunExisting] Shell mode: {use_shell}")
+    
+    # Merge environment variables - credentials will be available via process.env
+    env = os.environ.copy()
+    env.update(env_overrides)
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=str(root),
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='replace',
+            timeout=300,
+            shell=use_shell
+        )
+        
+        # Safely concatenate strings, handling None values
+        stdout = result.stdout or ''
+        stderr = result.stderr or ''
+        logs = banner + stdout + stderr
+        success = result.returncode == 0
+        
+        logger.info(f"[TrialRunExisting] Exit code: {result.returncode}")
+        logger.info(f"[TrialRunExisting] Success: {success}")
+        
+        return TrialRunResponse(success=success, logs=logs, updateInfo=upd_info)
+    except subprocess.TimeoutExpired:
+        return TrialRunResponse(success=False, logs=banner + "Test execution timed out after 5 minutes", updateInfo=upd_info)
+    except Exception as exec_exc:
+        logger.error(f"[TrialRunExisting] Execution failed: {exec_exc}", exc_info=True)
+        return TrialRunResponse(success=False, logs=banner + f"Execution error: {exec_exc}", updateInfo=upd_info)
 
 
 class KeywordInspectRequest(BaseModel):
@@ -507,11 +582,11 @@ class KeywordInspectResponse(BaseModel):
 async def keyword_inspect(req: KeywordInspectRequest) -> KeywordInspectResponse:
     """Inspect a keyword against the framework repo and refined recorder/vector flows.
 
-    Resolution order:
-      1. Validate repo path (clone if remote) using existing resolve logic.
-      2. Use AgenticScriptAgent.find_existing_framework_assets to locate matching files.
-      3. Use AgenticScriptAgent.gather_context to obtain vector/refined steps.
-      4. Summarise results and return structured response.
+    Flow:
+      1. Create/clone framework repository locally under framework_repos/
+      2. Search for keyword in tests/*.spec.ts files (existing scripts)
+      3. Search for refined recorder flows in vector DB
+      4. Return both existing scripts and refined flows
     """
     try:
         from ...agentic_script_agent import AgenticScriptAgent, FrameworkProfile
@@ -519,7 +594,7 @@ async def keyword_inspect(req: KeywordInspectRequest) -> KeywordInspectResponse:
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=500, detail=f"Import failure: {exc}") from exc
 
-    # Pre-validate simple fields outside catch-all so 400s are preserved
+    # Validate inputs
     keyword = (req.keyword or "").strip()
     if not keyword:
         raise HTTPException(status_code=400, detail="Keyword is required")
@@ -527,34 +602,15 @@ async def keyword_inspect(req: KeywordInspectRequest) -> KeywordInspectResponse:
     if not repo_input:
         raise HTTPException(status_code=400, detail="repoPath is mandatory")
 
-    # Lightweight normalization similar to streamlit_app normalize_remote_repo_input
-    def _normalize_remote_repo_input(raw: str) -> tuple[str, str | None]:
-        cleaned = raw.replace("\\", "/").strip()
-        cleaned = cleaned.replace("https:/", "https://").replace("http:/", "http://")
-        branch_in_url = None
-        if cleaned.startswith("git@"):
-            return cleaned, branch_in_url
-        if "://" not in cleaned and cleaned.startswith("github.com"):
-            cleaned = f"https://{cleaned}"
-        if cleaned.startswith("http") and "/tree/" in cleaned:
-            base, remainder = cleaned.split("/tree/", 1)
-            branch_in_url = remainder.split("/", 1)[0]
-            cleaned = base
-        if cleaned.endswith("/"):
-            cleaned = cleaned[:-1]
-        if cleaned.startswith("http") and not cleaned.endswith(".git"):
-            cleaned = f"{cleaned}.git"
-        return cleaned, branch_in_url
-
-    # Catch-all to avoid leaking 500s; keep 400s by re-raising HTTPException
+    messages = []
+    
     try:
-        desired_branch = (req.branch or "").strip()
+        # Step 1: Resolve/create framework repository locally
+        # This will clone remote repos to framework_repos/<hash> or create default if nothing provided
         framework_root: Path
-        active_branch = desired_branch or ""
-
-        # Use shared resolver to normalize local path or clone remote URL consistently
         try:
             framework_root = resolve_framework_root(repo_input)
+            messages.append(f"Framework repository resolved: {framework_root}")
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except Exception as exc:
@@ -563,85 +619,196 @@ async def keyword_inspect(req: KeywordInspectRequest) -> KeywordInspectResponse:
         framework = FrameworkProfile.from_root(framework_root)
         agent = AgenticScriptAgent()
 
-        # Existing assets search
-        existing_assets_raw = []
+        # Step 2: Search for existing test files with keyword
+        existing_assets = []
+        
+        logger.info(f"[KeywordInspect] Framework root: {framework_root}")
+        logger.info(f"[KeywordInspect] Searching for keyword: '{keyword}'")
+        
+        # Search in multiple common test directories
+        search_dirs = [
+            framework_root / "tests",
+            framework_root / "test", 
+            framework_root / "e2e",
+            framework_root / "specs",
+            framework_root / "__tests__",
+            framework_root  # Fallback: search entire repo
+        ]
+        
+        # Also check if there's a specific tests directory from framework profile
         try:
-            existing_assets_raw = agent.find_existing_framework_assets(keyword, framework, top_k=req.maxAssets)
-        except Exception:
-            existing_assets_raw = []
+            framework = FrameworkProfile.from_root(framework_root)
+            if framework.tests_dir and (framework_root / framework.tests_dir).exists():
+                tests_from_profile = framework_root / framework.tests_dir
+                if tests_from_profile not in search_dirs:
+                    search_dirs.insert(0, tests_from_profile)
+                    logger.info(f"[KeywordInspect] Added tests dir from framework profile: {tests_from_profile}")
+        except Exception as e:
+            logger.warning(f"[KeywordInspect] Could not load framework profile: {e}")
+        
+        spec_files = []
+        searched_paths = []
+        
+        for search_dir in search_dirs:
+            if search_dir.exists():
+                logger.info(f"[KeywordInspect] Searching in: {search_dir}")
+                searched_paths.append(str(search_dir.relative_to(framework_root)) if search_dir != framework_root else ".")
+                
+                # Search for spec files
+                found_in_dir = list(search_dir.glob("**/*.spec.ts")) + list(search_dir.glob("**/*.test.ts"))
+                
+                # Avoid duplicates
+                for f in found_in_dir:
+                    if f not in spec_files:
+                        spec_files.append(f)
+                
+                logger.info(f"[KeywordInspect] Found {len(found_in_dir)} files in {search_dir.name}")
+        
+        messages.append(f"Searched in: {', '.join(searched_paths)}")
+        messages.append(f"Found {len(spec_files)} test files to search")
+        logger.info(f"[KeywordInspect] Total unique spec files found: {len(spec_files)}")
+        
+        if len(spec_files) > 0:
+            # Log all file paths found
+            for sf in spec_files:
+                logger.info(f"[KeywordInspect] File in list: {sf.relative_to(framework_root)}")
+            
+            for spec_file in spec_files:
+                logger.info(f"[KeywordInspect] ========================================")
+                logger.info(f"[KeywordInspect] Checking file: {spec_file.name}")
+                logger.info(f"[KeywordInspect] Full path: {spec_file}")
+                try:
+                    content = spec_file.read_text(encoding='utf-8')
+                    logger.info(f"[KeywordInspect] File size: {len(content)} chars, {len(content.split(chr(10)))} lines")
+                    
+                    # More flexible keyword matching:
+                    # 1. Match against filename
+                    # 2. Direct keyword match in content (case-insensitive)
+                    # 3. Keyword with spaces/underscores/hyphens normalized
+                    keyword_lower = keyword.lower()
+                    keyword_normalized = keyword_lower.replace(' ', '').replace('_', '').replace('-', '')
+                    
+                    # Check filename first
+                    filename_lower = spec_file.name.lower()
+                    filename_normalized = filename_lower.replace(' ', '').replace('_', '').replace('-', '').replace('.spec.ts', '').replace('.test.ts', '')
+                    
+                    content_lower = content.lower()
+                    content_normalized = content_lower.replace(' ', '').replace('_', '').replace('-', '')
+                    
+                    logger.info(f"[KeywordInspect] Keyword (original): '{keyword}'")
+                    logger.info(f"[KeywordInspect] Keyword (lower): '{keyword_lower}'")
+                    logger.info(f"[KeywordInspect] Keyword (normalized): '{keyword_normalized}'")
+                    logger.info(f"[KeywordInspect] Filename (normalized): '{filename_normalized}'")
+                    logger.info(f"[KeywordInspect] Content preview (first 200 chars): {content[:200]}")
+                    
+                    match_found = False
+                    match_type = None
+                    
+                    # Check filename match
+                    if keyword_lower in filename_lower or keyword_normalized in filename_normalized:
+                        match_found = True
+                        match_type = "filename"
+                        logger.info(f"[KeywordInspect] MATCH FOUND: Filename match")
+                    # Check content match
+                    elif keyword_lower in content_lower:
+                        match_found = True
+                        match_type = "direct"
+                        logger.info(f"[KeywordInspect] MATCH FOUND: Direct match")
+                    elif keyword_normalized in content_normalized:
+                        match_found = True
+                        match_type = "normalized"
+                        logger.info(f"[KeywordInspect] MATCH FOUND: Normalized match")
+                    else:
+                        logger.info(f"[KeywordInspect] NO MATCH: Keyword not found in filename or content")
+                    
+                    logger.info(f"[KeywordInspect] Match found: {match_found}, type: {match_type}")
+                    
+                    if match_found:
+                        # Extract a snippet around the keyword
+                        lines = content.split('\n')
+                        matching_lines = []
+                        
+                        # For filename matches, show the beginning of the file
+                        if match_type == "filename":
+                            # Show first 5 lines as snippet
+                            snippet = '\n'.join(lines[:5])
+                            matching_lines = [0]  # Mark as having at least 1 match
+                        else:
+                            # For content matches, find matching lines
+                            for i, line in enumerate(lines):
+                                line_lower = line.lower()
+                                line_normalized = line_lower.replace(' ', '').replace('_', '').replace('-', '')
+                                if keyword_lower in line_lower or keyword_normalized in line_normalized:
+                                    matching_lines.append(i)
+                            
+                            if matching_lines:
+                                # Get context around first match
+                                match_idx = matching_lines[0]
+                                start = max(0, match_idx - 2)
+                                end = min(len(lines), match_idx + 3)
+                                snippet = '\n'.join(lines[start:end])
+                            else:
+                                # Fallback: show first 5 lines
+                                snippet = '\n'.join(lines[:5])
+                                matching_lines = [0]
+                        
+                        logger.info(f"[KeywordInspect] Found keyword in {len(matching_lines)} lines (match type: {match_type})")
+                        logger.info(f"[KeywordInspect] Found keyword in {len(matching_lines)} lines (match type: {match_type})")
+                        
+                        if matching_lines or match_type == "filename":
+                            relative_path = str(spec_file.relative_to(framework_root)).replace('\\', '/')
+                            existing_assets.append(ExistingAsset(
+                                path=relative_path,
+                                snippet=snippet[:500],  # Increased snippet length
+                                isTest=True,
+                                relevance=len(matching_lines) if matching_lines else 1
+                            ))
+                            msg = f"Found keyword in {relative_path} ({len(matching_lines)} occurrences, match type: {match_type})"
+                            messages.append(msg)
+                            logger.info(f"[KeywordInspect] {msg}")
+                except Exception as e:
+                    error_msg = f"Error reading {spec_file.name}: {str(e)}"
+                    messages.append(error_msg)
+                    logger.error(f"[KeywordInspect] {error_msg}")
+        else:
+            msg = f"No .spec.ts or .test.ts files found in repository"
+            messages.append(msg)
+            logger.warning(f"[KeywordInspect] {msg}")
 
-        existing_assets: list[ExistingAsset] = []
-        for asset in existing_assets_raw:
-            path_obj = asset.get("path")
-            if not path_obj:
-                continue
-            try:
-                content = path_obj.read_text(encoding="utf-8", errors="ignore")
-            except Exception:
-                content = ""
-            snippet = "\n".join(content.splitlines()[:40])
-            try:
-                rel_path = str(path_obj.relative_to(framework.root)).replace("\\", "/")
-            except Exception:
-                # Fallback if the file isn't strictly under root (defensive)
-                rel_path = str(path_obj).replace("\\", "/")
-            is_test = rel_path.lower().startswith("tests/") or rel_path.lower().endswith(".spec.ts")
-            relevance = (asset.get("metadata") or {}).get("relevance_score")
-            existing_assets.append(ExistingAsset(path=rel_path, snippet=snippet, isTest=is_test, relevance=relevance))
-
-        # Gather context (vector/refined steps) but avoid failing the whole endpoint
+        # Step 3: Search for refined recorder flows in vector DB
+        vector_context = VectorContext(flowAvailable=False, vectorStepsCount=0)
+        refined_flow = None
+        
         try:
             context = agent.gather_context(keyword)
-        except Exception:
-            context = {"vector_steps": [], "flow_available": False}
+            vector_steps = context.get("vector_steps", [])
+            
+            if vector_steps:
+                vector_context.flowAvailable = True
+                vector_context.vectorStepsCount = len(vector_steps)
+                
+                refined_flow = RefinedRecorderFlow(
+                    sourceSession=context.get("session_id"),
+                    steps=vector_steps[:20],  # Limit to first 20 steps
+                    stabilityWarnings=[]
+                )
+                messages.append(f"Found refined recorder flow with {len(vector_steps)} steps")
+            else:
+                messages.append("No refined recorder flow found in vector DB")
+        except Exception as e:
+            messages.append(f"Error gathering vector context: {str(e)}")
 
-        vector_steps = context.get("vector_steps") or []
-        flow_available = bool(context.get("flow_available"))
-
-        refined_flow_steps = []
-        if vector_steps:
-            for step in vector_steps:
-                refined_flow_steps.append({
-                    "step": step.get("step"),
-                    "action": step.get("action"),
-                    "navigation": step.get("navigation"),
-                    "data": step.get("data"),
-                    "expected": step.get("expected"),
-                })
-
-        refined_flow = None
-        stability_warnings: list[str] = []
-        for s in refined_flow_steps:
-            if not s.get("action") and not s.get("navigation"):
-                stability_warnings.append(f"Step {s.get('step')} missing action/navigation")
-
-        if refined_flow_steps:
-            flow_info = context.get("vector_flow") or {}
-            source_session = flow_info.get("flow_name") if isinstance(flow_info, dict) else None
-            refined_flow = RefinedRecorderFlow(sourceSession=source_session, steps=refined_flow_steps, stabilityWarnings=stability_warnings)
-
-        status: str
-        messages: list[str] = []
-        if existing_assets and refined_flow:
-            status = "found-existing"
-            messages.append("Existing framework assets and refined recorder flow found")
-        elif existing_assets:
-            status = "found-existing"
-            messages.append("Existing framework assets found")
-        elif refined_flow:
-            status = "found-refined-only"
-            messages.append("Refined recorder/vector flow found")
-        else:
-            status = "none"
-            messages.append("No information available in repo or refined flows")
+        # Sort existing assets by relevance (most matches first)
+        existing_assets.sort(key=lambda x: x.relevance or 0, reverse=True)
+        existing_assets = existing_assets[:req.maxAssets]
 
         return KeywordInspectResponse(
             keyword=keyword,
             existingAssets=existing_assets,
             refinedRecorderFlow=refined_flow,
-            vectorContext=VectorContext(flowAvailable=flow_available, vectorStepsCount=len(vector_steps)),
-            status=status,
-            messages=messages,
+            vectorContext=vector_context,
+            status="success",
+            messages=messages
         )
     except HTTPException:
         # Preserve intended HTTP status for validation/git errors
@@ -676,20 +843,25 @@ async def trial_run_stream(req: TrialRunRequest) -> StreamingResponse:
 
     async def gen() -> AsyncGenerator[bytes, None]:
         try:
+            logger.info(f"[TrialRunStream] Starting trial run stream - headed={req.headed}, frameworkRoot={req.frameworkRoot}")
             yield _format_sse({"phase": "start"})
             tmp_path = None
             cwd = None
             cmd = None
             # If a frameworkRoot is specified, write inside its detected testDir so Playwright config applies.
             if req.frameworkRoot:
+                logger.info(f"[TrialRunStream] Using frameworkRoot: {req.frameworkRoot}")
                 try:
                     # Resolve local path or remote git URL consistently
                     root = _resolve_root(req.frameworkRoot)
+                    logger.info(f"[TrialRunStream] Resolved root: {root}")
                 except Exception as exc:
+                    logger.error(f"[TrialRunStream] Failed to resolve frameworkRoot: {exc}")
                     yield _format_sse({"phase": "error", "error": f"Unable to resolve frameworkRoot: {exc}"})
                     return
                 # Optional testmanager update prior to run
                 if req.updateTestManager and (req.scenario or "").strip():
+                    logger.info(f"[TrialRunStream] Updating testmanager for scenario: {req.scenario}")
                     try:
                         from ...services.config_service import update_test_manager_entry as _upd
                         upd = _upd(
@@ -702,23 +874,52 @@ async def trial_run_stream(req: TrialRunRequest) -> StreamingResponse:
                             id_name=(req.idName or None),
                         )
                         if upd:
+                            logger.info(f"[TrialRunStream] TestManager updated: {upd}")
                             yield _format_sse({"phase": "update", "update": upd})
-                    except Exception:
+                    except Exception as e:
+                        logger.warning(f"[TrialRunStream] TestManager update failed: {e}")
                         pass
                 test_dir = _detect_test_dir(root)
                 test_dir.mkdir(parents=True, exist_ok=True)
+                logger.info(f"[TrialRunStream] Test directory: {test_dir}")
+                
+                # Adapt spec content for trial run (replace credentials, add waits)
+                from ...trial_spec_adapter import adapt_spec_content_for_trial
+                adapted_content, was_adapted = adapt_spec_content_for_trial(req.testFileContent, root)
+                if was_adapted:
+                    logger.info(f"[TrialRunStream] Spec content adapted for trial run")
+                    content = adapted_content
+                else:
+                    logger.info(f"[TrialRunStream] No adaptation needed, using original content")
+                    content = req.testFileContent
+                
                 # Unskip for trial stream as well
-                content, replaced = _unskip_tests_for_trial(req.testFileContent)
+                content, replaced = _unskip_tests_for_trial(content)
+                logger.info(f"[TrialRunStream] Content length: {len(content)}, unskipped: {replaced}")
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".spec.ts", dir=str(test_dir)) as tmp:
                     tmp.write(content.encode("utf-8"))
                     tmp_path = tmp.name
+                logger.info(f"[TrialRunStream] Created temp file: {tmp_path}")
                 # Use path relative to framework root to avoid Windows path regex pitfalls
                 try:
                     rel = _P(tmp_path).relative_to(root).as_posix()
                 except ValueError:
                     rel = tmp_path.replace('\\', '/')
+                logger.info(f"[TrialRunStream] Relative path: {rel}")
+                
+                # Load trial credentials and set as environment variables for the subprocess
+                trial_env = os.environ.copy()
+                env_overrides = trial_env_overrides(root)
+                if env_overrides:
+                    trial_env.update(env_overrides)
+                    logger.info(f"[TrialRunStream] Added trial environment overrides: {list(env_overrides.keys())}")
+                    print(f"[TrialRunStream] Trial credentials loaded from trial_run_config.json")
+                    print(f"[TrialRunStream] Environment variables set: {', '.join(env_overrides.keys())}")
+                
                 cmd, cwd = _resolve_playwright_command(rel, req.headed, project_root=root)
-                yield _format_sse({"phase": "prepared", "headed": req.headed, "cmd": cmd, "cwd": cwd, "unskipped": replaced})
+                logger.info(f"[TrialRunStream] Command: {' '.join(cmd)}, CWD: {cwd}, Headed: {req.headed}")
+                yield _format_sse({"phase": "prepared", "headed": req.headed, "cmd": ' '.join(cmd), "cwd": cwd, "unskipped": replaced})
+                logger.info(f"[TrialRunStream] Starting subprocess with headed={req.headed}")
                 proc = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
@@ -727,15 +928,31 @@ async def trial_run_stream(req: TrialRunRequest) -> StreamingResponse:
                     encoding="utf-8",
                     errors="replace",
                     cwd=str(root),
+                    env=trial_env,  # Pass environment with trial credentials
                 )
+                logger.info(f"[TrialRunStream] Subprocess PID: {proc.pid}")
             else:
+                logger.info("[TrialRunStream] No frameworkRoot - using system temp")
+                
+                # Load trial credentials even without frameworkRoot
+                from pathlib import Path as _PathLib
+                project_root = _PathLib(__file__).resolve().parents[3]
+                trial_env = os.environ.copy()
+                env_overrides = trial_env_overrides(project_root)
+                if env_overrides:
+                    trial_env.update(env_overrides)
+                    logger.info(f"[TrialRunStream] Added trial environment overrides: {list(env_overrides.keys())}")
+                
                 # Write temp spec file in system temp; rely on global PW config
                 content, replaced = _unskip_tests_for_trial(req.testFileContent)
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".spec.ts") as tmp:
                     tmp.write(content.encode("utf-8"))
                     tmp_path = tmp.name
+                logger.info(f"[TrialRunStream] Created temp file: {tmp_path}")
                 cmd, cwd = _resolve_playwright_command(tmp_path, req.headed)
-                yield _format_sse({"phase": "prepared", "headed": req.headed, "cmd": cmd, "cwd": cwd, "unskipped": replaced})
+                logger.info(f"[TrialRunStream] Command: {' '.join(cmd)}, CWD: {cwd}, Headed: {req.headed}")
+                yield _format_sse({"phase": "prepared", "headed": req.headed, "cmd": ' '.join(cmd), "cwd": cwd, "unskipped": replaced})
+                logger.info(f"[TrialRunStream] Starting subprocess with headed={req.headed}")
                 proc = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
@@ -744,9 +961,12 @@ async def trial_run_stream(req: TrialRunRequest) -> StreamingResponse:
                     encoding="utf-8",
                     errors="replace",
                     cwd=cwd,
+                    env=trial_env,  # Pass environment with trial credentials
                 )
+                logger.info(f"[TrialRunStream] Subprocess PID: {proc.pid}")
 
             yield _format_sse({"phase": "running"})
+            logger.info("[TrialRunStream] Reading subprocess output...")
             assert proc.stdout is not None
             while True:
                 line = await asyncio.get_event_loop().run_in_executor(None, proc.stdout.readline)
@@ -755,14 +975,68 @@ async def trial_run_stream(req: TrialRunRequest) -> StreamingResponse:
                 yield _format_sse({"phase": "chunk", "data": line.rstrip()})
             ret = proc.wait()
             success = ret == 0
+            logger.info(f"[TrialRunStream] Process finished with return code: {ret}, success: {success}")
             yield _format_sse({"phase": "done", "success": success})
         except Exception as exc:
+            logger.error(f"[TrialRunStream] Error: {exc}", exc_info=True)
             yield _format_sse({"phase": "error", "error": str(exc)})
         finally:  # cleanup
             try:
                 if 'tmp_path' in locals() and tmp_path and os.path.exists(tmp_path):
+                    logger.info(f"[TrialRunStream] Cleaning up temp file: {tmp_path}")
                     os.unlink(tmp_path)
-            except OSError:
+            except OSError as e:
+                logger.warning(f"[TrialRunStream] Failed to cleanup temp file: {e}")
                 pass
 
     return StreamingResponse(gen(), media_type="text/event-stream")
+
+
+@router.get("/read-file")
+async def read_file_from_repo(filePath: str, frameworkRoot: str | None = None):
+    """Read the full content of a file from the framework repository.
+    
+    Args:
+        filePath: Relative path to the file within the framework repository
+        frameworkRoot: Optional framework root path/URL
+        
+    Returns:
+        JSON with file content
+    """
+    try:
+        # Resolve framework root
+        root = resolve_framework_root(frameworkRoot) if frameworkRoot else resolve_framework_root()
+        
+        # Resolve target file path
+        target = (root / filePath).resolve()
+        
+        # Security check: ensure path doesn't escape framework root
+        root_resolved = root.resolve()
+        if root_resolved not in target.parents and target != root_resolved:
+            raise HTTPException(status_code=400, detail="File path escapes framework root")
+        
+        # Check if file exists
+        if not target.exists():
+            raise HTTPException(status_code=404, detail=f"File not found: {filePath}")
+        
+        if target.is_dir():
+            raise HTTPException(status_code=400, detail="Path points to a directory, not a file")
+        
+        # Read file content
+        try:
+            content = target.read_text(encoding="utf-8", errors="replace")
+        except Exception as read_error:
+            raise HTTPException(status_code=500, detail=f"Failed to read file: {read_error}")
+        
+        return {
+            "path": filePath,
+            "content": content,
+            "size": len(content),
+            "lines": content.count('\n') + 1
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error(f"Error reading file {filePath}: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal error: {exc}")
