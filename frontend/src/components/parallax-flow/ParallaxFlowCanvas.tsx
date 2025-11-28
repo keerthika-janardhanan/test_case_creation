@@ -17,6 +17,9 @@ import {
   Workflow,
   Database,
   CheckCircle,
+  RefreshCw,
+  FileCheck,
+  PlayCircle,
 } from 'lucide-react';
 
 interface ParallaxFlowCanvasProps {
@@ -25,9 +28,9 @@ interface ParallaxFlowCanvasProps {
 
 // Layout constants
 const HORIZONTAL_SPACING = 400;
-const VERTICAL_SPACING = 350;
-const START_X = 200;
-const START_Y = 300;
+const START_X = 300;
+const START_Y = 400; // Center Y position for horizontal line
+const LAYER_PARALLAX_FACTOR = [0.3, 0.6, 1.0]; // Parallax speed for each layer
 
 export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAction }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,7 +38,9 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   const [nodes, setNodes] = useState<Map<string, FlowNodeData>>(new Map());
   const [connections, setConnections] = useState<ConnectionData[]>([]);
   const [activePopup, setActivePopup] = useState<PopupData | null>(null);
-  const [canvasWidth, setCanvasWidth] = useState(3000);
+  const [canvasWidth, setCanvasWidth] = useState(4000);
+  const [mainCharacterNodeId, setMainCharacterNodeId] = useState<string | null>(null);
+  const [flowData, setFlowData] = useState<any>({});
 
   // Initialize with Esan start node
   useEffect(() => {
@@ -53,16 +58,21 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       description: 'Test Automation Studio',
       status: 'revealed',
       position: { x: START_X, y: START_Y },
+      layer: 1,
       color: 'blue',
       icon: <Lightbulb size={64} />,
+      flowType: 'neutral',
       onAction: () => handleEsanClick(),
     });
 
     setNodes(initialNodes);
+    setMainCharacterNodeId('esan');
   };
 
   const handleEsanClick = () => {
-    // Show progress animation (simulated)
+    setMainCharacterNodeId('esan');
+    
+    // Show progress animation
     updateNodeStatus('esan', 'processing', 0);
 
     // Simulate progress
@@ -74,8 +84,9 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       if (progress >= 100) {
         clearInterval(interval);
         updateNodeStatus('esan', 'completed');
-        // Reveal Recorder and Execute choice nodes
-        revealChoiceNodes();
+        setTimeout(() => {
+          revealChoiceNodes();
+        }, 300);
       }
     }, 100);
   };
@@ -90,24 +101,28 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       label: 'Recorder',
       description: 'Record user flow',
       status: 'revealed',
-      position: { x: START_X + HORIZONTAL_SPACING, y: START_Y - VERTICAL_SPACING / 2 },
+      position: { x: START_X + HORIZONTAL_SPACING, y: START_Y },
+      layer: 1,
       color: 'cyan',
-      icon: <Video size={48} />,
+      icon: <Video size={56} />,
       parentId: 'esan',
+      flowType: 'recorder',
       onAction: () => handleRecorderClick(),
     });
 
-    // Execute node (right branch)
+    // Execute node (right branch) - placeholder for now
     newNodes.set('execute', {
       id: 'execute',
       type: 'choice',
       label: 'Execute',
       description: 'Run test suites',
       status: 'revealed',
-      position: { x: START_X + HORIZONTAL_SPACING, y: START_Y + VERTICAL_SPACING / 2 },
+      position: { x: START_X + HORIZONTAL_SPACING, y: START_Y },
+      layer: 1,
       color: 'purple',
-      icon: <Play size={48} fill="currentColor" />,
+      icon: <Play size={56} fill="currentColor" />,
       parentId: 'esan',
+      flowType: 'execute',
       onAction: () => handleExecuteClick(),
     });
 
@@ -121,6 +136,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         toNodeId: 'recorder',
         direction: 'left',
         status: 'active',
+        flowType: 'recorder',
       },
       {
         id: 'esan-execute',
@@ -128,6 +144,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         toNodeId: 'execute',
         direction: 'right',
         status: 'active',
+        flowType: 'execute',
       },
     ];
 
@@ -135,7 +152,12 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
     expandCanvas();
   };
 
+  // ==================== RECORDER FLOW ====================
+
   const handleRecorderClick = () => {
+    setMainCharacterNodeId('recorder');
+    scrollToNode('recorder');
+    
     // Show popup for recorder input
     setActivePopup({
       nodeId: 'recorder',
@@ -169,15 +191,28 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   };
 
   const handleRecorderSubmit = async (values: any) => {
+    setActivePopup(null);
+    
+    // Store flow data
+    setFlowData((prev: any) => ({ ...prev, recorder: values }));
+    
     // Mark recorder as processing
     updateNodeStatus('recorder', 'processing', 0);
 
-    // TODO: Call backend API to start recorder
-    // For now, simulate the flow
-    setTimeout(() => {
-      updateNodeStatus('recorder', 'completed');
-      revealRefineRecorderNode();
-    }, 2000);
+    // Simulate recording process
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+      updateNodeStatus('recorder', 'processing', progress);
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        updateNodeStatus('recorder', 'completed');
+        setTimeout(() => {
+          revealRefineRecorderNode();
+        }, 300);
+      }
+    }, 200);
   };
 
   const revealRefineRecorderNode = () => {
@@ -187,17 +222,21 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       id: 'refine-recorder',
       type: 'process',
       label: 'Refine Recorder',
-      description: 'Processing flow...',
+      description: 'Ingesting to vector DB...',
       status: 'processing',
       progress: 0,
-      position: { x: START_X + HORIZONTAL_SPACING * 2, y: START_Y - VERTICAL_SPACING / 2 },
+      position: { x: START_X + HORIZONTAL_SPACING * 2, y: START_Y },
+      layer: 1,
       color: 'blue',
-      icon: <Settings size={48} />,
+      icon: <RefreshCw size={56} />,
       parentId: 'recorder',
+      flowType: 'recorder',
     });
 
     setNodes(newNodes);
-    addConnection('recorder', 'refine-recorder', 'left');
+    addConnection('recorder', 'refine-recorder', 'left', 'recorder');
+    setMainCharacterNodeId('refine-recorder');
+    scrollToNode('refine-recorder');
 
     // Simulate ingestion progress
     simulateProgress('refine-recorder', () => {
@@ -219,11 +258,13 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 3,
-        y: START_Y - VERTICAL_SPACING,
+        y: START_Y,
       },
+      layer: 1,
       color: 'green',
-      icon: <FileText size={48} />,
+      icon: <FileText size={56} />,
       parentId: 'refine-recorder',
+      flowType: 'recorder',
       onAction: () => handleManualClick(),
     });
 
@@ -238,20 +279,27 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         x: START_X + HORIZONTAL_SPACING * 3,
         y: START_Y,
       },
+      layer: 1,
       color: 'amber',
-      icon: <Code2 size={48} />,
+      icon: <Code2 size={56} />,
       parentId: 'refine-recorder',
+      flowType: 'recorder',
       onAction: () => handleAutomationClick(),
     });
 
     setNodes(newNodes);
-    addConnection('refine-recorder', 'manual', 'left');
-    addConnection('refine-recorder', 'automation', 'left');
+    addConnection('refine-recorder', 'manual', 'left', 'recorder');
+    addConnection('refine-recorder', 'automation', 'left', 'recorder');
     
     expandCanvas();
   };
 
+  // ===== MANUAL BRANCH =====
+
   const handleManualClick = () => {
+    setMainCharacterNodeId('manual');
+    scrollToNode('manual');
+    
     setActivePopup({
       nodeId: 'manual',
       title: 'Upload Test Template',
@@ -270,6 +318,9 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   };
 
   const handleManualSubmit = async (values: any) => {
+    setActivePopup(null);
+    setFlowData((prev: any) => ({ ...prev, manual: values }));
+    
     updateNodeStatus('manual', 'completed');
 
     // Add Test Processing node
@@ -283,15 +334,19 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       progress: 0,
       position: {
         x: START_X + HORIZONTAL_SPACING * 4,
-        y: START_Y - VERTICAL_SPACING,
+        y: START_Y,
       },
+      layer: 1,
       color: 'green',
-      icon: <Database size={48} />,
+      icon: <Database size={56} />,
       parentId: 'manual',
+      flowType: 'recorder',
     });
 
     setNodes(newNodes);
-    addConnection('manual', 'test-processing', 'left');
+    addConnection('manual', 'test-processing', 'left', 'recorder');
+    setMainCharacterNodeId('test-processing');
+    scrollToNode('test-processing');
 
     simulateProgress('test-processing', () => {
       revealExportTestResult();
@@ -311,26 +366,36 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 5,
-        y: START_Y - VERTICAL_SPACING,
+        y: START_Y,
       },
+      layer: 1,
       color: 'green',
-      icon: <Download size={48} />,
+      icon: <Download size={56} />,
       parentId: 'test-processing',
+      flowType: 'recorder',
       onAction: () => handleDownloadTest(),
     });
 
     setNodes(newNodes);
-    addConnection('test-processing', 'export-test', 'left');
+    addConnection('test-processing', 'export-test', 'left', 'recorder');
+    setMainCharacterNodeId('export-test');
+    scrollToNode('export-test');
     
     expandCanvas();
   };
 
   const handleDownloadTest = () => {
     updateNodeStatus('export-test', 'completed');
-    alert('Test results downloaded!');
+    alert('Test results downloaded! (Manual flow complete)');
+    setMainCharacterNodeId('export-test');
   };
 
+  // ===== AUTOMATION BRANCH =====
+
   const handleAutomationClick = () => {
+    setMainCharacterNodeId('automation');
+    scrollToNode('automation');
+    
     setActivePopup({
       nodeId: 'automation',
       title: 'Repository Details',
@@ -344,7 +409,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         },
         {
           name: 'branch',
-          label: 'Branch',
+          label: 'Branch (optional)',
           type: 'text',
           placeholder: 'main',
           required: false,
@@ -356,6 +421,9 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   };
 
   const handleAutomationSubmit = async (values: any) => {
+    setActivePopup(null);
+    setFlowData((prev: any) => ({ ...prev, automation: values }));
+    
     updateNodeStatus('automation', 'processing', 0);
 
     // Simulate cloning
@@ -372,26 +440,33 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       id: 'refine-steps',
       type: 'action',
       label: 'Refine Steps',
-      description: 'Review and edit',
+      description: 'Review and edit flow',
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 4,
         y: START_Y,
       },
+      layer: 1,
       color: 'amber',
-      icon: <Settings size={48} />,
+      icon: <FileCheck size={56} />,
       parentId: 'automation',
+      flowType: 'recorder',
       onAction: () => handleRefineStepsClick(),
     });
 
     setNodes(newNodes);
-    addConnection('automation', 'refine-steps', 'left');
+    addConnection('automation', 'refine-steps', 'left', 'recorder');
+    setMainCharacterNodeId('refine-steps');
+    scrollToNode('refine-steps');
     
     expandCanvas();
   };
 
   const handleRefineStepsClick = () => {
-    // Show editable steps (for now, just complete it)
+    setMainCharacterNodeId('refine-steps');
+    scrollToNode('refine-steps');
+    
+    // For now, just auto-complete
     updateNodeStatus('refine-steps', 'processing', 0);
     
     simulateProgress('refine-steps', () => {
@@ -413,21 +488,28 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         x: START_X + HORIZONTAL_SPACING * 5,
         y: START_Y,
       },
+      layer: 1,
       color: 'amber',
-      icon: <Code2 size={48} />,
+      icon: <Code2 size={56} />,
       parentId: 'refine-steps',
+      flowType: 'recorder',
       onAction: () => handleReviewScriptClick(),
     });
 
     setNodes(newNodes);
-    addConnection('refine-steps', 'review-script', 'left');
+    addConnection('refine-steps', 'review-script', 'left', 'recorder');
+    setMainCharacterNodeId('review-script');
+    scrollToNode('review-script');
     
     expandCanvas();
   };
 
   const handleReviewScriptClick = () => {
+    setMainCharacterNodeId('review-script');
     updateNodeStatus('review-script', 'completed');
-    revealTestExecutionDetails();
+    setTimeout(() => {
+      revealTestExecutionDetails();
+    }, 500);
   };
 
   const revealTestExecutionDetails = () => {
@@ -436,26 +518,33 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
     newNodes.set('test-execution', {
       id: 'test-execution',
       type: 'action',
-      label: 'Test Execution',
-      description: 'Configure and run',
+      label: 'Test Execution Details',
+      description: 'Configure test run',
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 6,
         y: START_Y,
       },
+      layer: 1,
       color: 'amber',
-      icon: <Upload size={48} />,
+      icon: <Upload size={56} />,
       parentId: 'review-script',
+      flowType: 'recorder',
       onAction: () => handleTestExecutionClick(),
     });
 
     setNodes(newNodes);
-    addConnection('review-script', 'test-execution', 'left');
+    addConnection('review-script', 'test-execution', 'left', 'recorder');
+    setMainCharacterNodeId('test-execution');
+    scrollToNode('test-execution');
     
     expandCanvas();
   };
 
   const handleTestExecutionClick = () => {
+    setMainCharacterNodeId('test-execution');
+    scrollToNode('test-execution');
+    
     setActivePopup({
       nodeId: 'test-execution',
       title: 'Test Execution Details',
@@ -481,6 +570,9 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   };
 
   const handleTestExecutionSubmit = async (values: any) => {
+    setActivePopup(null);
+    setFlowData((prev: any) => ({ ...prev, testExecution: values }));
+    
     updateNodeStatus('test-execution', 'processing', 0);
 
     simulateProgress('test-execution', () => {
@@ -503,13 +595,17 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         x: START_X + HORIZONTAL_SPACING * 7,
         y: START_Y,
       },
+      layer: 1,
       color: 'amber',
-      icon: <Workflow size={48} />,
+      icon: <PlayCircle size={56} />,
       parentId: 'test-execution',
+      flowType: 'recorder',
     });
 
     setNodes(newNodes);
-    addConnection('test-execution', 'trial-run', 'left');
+    addConnection('test-execution', 'trial-run', 'left', 'recorder');
+    setMainCharacterNodeId('trial-run');
+    scrollToNode('trial-run');
 
     simulateProgress('trial-run', () => {
       revealCompletionOptions();
@@ -530,11 +626,13 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 8,
-        y: START_Y - VERTICAL_SPACING / 3,
+        y: START_Y,
       },
+      layer: 1,
       color: 'rose',
-      icon: <GitBranch size={48} />,
+      icon: <GitBranch size={56} />,
       parentId: 'trial-run',
+      flowType: 'recorder',
       onAction: () => handlePushToGit(),
     });
 
@@ -547,22 +645,27 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       status: 'revealed',
       position: {
         x: START_X + HORIZONTAL_SPACING * 8,
-        y: START_Y + VERTICAL_SPACING / 3,
+        y: START_Y,
       },
+      layer: 1,
       color: 'green',
-      icon: <Download size={48} />,
+      icon: <Download size={56} />,
       parentId: 'trial-run',
+      flowType: 'recorder',
       onAction: () => handleDownloadReport(),
     });
 
     setNodes(newNodes);
-    addConnection('trial-run', 'push-git', 'left');
-    addConnection('trial-run', 'test-report', 'left');
+    addConnection('trial-run', 'push-git', 'left', 'recorder');
+    addConnection('trial-run', 'test-report', 'left', 'recorder');
     
     expandCanvas();
   };
 
   const handlePushToGit = () => {
+    setMainCharacterNodeId('push-git');
+    scrollToNode('push-git');
+    
     setActivePopup({
       nodeId: 'push-git',
       title: 'Push to Git',
@@ -588,130 +691,45 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
   };
 
   const handlePushToGitSubmit = async (values: any) => {
+    setActivePopup(null);
     updateNodeStatus('push-git', 'processing', 0);
     
     simulateProgress('push-git', () => {
       updateNodeStatus('push-git', 'completed');
-      alert('Successfully pushed to Git!');
+      alert('Successfully pushed to Git! (Recorder flow complete)');
     });
   };
 
   const handleDownloadReport = () => {
+    setMainCharacterNodeId('test-report');
+    scrollToNode('test-report');
     updateNodeStatus('test-report', 'completed');
-    alert('Test report downloaded!');
+    alert('Test report downloaded! (Recorder flow complete)');
   };
+
+  // ==================== EXECUTE FLOW (Placeholder) ====================
 
   const handleExecuteClick = () => {
-    // Show Execute flow options
-    const newNodes = new Map(nodes);
+    setMainCharacterNodeId('execute');
+    scrollToNode('execute');
+    alert('Execute flow - Coming soon! (Will be implemented next)');
+  };
 
-    // Manual Test Case Generation
-    newNodes.set('execute-manual', {
-      id: 'execute-manual',
-      type: 'action',
-      label: 'Manual Test Case',
-      description: 'Generate from flow',
-      status: 'revealed',
-      position: {
-        x: START_X + HORIZONTAL_SPACING * 2,
-        y: START_Y + VERTICAL_SPACING / 2 - VERTICAL_SPACING / 3,
-      },
-      color: 'green',
-      icon: <FileText size={48} />,
-      parentId: 'execute',
-      onAction: () => handleExecuteManualClick(),
-    });
+  // ==================== UTILITY FUNCTIONS ====================
 
-    // Automation Script Generation
-    newNodes.set('execute-automation', {
-      id: 'execute-automation',
-      type: 'action',
-      label: 'Automation Script',
-      description: 'Generate from flow',
-      status: 'revealed',
-      position: {
-        x: START_X + HORIZONTAL_SPACING * 2,
-        y: START_Y + VERTICAL_SPACING / 2 + VERTICAL_SPACING / 3,
-      },
-      color: 'purple',
-      icon: <Code2 size={48} />,
-      parentId: 'execute',
-      onAction: () => handleExecuteAutomationClick(),
-    });
+  const scrollToNode = (nodeId: string) => {
+    const node = nodes.get(nodeId);
+    if (!node || !containerRef.current) return;
 
-    setNodes(newNodes);
-    addConnection('execute', 'execute-manual', 'right');
-    addConnection('execute', 'execute-automation', 'right');
-    updateNodeStatus('execute', 'completed');
+    // Calculate target scroll position to center the node
+    const targetX = node.position.x - (containerRef.current.clientWidth / 2) + (NODE_DIMENSIONS.width / 2);
     
-    expandCanvas();
-  };
-
-  const handleExecuteManualClick = () => {
-    setActivePopup({
-      nodeId: 'execute-manual',
-      title: 'Select Flow for Manual Tests',
-      fields: [
-        {
-          name: 'flow',
-          label: 'Existing Flow',
-          type: 'select',
-          options: [
-            { value: 'flow1', label: 'Login Flow' },
-            { value: 'flow2', label: 'Checkout Flow' },
-            { value: 'flow3', label: 'Search Flow' },
-          ],
-          required: true,
-        },
-        {
-          name: 'template',
-          label: 'XLSX Template',
-          type: 'file',
-          placeholder: 'Choose template',
-          required: true,
-        },
-      ],
-      onSubmit: (values) => handleExecuteManualSubmit(values),
-      onCancel: () => setActivePopup(null),
+    containerRef.current.scrollTo({
+      left: Math.max(0, targetX),
+      behavior: 'smooth',
     });
   };
 
-  const handleExecuteManualSubmit = async (values: any) => {
-    updateNodeStatus('execute-manual', 'completed');
-    // Continue with similar flow as manual branch
-    // For brevity, showing simplified version
-    alert('Execute Manual flow would continue...');
-  };
-
-  const handleExecuteAutomationClick = () => {
-    setActivePopup({
-      nodeId: 'execute-automation',
-      title: 'Repository Details',
-      fields: [
-        {
-          name: 'repoUrl',
-          label: 'Repository URL',
-          type: 'text',
-          placeholder: 'https://github.com/user/repo',
-          required: true,
-        },
-      ],
-      onSubmit: (values) => handleExecuteAutomationSubmit(values),
-      onCancel: () => setActivePopup(null),
-    });
-  };
-
-  const handleExecuteAutomationSubmit = async (values: any) => {
-    updateNodeStatus('execute-automation', 'processing', 0);
-    
-    simulateProgress('execute-automation', () => {
-      updateNodeStatus('execute-automation', 'completed');
-      // Continue with workflow selection
-      alert('Execute Automation flow would continue...');
-    });
-  };
-
-  // Utility functions
   const updateNodeStatus = (nodeId: string, status: FlowNodeData['status'], progress?: number) => {
     setNodes((prev) => {
       const newNodes = new Map(prev);
@@ -727,7 +745,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
     });
   };
 
-  const addConnection = (fromId: string, toId: string, direction: 'left' | 'right') => {
+  const addConnection = (fromId: string, toId: string, direction: 'left' | 'right', flowType: 'recorder' | 'execute' | 'neutral') => {
     setConnections((prev) => [
       ...prev,
       {
@@ -736,6 +754,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         toNodeId: toId,
         direction,
         status: 'active',
+        flowType,
       },
     ]);
   };
@@ -763,7 +782,7 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         maxX = nodeRight;
       }
     });
-    setCanvasWidth(Math.max(maxX + 500, 3000));
+    setCanvasWidth(Math.max(maxX + 600, 4000));
   };
 
   // Parallax scroll handler
@@ -778,32 +797,44 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
       <div
         className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/20 to-slate-950/20"
         style={{
-          transform: `translateX(${-scrollX * 0.1}px)`,
+          transform: `translateX(${-scrollX * 0.2}px)`,
+          transition: 'transform 0.1s ease-out',
         }}
       />
 
-      {/* Floating particles */}
+      {/* Floating particles - Background layer */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `translateX(${-scrollX * (0.05 + Math.random() * 0.1)}px)`,
-            }}
-            animate={{
-              opacity: [0.2, 0.6, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        {[...Array(80)].map((_, i) => {
+          const layer = i % 3;
+          return (
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                left: `${(i * 13) % 100}%`,
+                top: `${(i * 17) % 100}%`,
+                width: `${2 + layer}px`,
+                height: `${2 + layer}px`,
+                background: layer === 2 
+                  ? 'radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%)',
+                transform: `translateX(${-scrollX * LAYER_PARALLAX_FACTOR[layer]}px)`,
+                filter: 'blur(1px)',
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.3, 0.7, 0.3],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 5 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: 'easeInOut',
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Scrollable Canvas */}
@@ -823,8 +854,13 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
             minHeight: '100vh',
           }}
         >
-          {/* Connections Layer */}
-          <div className="absolute inset-0 pointer-events-none">
+          {/* Connections Layer - moves with middle layer parallax */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              transform: `translateX(${-scrollX * 0.3}px)`,
+            }}
+          >
             {connections.map((connection) => {
               const fromNode = nodes.get(connection.fromNodeId);
               const toNode = nodes.get(connection.toNodeId);
@@ -839,14 +875,29 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
                   toPos={toNode.position}
                   nodeWidth={NODE_DIMENSIONS.width}
                   nodeHeight={NODE_DIMENSIONS.height}
+                  scrollX={scrollX}
                 />
               );
             })}
           </div>
 
-          {/* Nodes Layer */}
+          {/* Nodes Layer - full speed parallax */}
           {Array.from(nodes.values()).map((node) => (
-            <FlowNode key={node.id} node={node} onClick={node.onAction} />
+            <div
+              key={node.id}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                transform: `translateX(${-scrollX * (1 - LAYER_PARALLAX_FACTOR[node.layer])}px)`,
+              }}
+            >
+              <FlowNode 
+                node={node} 
+                onClick={node.onAction}
+                isMainCharacter={mainCharacterNodeId === node.id}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -859,9 +910,22 @@ export const ParallaxFlowCanvas: React.FC<ParallaxFlowCanvasProps> = ({ onNodeAc
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-white text-sm"
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-white text-sm z-50"
       >
-        Click on nodes to progress through the workflow
+        🎯 Click on nodes to progress • Scroll to explore the flow
+      </motion.div>
+
+      {/* Flow Status */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.5 }}
+        className="fixed top-8 left-8 px-6 py-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl text-white text-sm z-50"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+          <span className="font-semibold">Recorder Flow Active</span>
+        </div>
       </motion.div>
     </div>
   );

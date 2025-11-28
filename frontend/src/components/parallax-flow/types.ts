@@ -12,10 +12,12 @@ export interface FlowNodeData {
   icon?: React.ReactNode;
   color?: string;
   position: { x: number; y: number };
+  layer: number; // 0-2, for parallax depth (0=background, 2=foreground)
   parentId?: string;
   children?: string[];
   onAction?: () => void | Promise<void>;
   metadata?: Record<string, any>;
+  flowType?: 'recorder' | 'execute' | 'neutral'; // For connection direction
 }
 
 export interface ConnectionData {
@@ -24,6 +26,7 @@ export interface ConnectionData {
   toNodeId: string;
   direction: 'left' | 'right'; // Flow direction for animation
   status: 'inactive' | 'active' | 'completed';
+  flowType: 'recorder' | 'execute' | 'neutral';
 }
 
 export interface PopupData {
